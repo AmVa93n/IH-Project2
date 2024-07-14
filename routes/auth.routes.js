@@ -153,4 +153,10 @@ router.get("/logout", isLoggedIn, (req, res) => {
   });
 });
 
+// GET /profile
+router.get("/profile", isLoggedIn, (req, res) => {
+  let user = req.session.currentUser
+  res.render("auth/profile", {user});
+});
+
 module.exports = router;
