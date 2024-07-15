@@ -1,24 +1,57 @@
-<div id="form">
-  <h2>Sign Up</h2>
-  <form action="/auth/signup" method="POST">
+{{#if errorMessage}}
+<div class="alert alert-danger d-flex align-items-center" role="alert">
+  <svg xmlns="http://www.w3.org/2000/svg" class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2" viewBox="0 0 16 16" role="img" aria-label="Warning:" style="width: 1em">
+    <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+  </svg>
+  <div>
+    {{errorMessage}}
+  </div>
+</div>
+{{/if}}
 
-    <label> Username
-      <input type="text" name="username" placeholder="Your username" />
-    </label>
+<div style="width:fit-content;margin:auto">
+  <h2 class="center">Create an account</h2>
+  <form action="/auth/signup" method="POST" enctype="multipart/form-data">
 
-    <label> Email
-      <input type="email" name="email" placeholder="Your email" />
-    </label>
+    <div class="form-group mb-3">
+      <label for="username"> Username</label>
+      <input type="text" name="username" id="username" placeholder="Your username" class="form-control">
+    </div>
 
-    <label> Password
-      <input type="password" name="password" placeholder="Your password" />
-    </label>
+    <div class="form-group mb-3">
+      <label for="email"> Email address</label>
+      <input type="email" name="email" id="email" placeholder="Your email" class="form-control">
+      <small class="form-text text-muted">We'll never share your email with anyone else.</small>
+    </div>
 
-    <button type="submit">Sign Up</button>
+    <div class="form-group mb-3">
+      <label for="password"> Password</label>
+      <input type="password" name="password" id="password" placeholder="Your password" class="form-control">
+      <small class="form-text text-muted">* Must be at least 8 characters long.</small><br>
+      <small class="form-text text-muted">* Must contain at least one number, one lowercase and one uppercase letter.</small>
+    </div>
 
-
-    {{#if errorMessage}}
-      <p class="error">{{errorMessage}}</p>
-    {{/if}}
+    <div class="form-group mb-3">
+      <label for="profile-pic" class="form-label">Choose profile picture</label>
+      <div style="width: 200px; height: 200px;" class="mb-3 mx-auto">
+        <img src="/images/Profile-PNG-File.png" class="img-fluid" id="profile-pic-preview" style="object-fit: cover">
+      </div>
+      <input class="form-control" type="file" name="profilepic" id="profile-pic" onchange="previewImage(event)">
+    </div>
+    
+    <div class="d-flex justify-content-center">
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
   </form>
 </div>
+
+<script>
+  function previewImage(event) {
+    const reader = new FileReader();
+    reader.onload = function(){
+      const preview = document.getElementById('profile-pic-preview');
+      preview.src = reader.result;
+    }
+    reader.readAsDataURL(event.target.files[0]);
+  }
+</script>
