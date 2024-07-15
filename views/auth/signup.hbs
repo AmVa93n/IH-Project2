@@ -9,32 +9,57 @@
 </div>
 {{/if}}
 
-<div style="width:fit-content;margin:auto">
+<div class="content-box">
   <h2 class="center">Create an account</h2>
   <form action="/auth/signup" method="POST" enctype="multipart/form-data">
 
-    <div class="form-group mb-3">
-      <label for="username"> Username</label>
-      <input type="text" name="username" id="username" placeholder="Your username" class="form-control">
+    <div class="form-floating mb-3">
+      <input type="text" name="username" id="username" placeholder="Your username" class="form-control" autocomplete="username">
+      <label for="username">Username</label>
     </div>
 
-    <div class="form-group mb-3">
-      <label for="email"> Email address</label>
+    <div class="form-floating mb-3">
       <input type="email" name="email" id="email" placeholder="Your email" class="form-control">
+      <label for="email">Email address</label>
       <small class="form-text text-muted">We'll never share your email with anyone else.</small>
     </div>
 
-    <div class="form-group mb-3">
-      <label for="password"> Password</label>
-      <input type="password" name="password" id="password" placeholder="Your password" class="form-control">
+    <div class="form-floating mb-3">
+      <input type="password" name="password" id="password" placeholder="Your password" class="form-control" autocomplete="current-password">
+      <label for="password">Password</label>
       <small class="form-text text-muted">* Must be at least 8 characters long.</small><br>
       <small class="form-text text-muted">* Must contain at least one number, one lowercase and one uppercase letter.</small>
     </div>
 
+    <fieldset class="row mb-3">
+      <legend class="col-form-label col-sm-3 pt-0">Gender</legend>
+      <div class="col-sm-9">
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="gender" id="male", value="male">
+          <label class="form-check-label" for="male">Male</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="gender" id="female", value="female">
+          <label class="form-check-label" for="female">Female</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="gender" id="other", value="other">
+          <label class="form-check-label" for="other">Other</label>
+        </div>
+      </div>
+    </fieldset>
+    
+    <div class="row mb-3">
+      <label for="birthdate" class="col-sm-3 col-form-label">Birth Date</label>
+      <div class="col-sm-9">
+        <input type="date" id="birthdate" name="birthdate" class="form-control">
+      </div>
+    </div>
+
     <div class="form-group mb-3">
-      <label for="profile-pic" class="form-label">Choose profile picture</label>
-      <div style="width: 200px; height: 200px;" class="mb-3 mx-auto">
-        <img src="/images/Profile-PNG-File.png" class="img-fluid" id="profile-pic-preview" style="object-fit: cover">
+      <label for="profile-pic" class="form-label">Profile Picture</label>
+      <div class="mb-3 mx-auto circle-crop">
+        <img src="/images/Profile-PNG-File.png" class="img-fluid" id="profile-pic-preview" style="width:100%; height:100%; object-fit:cover">
       </div>
       <input class="form-control" type="file" name="profilepic" id="profile-pic" onchange="previewImage(event)">
     </div>

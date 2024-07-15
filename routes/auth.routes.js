@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const formatDate = require("../utils/date");
 
 // ℹ️ Handles password encryption
 const bcrypt = require("bcrypt");
@@ -18,6 +19,7 @@ const isLoggedIn = require("../middleware/isLoggedIn");
 // ℹ️ Handles file upload via forms
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 
 // Set storage engine for multer
 const storage = multer.diskStorage({
@@ -43,8 +45,9 @@ router.get("/signup", isLoggedOut, (req, res) => {
 // POST /auth/signup
 router.post("/signup", upload.single('profilepic'), isLoggedOut, (req, res) => {
   console.log(req)
-  const { username, email, password } = req.body;
-  const profilePic = req.file ? req.file.path : null;
+  const { username, email, password, gender, birthdate } = req.body;
+  const formattedDate = formatDate(new Date(birthdate))
+  const profilePic = req.file ? req.file.filename : null;
 
   // Check that username, email, and password are provided
   if (username === "" || email === "" || password === "") {
@@ -82,7 +85,7 @@ router.post("/signup", upload.single('profilepic'), isLoggedOut, (req, res) => {
     .then((salt) => bcrypt.hash(password, salt))
     .then((hashedPassword) => {
       // Create a user and save it in the database
-      return User.create({ username, email, password: hashedPassword, profilePic });
+      return User.create({ username, email, password: hashedPassword, gender, birthdate: formattedDate, profilePic });
     })
     .then((user) => {
       res.redirect("/auth/login");
@@ -108,34 +111,26 @@ router.get("/login", isLoggedOut, (req, res) => {
 
 // POST /auth/login
 router.post("/login", isLoggedOut, (req, res, next) => {
-  const { username, email, password } = req.body;
+  const { username, password } = req.body;
 
   // Check that username, email, and password are provided
-  if (username === "" || email === "" || password === "") {
+  if (username === "" || password === "") {
     res.status(400).render("auth/login", {
       errorMessage:
-        "All fields are mandatory. Please provide username, email and password.",
+        "All fields are mandatory. Please provide username and password.",
     });
 
     return;
   }
 
-  // Here we use the same logic as above
-  // - either length based parameters or we check the strength of a password
-  if (password.length < 6) {
-    return res.status(400).render("auth/login", {
-      errorMessage: "Your password needs to be at least 6 characters long.",
-    });
-  }
-
   // Search the database for a user with the email submitted in the form
-  User.findOne({ email })
+  User.findOne({ username })
     .then((user) => {
       // If the user isn't found, send an error message that user provided wrong credentials
       if (!user) {
         res
           .status(400)
-          .render("auth/login", { errorMessage: "Wrong credentials." });
+          .render("auth/login", { errorMessage: "User not found. Please try again." });
         return;
       }
 
@@ -146,7 +141,7 @@ router.post("/login", isLoggedOut, (req, res, next) => {
           if (!isSamePassword) {
             res
               .status(400)
-              .render("auth/login", { errorMessage: "Wrong credentials." });
+              .render("auth/login", { errorMessage: "Password is incorrect. Please try again." });
             return;
           }
 
@@ -178,6 +173,23 @@ router.get("/logout", isLoggedIn, (req, res) => {
 router.get("/profile", isLoggedIn, (req, res) => {
   let user = req.session.currentUser
   res.render("auth/profile", {user});
+});
+
+// GET /profile/delete
+router.get("/profile/delete", isLoggedIn, (req, res) => {
+  const user = req.session.currentUser
+  const username = user.username
+  User.findOneAndDelete({ username })
+    .then(() => {
+      const profilePicPath = path.join(__dirname, '../public/uploads', user.profilePic);
+      fs.unlinkSync(profilePicPath)
+      req.session.destroy(() => {
+        res.redirect("/");
+      })
+    })
+    .catch((err) => {
+      res.status(500).render("auth/profile", { errorMessage: "An error occurred while deleting your account." });
+    });
 });
 
 module.exports = router;
