@@ -27,7 +27,7 @@ const storage = multer.diskStorage({
     cb(null, './public/uploads'); // Directory where uploaded files will be stored
   },
   filename: function (req, file, cb) {
-    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname)); // File naming convention
+    cb(null, 'pfp-' + Date.now() + path.extname(file.originalname)); // File naming convention
   }
 });
 
@@ -44,7 +44,6 @@ router.get("/signup", isLoggedOut, (req, res) => {
 
 // POST /auth/signup
 router.post("/signup", upload.single('profilepic'), isLoggedOut, (req, res) => {
-  console.log(req)
   const { username, email, password, gender, birthdate } = req.body;
   const formattedDate = formatDate(new Date(birthdate))
   const profilePic = req.file ? req.file.filename : null;
@@ -190,6 +189,83 @@ router.get("/profile/delete", isLoggedIn, (req, res) => {
     .catch((err) => {
       res.status(500).render("auth/profile", { errorMessage: "An error occurred while deleting your account." });
     });
+});
+
+// POST route to handle edit username
+router.post('/profile/edit/username', isLoggedIn, async (req, res) => {
+  const { username } = req.body;
+  const userId = req.session.currentUser._id;
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(userId, { username }, { new: true });
+    req.session.currentUser = updatedUser; // Update current user in session
+    res.redirect('/auth/profile'); // Redirect to profile page
+  } catch (err) {
+    res.status(500).render('auth/profile', { errorMessage: 'Failed to update username. Please try again.' });
+  }
+});
+
+// POST route to handle edit email
+router.post('/profile/edit/email', isLoggedIn, async (req, res) => {
+  const { email } = req.body;
+  const userId = req.session.currentUser._id;
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(userId, { email }, { new: true });
+    req.session.currentUser = updatedUser; // Update current user in session
+    res.redirect('/auth/profile'); // Redirect to profile page
+  } catch (err) {
+    res.status(500).render('auth/profile', { errorMessage: 'Failed to update email. Please try again.' });
+  }
+});
+
+// POST route to handle edit gender
+router.post('/profile/edit/gender', isLoggedIn, async (req, res) => {
+  const { gender } = req.body;
+  const userId = req.session.currentUser._id;
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(userId, { gender }, { new: true });
+    req.session.currentUser = updatedUser; // Update current user in session
+    res.redirect('/auth/profile'); // Redirect to profile page
+  } catch (err) {
+    res.status(500).render('auth/profile', { errorMessage: 'Failed to update gender. Please try again.' });
+  }
+});
+
+// POST route to handle edit birthdate
+router.post('/profile/edit/birthdate', isLoggedIn, async (req, res) => {
+  const { birthdate } = req.body;
+  const formattedDate = formatDate(new Date(birthdate))
+  const userId = req.session.currentUser._id;
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(userId, { birthdate: formattedDate }, { new: true });
+    req.session.currentUser = updatedUser; // Update current user in session
+    res.redirect('/auth/profile'); // Redirect to profile page
+  } catch (err) {
+    res.status(500).render('auth/profile', { errorMessage: 'Failed to update birthdate. Please try again.' });
+  }
+});
+
+// POST route to handle edit profile picture
+router.post('/profile/edit/pfp', upload.single('edit-pfp'), isLoggedIn, async (req, res) => {
+  console.log(req)
+  const profilePic = req.file ? req.file.filename : null;
+  const user = req.session.currentUser
+  const userId = req.session.currentUser._id;
+
+  try {
+    if (user.profilePic) { // delete old profile picture from file system, if it exists
+      const oldPfpPath = path.join(__dirname, '../public/uploads', user.profilePic);
+      fs.unlinkSync(oldPfpPath)
+    } 
+    const updatedUser = await User.findByIdAndUpdate(userId, { profilePic }, { new: true });
+    req.session.currentUser = updatedUser; // Update current user in session
+    res.redirect('/auth/profile'); // Redirect to profile page
+  } catch (err) {
+    res.status(500).render('auth/profile', { errorMessage: 'Failed to update profile picture. Please try again.' });
+  }
 });
 
 module.exports = router;

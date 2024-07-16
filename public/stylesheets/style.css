@@ -1,6 +1,5 @@
 body {
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
-  background-color: rgb(91, 151, 255);
 }
 
 .center {
@@ -24,4 +23,24 @@ body {
   width: fit-content;
   padding: 15px;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.mini-btn {
+  padding: 0 3px;
+  font-size: 11px;
+  width: fit-content;
+  height: fit-content;
+}
+
+.circle-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.no-arrow::after {
+  display: none;
 }

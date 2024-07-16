@@ -1,38 +1,147 @@
 {{#if errorMessage}}
-  <div class="alert alert-danger d-flex align-items-center" role="alert">
-    <svg xmlns="http://www.w3.org/2000/svg" class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2" viewBox="0 0 16 16" role="img" aria-label="Warning:" style="width: 1em">
-      <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-    </svg>
-    <div>
-      {{errorMessage}}
-    </div>
+  <div class="alert alert-danger d-flex align-items-center justify-content-center" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    {{errorMessage}}
   </div>
 {{/if}}
 
-<div class="content-box">
-    <h2 class="center">Welcome to your profile</h2>
+<div class="content-box" style="width: 35%; position:relative">
+    <h2 class="mb-3 center">Welcome to your profile</h2>
     <div class="mb-3 mx-auto circle-crop">
-        <img src="/uploads/{{user.profilePic}}">
+        {{#if user.profilePic}}
+        <img id="profile-pic-preview" src="/uploads/{{user.profilePic}}">
+        {{else}}
+        <img id="profile-pic-preview" src="/images/Profile-PNG-File.png">
+        {{/if}}
     </div>
-    <div class="row">
-        <p class="col fw-bold">Username</p>
-        <p class="col">{{user.username}}</p>
+    <button id="edit-pfp-btn" class="btn btn-secondary btn-sm circle-btn" style="position: absolute;top:230;right:200">
+        <i class="bi bi-pencil-square"></i>
+    </button>
+    <div id="save-cancel-pfp" class="d-flex justify-content-center mt-3" style="visibility: hidden;">
+      <form action="/auth/profile/edit/pfp" method="POST" enctype="multipart/form-data">
+        <input type="file" id="edit-pfp" name="edit-pfp" style="display: none;" onchange="previewImage(event)" />
+        <button type="submit" class="btn btn-secondary btn-sm mini-btn mb-3">Save</button>
+        <button type="button" class="btn btn-secondary btn-sm mini-btn mb-3" onclick="cancel(`pfp`)">Cancel</button>
+      </form>
     </div>
-    <div class="row">
-        <p class="col fw-bold">Email</p>
-        <p class="col">{{user.email}}</p>
+
+    <div class="row fs-6 mb-2">
+        <p class="col-4 fw-bold">Username</p>
+        <div class="col" id="username">
+          <span>{{user.username}}</span>
+          <button class="btn btn-secondary btn-sm mini-btn" onclick="edit(`username`)">Edit</button>
+        </div>
     </div>
-    <div class="row">
-        <p class="col fw-bold">Gender</p>
-        <p class="col">{{user.gender}}</p>
+    <div class="row fs-6 mb-2">
+        <p class="col-4 fw-bold">Email</p>
+        <div class="col" id="email">
+          <span>{{user.email}}</span>
+          <button class="btn btn-secondary btn-sm mini-btn" onclick="edit(`email`)">Edit</button>
+        </div>
     </div>
-    <div class="row">
-        <p class="col fw-bold">Birthdate</p>
-        <p class="col">{{user.birthdate}}</p>
+    <div class="row fs-6 mb-2">
+        <p class="col-4 fw-bold">Gender</p>
+        <div class="col" id="gender">
+          <span>{{user.gender}}</span>
+          <button class="btn btn-secondary btn-sm mini-btn" onclick="edit(`gender`)">Edit</button>
+        </div>
     </div>
+    <div class="row fs-6 mb-2">
+        <p class="col-4 fw-bold">Birthdate</p>
+        <div class="col" id="birthdate">
+          <span>{{user.birthdate}}</span>
+          <button class="btn btn-secondary btn-sm mini-btn" onclick="edit(`birthdate`)">Edit</button>
+        </div>
+    </div>
+
     <form action="/auth/profile/delete" method="GET">
-        <div class="d-flex justify-content-center">
+        <div class="d-flex justify-content-center mt-3">
         <button type="submit" class="btn btn-danger">Delete Account</button>
         </div>
     </form>
 </div>
+
+<script>
+  document.getElementById('edit-pfp-btn').addEventListener('click', function() {
+      document.getElementById('edit-pfp').click();
+  });
+
+  function previewImage(event) {
+    const reader = new FileReader();
+    reader.onload = function(){
+      const preview = document.getElementById('profile-pic-preview');
+      preview.src = reader.result;
+    }
+    reader.readAsDataURL(event.target.files[0]);
+    document.getElementById('save-cancel-pfp').style.visibility = "visible"
+  }
+
+  function edit(field) {
+    if (field == 'pfp') {
+      document.getElementById('save-cancel-pfp').style.visibility = "hidden"
+      return
+    }
+
+    const field_el = document.getElementById(field)
+
+    if (field == 'gender') {
+      let male = '{{user.gender}}' == 'male' ? 'checked' : ""
+      let female = '{{user.gender}}' == 'female' ? 'checked' : ""
+      let other = '{{user.gender}}' == 'other' ? 'checked' : ""
+      field_el.innerHTML = `
+        <form action="/auth/profile/edit/gender" method="POST" class="d-flex align-items-center">
+          <div class="form-check">
+          <input class="form-check-input" type="radio" name="gender" id="male", value="male" ${male}>
+          <label class="form-check-label me-2" for="male">Male</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="gender" id="female", value="female" ${female}>
+            <label class="form-check-label me-2" for="female">Female</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="gender" id="other", value="other" ${other}>
+            <label class="form-check-label me-2" for="other">Other</label>
+          </div>
+          <button type="submit" class="btn btn-secondary btn-sm me-2 mini-btn">Save</button>
+          <button type="button" class="btn btn-secondary btn-sm mini-btn" onclick="cancel('gender')">Cancel</button>
+        </form>`
+        return
+    }
+
+    if (field == 'birthdate') {
+      field_el.innerHTML = `
+        <form action="/auth/profile/edit/birthdate" method="POST" class="d-flex align-items-center">
+          <input type="date" id="birthdate" name="birthdate" class="form-control me-2">
+          <button type="submit" class="btn btn-secondary btn-sm me-2 mini-btn">Save</button>
+          <button type="button" class="btn btn-secondary btn-sm mini-btn" onclick="cancel('birthdate')">Cancel</button>
+        </form>`
+        return
+    }
+
+    let fieldValue = field == 'username' ? `{{ user.username }}` 
+      : field =='email' ? `{{ user.email }}` : ""
+    field_el.innerHTML = `
+    <form action="/auth/profile/edit/${field}" method="POST" class="d-flex align-items-center">
+      <input type="text" name="${field}" value="${fieldValue}" class="form-control me-2 mb-2">
+      <button type="submit" class="btn btn-secondary btn-sm me-2 mini-btn">Save</button>
+      <button type="button" class="btn btn-secondary btn-sm mini-btn" onclick="cancel('${field}')">Cancel</button>
+    </form>`
+  }
+
+  function cancel(field) {
+    if (field == 'pfp') {
+      document.getElementById('profile-pic-preview').src = "/uploads/{{user.profilePic}}"
+      document.getElementById('save-cancel-pfp').style.visibility = "hidden"
+      return
+    }
+
+    const field_el = document.getElementById(field)
+    let fieldValue = field == 'username' ? `{{ user.username }}` 
+      : field =='email' ? `{{ user.email }}`
+      : field =='gender' ? `{{ user.gender }}`
+      : field =='birthdate' ? `{{ user.birthdate }}` : ""
+    field_el.innerHTML = `
+      <span>${fieldValue}</span>
+      <button class="btn btn-secondary btn-sm mini-btn" onclick="edit('${field}')">Edit</button>`
+  }
+</script>
