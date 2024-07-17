@@ -25,6 +25,14 @@ body {
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
+.user-card {
+  background-color: rgba(250, 250, 250, 0.8);
+  border-radius: 20px;
+  width: 255px;
+  padding: 20px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
 .mini-btn {
   padding: 0 3px;
   font-size: 11px;

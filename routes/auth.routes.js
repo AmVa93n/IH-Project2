@@ -322,4 +322,17 @@ router.post('/profile/edit/pfp', upload.single('edit-pfp'), isLoggedIn, async (r
   }
 });
 
+// GET route matches
+router.get("/matches", isLoggedIn, async (req, res) => {
+  const user = req.session.currentUser
+  const user_speak = user.lang_speak
+  const user_learn = user.lang_learn
+  const matches = await User.find({lang_speak: { $in: user_learn }, lang_learn: { $in: user_speak }})
+  for (let match of matches) { // filter irrelevant languages
+    match.lang_speak = match.lang_speak.filter(lang => user_learn.includes(lang))
+    match.lang_learn = match.lang_learn.filter(lang => user_speak.includes(lang))
+  }
+  res.render("auth/matches", {user, matches});
+});
+
 module.exports = router;

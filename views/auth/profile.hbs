@@ -66,8 +66,10 @@
         <div class="col">
           <div id="lang_speak">
             {{#each user.lang_speak}}
-              <img src="/images/{{this}}.svg" class="lang-flag">
-              <span class="lang-name me-1">{{this}}</span>
+              <div class="me-1">
+                <img src="/images/{{this}}.svg" class="lang-flag">
+                <span class="lang-name">{{this}}</span>
+              </div>
             {{/each}}
             <button class="btn btn-secondary btn-sm mini-btn" onclick="editLang('lang_speak')">Edit</button>
           </div>
@@ -80,8 +82,10 @@
         <div class="col">
           <div id="lang_learn">
             {{#each user.lang_learn}}
-              <img src="/images/{{this}}.svg" class="lang-flag">
-              <span class="lang-name me-1">{{this}}</span>
+              <div class="me-1">
+                <img src="/images/{{this}}.svg" class="lang-flag">
+                <span class="lang-name">{{this}}</span>
+              </div>
             {{/each}}
             <button class="btn btn-secondary btn-sm mini-btn" onclick="editLang('lang_learn')">Edit</button>
           </div>
