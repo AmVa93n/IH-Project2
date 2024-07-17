@@ -21,7 +21,7 @@ body {
   border-radius: 20px;
   margin: 10px auto;
   width: fit-content;
-  padding: 15px;
+  padding: 20px;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
@@ -43,4 +43,8 @@ body {
 
 .no-arrow::after {
   display: none;
+}
+
+.lang-flag {
+  width: 20px;
 }

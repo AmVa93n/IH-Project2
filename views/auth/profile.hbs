@@ -53,6 +53,41 @@
           <button class="btn btn-secondary btn-sm mini-btn" onclick="edit(`birthdate`)">Edit</button>
         </div>
     </div>
+    <div class="row fs-6 mb-4">
+        <p class="col-4 fw-bold">Country</p>
+        <div class="col" id="country">
+          <span>{{user.country}}</span>
+          <button class="btn btn-secondary btn-sm mini-btn" onclick="edit(`country`)">Edit</button>
+        </div>
+    </div>
+
+    <div class="row fs-6 mb-2">
+        <p class="col-4 fw-bold">I can speak</p>
+        <div class="col">
+          <div id="lang_speak">
+            {{#each user.lang_speak}}
+              <img src="/images/{{this}}.svg" class="lang-flag">
+              <span class="lang-name me-1">{{this}}</span>
+            {{/each}}
+            <button class="btn btn-secondary btn-sm mini-btn" onclick="editLang('lang_speak')">Edit</button>
+          </div>
+          <form action="/auth/profile/edit/lang_speak" method="POST" id="lang_speak-edit"></form>
+        </div>
+    </div>
+
+    <div class="row fs-6 mb-2">
+        <p class="col-4 fw-bold">I want to learn</p>
+        <div class="col">
+          <div id="lang_learn">
+            {{#each user.lang_learn}}
+              <img src="/images/{{this}}.svg" class="lang-flag">
+              <span class="lang-name me-1">{{this}}</span>
+            {{/each}}
+            <button class="btn btn-secondary btn-sm mini-btn" onclick="editLang('lang_learn')">Edit</button>
+          </div>
+          <form action="/auth/profile/edit/lang_learn" method="POST" id="lang_learn-edit"></form>
+        </div>
+    </div>
 
     <form action="/auth/profile/delete" method="GET">
         <div class="d-flex justify-content-center mt-3">
@@ -65,6 +100,50 @@
   document.getElementById('edit-pfp-btn').addEventListener('click', function() {
       document.getElementById('edit-pfp').click();
   });
+
+  // populate languages
+    const speakList = [...document.querySelectorAll('#lang_speak .lang-name')];
+    for (lang of speakList) {
+      lang.innerText = getLanguageName(lang.innerText)
+    }
+
+    const learnList = [...document.querySelectorAll('#lang_learn .lang-name')];
+    for (lang of learnList) {
+      lang.innerText = getLanguageName(lang.innerText)
+    }
+
+  function editLang(list) {
+    const languages = Object.keys(langList).sort((a,b) => {
+            if (langList[b] < langList[a]) return 1
+            if (langList[a] < langList[b]) return -1
+            if (langList[a] == langList[b]) return 0
+          })
+    let currentList_el = list == "lang_speak" ? speakList : learnList
+    let inverseList_el = list == "lang_speak" ? learnList : speakList
+    let currentList = currentList_el.map(el => el.innerText)
+    let inverseList = inverseList_el.map(el => el.innerText)
+    const list_edit = document.getElementById(list+"-edit");
+    document.getElementById(list).style.display = "none"
+    for (lang of languages) {
+      let langName = getLanguageName(lang)
+      let attr = currentList.includes(langName) ? "checked" : inverseList.includes(langName) ? "disabled" : ""
+      list_edit.innerHTML += `
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="${list}" value="${lang}" id="speak-${lang}" ${attr}>
+          <label class="form-check-label" for="speak-${lang}"><img src="/images/${lang}.svg" class="lang-flag"> ${langName}</label>
+        </div>`
+    }
+    list_edit.innerHTML += `
+      <button type="submit" class="btn btn-secondary btn-sm me-2 mini-btn">Save</button>
+      <button type="button" class="btn btn-secondary btn-sm mini-btn" onclick="cancelLang('${list}')">Cancel</button>
+      `
+  }
+
+  function cancelLang(list) {
+    document.getElementById(list).style.display = "block"
+    const editChildren = [...document.querySelectorAll(`#${list}-edit *`)]
+    editChildren.forEach(el => el.remove())
+  }
 
   function previewImage(event) {
     const reader = new FileReader();
@@ -117,6 +196,17 @@
         </form>`
         return
     }
+ 
+    if (field == 'country') {
+      field_el.innerHTML = `
+        <form action="/auth/profile/edit/country" method="POST" class="d-flex align-items-center">
+          <select class="form-select me-2" id="countrySelect" name="country"></select>
+          <button type="submit" class="btn btn-secondary btn-sm me-2 mini-btn">Save</button>
+          <button type="button" class="btn btn-secondary btn-sm mini-btn" onclick="cancel('country')">Cancel</button>
+        </form>`
+        populateCountries()
+        return
+    }
 
     let fieldValue = field == 'username' ? `{{ user.username }}` 
       : field =='email' ? `{{ user.email }}` : ""
@@ -139,9 +229,33 @@
     let fieldValue = field == 'username' ? `{{ user.username }}` 
       : field =='email' ? `{{ user.email }}`
       : field =='gender' ? `{{ user.gender }}`
-      : field =='birthdate' ? `{{ user.birthdate }}` : ""
+      : field =='birthdate' ? `{{ user.birthdate }}` 
+      : field =='country' ? `{{ user.country }}` 
+      : ""
     field_el.innerHTML = `
       <span>${fieldValue}</span>
       <button class="btn btn-secondary btn-sm mini-btn" onclick="edit('${field}')">Edit</button>`
+  }
+
+  async function populateCountries() {
+    const countrySelect = document.getElementById('countrySelect');
+      // Fetch list of countries
+      try {
+          const response = await fetch('https://restcountries.com/v3.1/all');
+          const countries = await response.json();
+          countries.sort((a,b) => {
+            if (b.name.common < a.name.common) return 1
+            if (a.name.common < b.name.common) return -1
+            if (a.name.common == b.name.common) return 0
+          })
+
+          // Populate the country select element
+          countries.forEach(country => {
+              countrySelect.innerHTML += `
+              <option value="${country.name.common}">${country.name.common}</option>`
+          });
+      } catch (error) {
+          console.error('Error fetching countries:', error);
+      }
   }
 </script>

@@ -44,17 +44,26 @@ router.get("/signup", isLoggedOut, (req, res) => {
 
 // POST /auth/signup
 router.post("/signup", upload.single('profilepic'), isLoggedOut, (req, res) => {
-  const { username, email, password, gender, birthdate } = req.body;
-  const formattedDate = formatDate(new Date(birthdate))
+  console.log(req.body)
+  const { username, email, password, gender, birthdate, country, lang_speak, lang_learn, private} = req.body;
+  const formattedDate = birthdate ? formatDate(new Date(birthdate)) : null
   const profilePic = req.file ? req.file.filename : null;
+  const isPrivateProfile = !!private
 
   // Check that username, email, and password are provided
-  if (username === "" || email === "" || password === "") {
+  if ([username,email,password].some(field => field === "")) {
     res.status(400).render("auth/signup", {
       errorMessage:
-        "All fields are mandatory. Please provide your username, email and password.",
+        "Some mandatory fields are missing. Please provide your username, email and password.",
     });
+    return;
+  }
 
+  if (!lang_learn || lang_learn.length === 0) {
+    res.status(400).render("auth/signup", {
+      errorMessage:
+        "Please choose at least one language you'd like to learn",
+    });
     return;
   }
 
@@ -84,7 +93,8 @@ router.post("/signup", upload.single('profilepic'), isLoggedOut, (req, res) => {
     .then((salt) => bcrypt.hash(password, salt))
     .then((hashedPassword) => {
       // Create a user and save it in the database
-      return User.create({ username, email, password: hashedPassword, gender, birthdate: formattedDate, profilePic });
+      return User.create({ username, email, password: hashedPassword, gender, birthdate: formattedDate, country, 
+        profilePic, lang_speak, lang_learn, private: isPrivateProfile });
     })
     .then((user) => {
       res.redirect("/auth/login");
@@ -180,8 +190,10 @@ router.get("/profile/delete", isLoggedIn, (req, res) => {
   const username = user.username
   User.findOneAndDelete({ username })
     .then(() => {
-      const profilePicPath = path.join(__dirname, '../public/uploads', user.profilePic);
-      fs.unlinkSync(profilePicPath)
+      if (user.profilePic) { // delete profile picture from file system, if it exists
+        const profilePicPath = path.join(__dirname, '../public/uploads', user.profilePic);
+        fs.unlinkSync(profilePicPath)
+      }
       req.session.destroy(() => {
         res.redirect("/");
       })
@@ -248,9 +260,51 @@ router.post('/profile/edit/birthdate', isLoggedIn, async (req, res) => {
   }
 });
 
+// POST route to handle edit country
+router.post('/profile/edit/country', isLoggedIn, async (req, res) => {
+  const { country } = req.body;
+  const userId = req.session.currentUser._id;
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(userId, { country }, { new: true });
+    req.session.currentUser = updatedUser; // Update current user in session
+    res.redirect('/auth/profile'); // Redirect to profile page
+  } catch (err) {
+    res.status(500).render('auth/profile', { errorMessage: 'Failed to update country. Please try again.' });
+  }
+});
+
+// POST route to handle edit language user speaks
+router.post('/profile/edit/lang_speak', isLoggedIn, async (req, res) => {
+  let { lang_speak } = req.body;
+  if (!lang_speak) lang_speak = []
+  const userId = req.session.currentUser._id;
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(userId, { lang_speak }, { new: true });
+    req.session.currentUser = updatedUser; // Update current user in session
+    res.redirect('/auth/profile'); // Redirect to profile page
+  } catch (err) {
+    res.status(500).render('auth/profile', { errorMessage: 'Failed to update languages. Please try again.' });
+  }
+});
+
+// POST route to handle edit language user wants to learn
+router.post('/profile/edit/lang_learn', isLoggedIn, async (req, res) => {
+  let { lang_learn } = req.body;
+  const userId = req.session.currentUser._id;
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(userId, { lang_learn }, { new: true });
+    req.session.currentUser = updatedUser; // Update current user in session
+    res.redirect('/auth/profile'); // Redirect to profile page
+  } catch (err) {
+    res.status(500).render('auth/profile', { errorMessage: 'Failed to update languages. Please try again.' });
+  }
+});
+
 // POST route to handle edit profile picture
 router.post('/profile/edit/pfp', upload.single('edit-pfp'), isLoggedIn, async (req, res) => {
-  console.log(req)
   const profilePic = req.file ? req.file.filename : null;
   const user = req.session.currentUser
   const userId = req.session.currentUser._id;

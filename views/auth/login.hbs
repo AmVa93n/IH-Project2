@@ -5,6 +5,13 @@
 </div>
 {{/if}}
 
+{{#if account_created}}
+<div class="alert alert-success d-flex align-items-center justify-content-center" role="alert">
+  <i class="bi bi-check-circle-fill me-2"></i>
+  Your account was successfully created! You can now log in.
+</div>
+{{/if}}
+
 <div class="content-box">
   <h2 class="center">Login</h2>
   <form action="/auth/login" method="POST">
