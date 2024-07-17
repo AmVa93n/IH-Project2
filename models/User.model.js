@@ -26,8 +26,21 @@ const userSchema = new Schema(
     birthdate: {
       type: String,
     },
+    country: {
+      type: String,
+    },
     profilePic: {
       type: String,
+    },
+    lang_speak: {
+      type: [ String ],
+    },
+    lang_learn: {
+      type: [ String ],
+      required: true,
+    },
+    private: {
+      type: Boolean,
     }
   },
   {
