@@ -1,25 +1,34 @@
-const users = []
-//const names = getRandomNames(50)
-const langList = ['es','it','pt','fr','de','ru','nl','zh','hu','he','ar']
+const mongoose = require('mongoose');
+const User = require('../models/User.model');
+const MONGO_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/ironhack-project2';
+const langList = ['es','it','pt','fr','de','ru','nl','zh','hu','he','ar','kr','jp','ro','pl']
 
-// seed database with 100 users with randomized languages
-for (let i = 0; i < 100; i++) {
-  let lang_speak = getRandomSubset(langList)
-  const remainingLangs = langList.filter(l => !lang_speak.includes(l))
-  let lang_learn = getRandomSubset(remainingLangs)
-  let user = {
-    username: "User"+i,
-    email: "user"+i+"@gmail.com",
-    password: "Ab123456",
-    gender: "male",
-    birthdate: "30th June 1999",
-    profilePic: null,
-    description: "",
-    lang_speak,
-    lang_learn,
-    private: false,
+// seed database with 100 users with randomized names and languages
+async function seedDatabase() {
+  const names = await getRandomNames(100)
+  const users = []
+  for (let i = 0; i < 100; i++) {
+    let lang_speak = getRandomSubset(langList)
+    const remainingLangs = langList.filter(l => !lang_speak.includes(l))
+    let lang_learn = getRandomSubset(remainingLangs)
+    let user = {
+      username: names[i],
+      email: "user"+i+"@gmail.com",
+      password: "Ab123456",
+      gender: "male",
+      birthdate: "30th June 1999",
+      country: "Germany",
+      profilePic: null,
+      lang_speak,
+      lang_learn,
+      private: false,
+    }
+    users.push(user)
   }
-  users.push(user)
+
+  await mongoose.connect(MONGO_URI)
+  await User.create(users);
+  await mongoose.connection.close();
 }
 
 function getRandomSubset(arr) {
@@ -49,21 +58,5 @@ async function getRandomNames(count) {
   }
 }
 
-const mongoose = require('mongoose');
-const User = require('../models/User.model');
-
-const MONGO_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/ironhack-project2';
-
-mongoose
-  .connect(MONGO_URI)
-  .then(() => {
-    // Create new documents in the users collection
-    return User.create(users);
-  })
-  .then(() => {
-    // Once the documents are created, close the DB connection
-    return mongoose.connection.close();
-  })
-  .catch(err => {
-    console.log(err);
-  });
+// Run the seeding script
+seedDatabase();

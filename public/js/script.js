@@ -15,6 +15,10 @@ const langList = {
   'hu': 'Hungarian',
   'he': 'Hebrew',
   'ar': 'Arabic',
+  'pl': 'Polish',
+  'ro': 'Romanian',
+  'jp': 'Japanese',
+  'kr': 'Korean',
 }
 
 function getLanguageName(langCode) {
