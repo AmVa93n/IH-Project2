@@ -3,6 +3,36 @@ document.addEventListener("DOMContentLoaded", () => {
   //console.log("ironhack-project2 JS imported successfully!");
 });
 
+async function searchItems(query) {
+  if (!query) return; // Skip if the input is empty
+
+  const response = await fetch(`/search?q=${query}`);
+  const items = await response.json();
+  const results = document.getElementById('results'); // Adjust the ID as needed
+  results.innerHTML = ''; // Clear previous results
+
+  items.forEach(item => {
+      const li = document.createElement('li');
+      li.textContent = item.name; // Assuming 'name' is a field in your Product model
+      results.appendChild(li);
+  });
+}
+
+const searchInput = document.getElementById('search'); // Ensure the input has this ID
+if (searchInput) {
+  searchInput.addEventListener('input', () => {
+      searchItems(searchInput.value); // Calls the search function on input
+  });
+}
+
+const searchForm = document.getElementById('searchForm'); // Ensure the form has this ID
+if (searchForm) {
+  searchForm.addEventListener('submit', (event) => {
+      event.preventDefault(); // Prevents the default form submission
+      searchItems(searchInput.value); // Calls the search function on submit
+  });
+}
+
 const langList = {
   'es': 'Spanish',
   'it': 'Italian',
