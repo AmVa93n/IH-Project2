@@ -24,9 +24,6 @@
             <input id="search" class="form-control rounded-start-pill" type="search" placeholder="Search" aria-label="Search">
             <button class="btn rounded-end-pill" type="submit" style="background-color: rgb(192, 192, 192);"><i class="bi bi-search"></i></button>
           </form>
-          
-          <ul id="results" class="list-group mt-3"></ul>
-
           {{#if user}}
           <a href="/auth/matches"><button class="btn btn-info rounded-pill"><i class="bi bi-rocket-takeoff-fill me-1"></i>Match me!</button></a>
           
@@ -61,7 +58,7 @@
         </div>
       </div>
     </nav>
-
+<ul id="results" class="list-group mt-3"></ul>  
     <script src="/js/script.js"></script>
 
     {{{body}}}
