@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const formatDate = require("../utils/date");
 
 // ℹ️ Handles password encryption
 const bcrypt = require("bcrypt");
@@ -46,16 +45,15 @@ router.get("/signup", isLoggedOut, (req, res) => {
 router.post("/signup", upload.single('profilepic'), isLoggedOut, (req, res) => {
   console.log(req.body)
   const { username, email, password, gender, birthdate, country, lang_teach, lang_learn, professional, private} = req.body;
-  const formattedDate = birthdate ? formatDate(new Date(birthdate)) : null
   const profilePic = req.file ? req.file.filename : null;
   const isPrivate = !!private
   const isProfessional = !!professional
 
   // Check that username, email, and password are provided
-  if ([username,email,password].some(field => field === "")) {
+  if ([username,email,password,birthdate,country].some(field => field === "")) {
     res.status(400).render("auth/signup", {
       errorMessage:
-        "Some mandatory fields are missing. Please provide your username, email and password.",
+        "Some mandatory fields are missing. Please provide your username, email, password, birth date and country of residence.",
     });
     return;
   }
@@ -94,7 +92,7 @@ router.post("/signup", upload.single('profilepic'), isLoggedOut, (req, res) => {
     .then((salt) => bcrypt.hash(password, salt))
     .then((hashedPassword) => {
       // Create a user and save it in the database
-      return User.create({ username, email, password: hashedPassword, gender, birthdate: formattedDate, country, 
+      return User.create({ username, email, password: hashedPassword, gender, birthdate, country, 
         profilePic, lang_teach, lang_learn, private: isPrivate, professional: isProfessional });
     })
     .then((user) => {

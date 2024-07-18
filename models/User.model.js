@@ -25,9 +25,11 @@ const userSchema = new Schema(
     },
     birthdate: {
       type: String,
+      required: true,
     },
     country: {
       type: String,
+      required: true,
     },
     profilePic: {
       type: String,
@@ -41,7 +43,10 @@ const userSchema = new Schema(
     },
     private: {
       type: Boolean,
-    }
+    },
+    professional: {
+      type: Boolean,
+    },
   },
   {
     // this second object adds extra properties: `createdAt` and `updatedAt`

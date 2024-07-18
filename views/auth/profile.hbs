@@ -52,7 +52,7 @@
     <div class="row fs-6 mb-2">
         <p class="col-4 fw-bold">Birthdate</p>
         <div class="col" id="birthdate">
-          <span>{{user.birthdate}}</span>
+          <span class="date">{{user.birthdate}}</span>
           <button class="btn btn-secondary btn-sm mini-btn" onclick="edit(`birthdate`)">Edit</button>
         </div>
     </div>
@@ -108,6 +108,8 @@
   document.getElementById('edit-pfp-btn').addEventListener('click', function() {
       document.getElementById('edit-pfp').click();
   });
+
+  document.querySelector('.date').innerText = formatDate(document.querySelector('.date').innerText)
 
   // populate languages
     const teachList = [...document.querySelectorAll('#lang_teach .lang-name')];

@@ -3,8 +3,8 @@
 {{#each matches}}
 
 <div class="user-card mx-3 mb-4">
-    <a href="/users/{{this.username}}">
-    <div class="d-flex align-items-center mb-3">
+    <a href="/users/{{this.username}}" class="link-text">
+    <div class="d-flex align-items-center mb-3 position-relative">
         <div class="circle-crop me-2" style="width:50px;height:50px;display:inline-flex">
             {{#if user.profilePic}}
             <img src="/uploads/{{user.profilePic}}">
@@ -12,8 +12,15 @@
             <img src="/images/Profile-PNG-File.png">
             {{/if}}
         </div>
-        <span class="fs-4">{{this.username}}</span>
+        <span class="fs-5">{{this.username}}</span>
+        <span class="position-absolute" style="top:40;left:60;font-size:12px">
+            <span class="date">{{this.birthdate}}</span>, {{this.country}}
+        </span>
+        {{#if this.professional}}
+        <span class="badge rounded-pill text-bg-primary position-absolute" style="top:-8;right:-8">Professional</span>
+        {{/if}}
     </div></a>
+
     <div class="row mb-2">
         <span class="fw-bold col-auto" style="width: 125px;">Wants to teach</span> 
         <div class="col">
@@ -25,7 +32,8 @@
             {{/each}}
         </div>
     </div>
-    <div class="row">
+    
+    <div class="row mb-4">
         <span class="fw-bold col-auto" style="width: 125px;">Wants to learn</span>
         <div class="col">
             {{#each this.lang_learn}}
@@ -36,6 +44,15 @@
             {{/each}}
         </div>
     </div>
+
+    <div class="row">
+        <div class="col d-flex justify-content-center align-items-end">
+            <button class="btn btn-primary mx-1"><i class="bi bi-envelope-fill me-1"></i>Message</button>
+            {{#if this.professional}}
+            <button class="btn btn-warning mx-1"><i class="bi bi-cash-coin me-1"></i>Offers</button>
+            {{/if}}
+        </div>
+    </div>
     
 </div>
 
@@ -43,6 +60,9 @@
 </div>
 
 <script>
+    const dates = [...document.querySelectorAll('.date')]
+    for (let date of dates) date.innerText = getUserAge(date.innerText)
+
     const spans = [...document.querySelectorAll('.lang-name')];
     for (lang of spans) {
       lang.innerText = getLanguageName(lang.innerText)

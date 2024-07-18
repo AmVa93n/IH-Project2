@@ -56,3 +56,8 @@ body {
 .lang-flag {
   width: 20px;
 }
+
+.link-text {
+  text-decoration: none;
+  color: black;
+}
