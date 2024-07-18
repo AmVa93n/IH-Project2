@@ -32,6 +32,7 @@
           <button class="btn btn-secondary btn-sm mini-btn" onclick="edit(`username`)">Edit</button>
         </div>
     </div>
+    
     <div class="row fs-6 mb-2">
         <p class="col-4 fw-bold">Email</p>
         <div class="col" id="email">
@@ -39,6 +40,7 @@
           <button class="btn btn-secondary btn-sm mini-btn" onclick="edit(`email`)">Edit</button>
         </div>
     </div>
+
     <div class="row fs-6 mb-2">
         <p class="col-4 fw-bold">Gender</p>
         <div class="col" id="gender">
@@ -46,6 +48,7 @@
           <button class="btn btn-secondary btn-sm mini-btn" onclick="edit(`gender`)">Edit</button>
         </div>
     </div>
+
     <div class="row fs-6 mb-2">
         <p class="col-4 fw-bold">Birthdate</p>
         <div class="col" id="birthdate">
@@ -53,6 +56,7 @@
           <button class="btn btn-secondary btn-sm mini-btn" onclick="edit(`birthdate`)">Edit</button>
         </div>
     </div>
+
     <div class="row fs-6 mb-4">
         <p class="col-4 fw-bold">Country</p>
         <div class="col" id="country">
@@ -62,18 +66,18 @@
     </div>
 
     <div class="row fs-6 mb-2">
-        <p class="col-4 fw-bold">I can speak</p>
+        <p class="col-4 fw-bold">I want to teach</p>
         <div class="col">
-          <div id="lang_speak">
-            {{#each user.lang_speak}}
+          <div id="lang_teach">
+            {{#each user.lang_teach}}
               <div class="me-1">
                 <img src="/images/{{this}}.svg" class="lang-flag">
                 <span class="lang-name">{{this}}</span>
               </div>
             {{/each}}
-            <button class="btn btn-secondary btn-sm mini-btn" onclick="editLang('lang_speak')">Edit</button>
+            <button class="btn btn-secondary btn-sm mini-btn" onclick="editLang('lang_teach')">Edit</button>
           </div>
-          <form action="/auth/profile/edit/lang_speak" method="POST" id="lang_speak-edit"></form>
+          <form action="/auth/profile/edit/lang_teach" method="POST" id="lang_teach-edit"></form>
         </div>
     </div>
 
@@ -106,8 +110,8 @@
   });
 
   // populate languages
-    const speakList = [...document.querySelectorAll('#lang_speak .lang-name')];
-    for (lang of speakList) {
+    const teachList = [...document.querySelectorAll('#lang_teach .lang-name')];
+    for (lang of teachList) {
       lang.innerText = getLanguageName(lang.innerText)
     }
 
@@ -122,8 +126,8 @@
             if (langList[a] < langList[b]) return -1
             if (langList[a] == langList[b]) return 0
           })
-    let currentList_el = list == "lang_speak" ? speakList : learnList
-    let inverseList_el = list == "lang_speak" ? learnList : speakList
+    let currentList_el = list == "lang_teach" ? teachList : learnList
+    let inverseList_el = list == "lang_teach" ? learnList : teachList
     let currentList = currentList_el.map(el => el.innerText)
     let inverseList = inverseList_el.map(el => el.innerText)
     const list_edit = document.getElementById(list+"-edit");
@@ -133,8 +137,8 @@
       let attr = currentList.includes(langName) ? "checked" : inverseList.includes(langName) ? "disabled" : ""
       list_edit.innerHTML += `
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" name="${list}" value="${lang}" id="speak-${lang}" ${attr}>
-          <label class="form-check-label" for="speak-${lang}"><img src="/images/${lang}.svg" class="lang-flag"> ${langName}</label>
+          <input class="form-check-input" type="checkbox" name="${list}" value="${lang}" id="teach-${lang}" ${attr}>
+          <label class="form-check-label" for="teach-${lang}"><img src="/images/${lang}.svg" class="lang-flag"> ${langName}</label>
         </div>`
     }
     list_edit.innerHTML += `

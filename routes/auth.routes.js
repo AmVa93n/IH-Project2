@@ -45,10 +45,11 @@ router.get("/signup", isLoggedOut, (req, res) => {
 // POST /auth/signup
 router.post("/signup", upload.single('profilepic'), isLoggedOut, (req, res) => {
   console.log(req.body)
-  const { username, email, password, gender, birthdate, country, lang_speak, lang_learn, private} = req.body;
+  const { username, email, password, gender, birthdate, country, lang_teach, lang_learn, professional, private} = req.body;
   const formattedDate = birthdate ? formatDate(new Date(birthdate)) : null
   const profilePic = req.file ? req.file.filename : null;
-  const isPrivateProfile = !!private
+  const isPrivate = !!private
+  const isProfessional = !!professional
 
   // Check that username, email, and password are provided
   if ([username,email,password].some(field => field === "")) {
@@ -59,10 +60,10 @@ router.post("/signup", upload.single('profilepic'), isLoggedOut, (req, res) => {
     return;
   }
 
-  if (!lang_learn || lang_learn.length === 0) {
+  if (!lang_learn && !lang_teach) {
     res.status(400).render("auth/signup", {
       errorMessage:
-        "Please choose at least one language you'd like to learn",
+        "Please choose at least one language you'd like to teach or learn",
     });
     return;
   }
@@ -94,7 +95,7 @@ router.post("/signup", upload.single('profilepic'), isLoggedOut, (req, res) => {
     .then((hashedPassword) => {
       // Create a user and save it in the database
       return User.create({ username, email, password: hashedPassword, gender, birthdate: formattedDate, country, 
-        profilePic, lang_speak, lang_learn, private: isPrivateProfile });
+        profilePic, lang_teach, lang_learn, private: isPrivate, professional: isProfessional });
     })
     .then((user) => {
       res.redirect("/auth/login");
@@ -274,14 +275,14 @@ router.post('/profile/edit/country', isLoggedIn, async (req, res) => {
   }
 });
 
-// POST route to handle edit language user speaks
-router.post('/profile/edit/lang_speak', isLoggedIn, async (req, res) => {
-  let { lang_speak } = req.body;
-  if (!lang_speak) lang_speak = []
+// POST route to handle edit language user wants to teach
+router.post('/profile/edit/lang_teach', isLoggedIn, async (req, res) => {
+  let { lang_teach } = req.body;
+  if (!lang_teach) lang_teach = []
   const userId = req.session.currentUser._id;
 
   try {
-    const updatedUser = await User.findByIdAndUpdate(userId, { lang_speak }, { new: true });
+    const updatedUser = await User.findByIdAndUpdate(userId, { lang_teach }, { new: true });
     req.session.currentUser = updatedUser; // Update current user in session
     res.redirect('/auth/profile'); // Redirect to profile page
   } catch (err) {
@@ -325,12 +326,13 @@ router.post('/profile/edit/pfp', upload.single('edit-pfp'), isLoggedIn, async (r
 // GET route matches
 router.get("/matches", isLoggedIn, async (req, res) => {
   const user = req.session.currentUser
-  const user_speak = user.lang_speak
+  const user_teach = user.lang_teach
   const user_learn = user.lang_learn
-  const matches = await User.find({lang_speak: { $in: user_learn }, lang_learn: { $in: user_speak }})
+  let matches = await User.find({lang_teach: { $in: user_learn }, lang_learn: { $in: user_teach }})
+  matches = matches.filter(match => !match.private) // filter private profiles
   for (let match of matches) { // filter irrelevant languages
-    match.lang_speak = match.lang_speak.filter(lang => user_learn.includes(lang))
-    match.lang_learn = match.lang_learn.filter(lang => user_speak.includes(lang))
+    match.lang_teach = match.lang_teach.filter(lang => user_learn.includes(lang))
+    match.lang_learn = match.lang_learn.filter(lang => user_teach.includes(lang))
   }
   res.render("auth/matches", {user, matches});
 });

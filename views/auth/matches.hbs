@@ -3,6 +3,7 @@
 {{#each matches}}
 
 <div class="user-card mx-3 mb-4">
+    <a href="/users/{{this.username}}">
     <div class="d-flex align-items-center mb-3">
         <div class="circle-crop me-2" style="width:50px;height:50px;display:inline-flex">
             {{#if user.profilePic}}
@@ -12,11 +13,11 @@
             {{/if}}
         </div>
         <span class="fs-4">{{this.username}}</span>
-    </div>
+    </div></a>
     <div class="row mb-2">
-        <span class="fw-bold col-auto" style="width: 120px;">Can speak</span> 
+        <span class="fw-bold col-auto" style="width: 125px;">Wants to teach</span> 
         <div class="col">
-            {{#each this.lang_speak}}
+            {{#each this.lang_teach}}
             <div>
                 <img src="/images/{{this}}.svg" class="lang-flag">
                 <span class="lang-name me-1">{{this}}</span>
@@ -25,7 +26,7 @@
         </div>
     </div>
     <div class="row">
-        <span class="fw-bold col-auto" style="width: 120px;">Wants to learn</span>
+        <span class="fw-bold col-auto" style="width: 125px;">Wants to learn</span>
         <div class="col">
             {{#each this.lang_learn}}
             <div>

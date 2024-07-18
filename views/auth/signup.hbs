@@ -67,8 +67,8 @@
     </div>
     
     <div class="row mb-3">
-      <div class="col-6" id="lang_speak">
-        <p>I can speak</p>
+      <div class="col-6" id="lang_teach">
+        <p>I want to teach</p>
       </div>
 
       <div class="col-6" id="lang_learn">
@@ -76,9 +76,16 @@
       </div>
     </div>
 
+    <p>Professional Profile</p>
+    <div class="form-check form-switch mb-3">
+      <input class="form-check-input" type="checkbox" role="switch" id="professional" name="professional" onchange="switchCheck('professional')">
+      <label class="form-check-label" for="private"><small>I want to offer paid classes and educational content.
+      </small></label>
+    </div>
+
     <p>Private Profile</p>
     <div class="form-check form-switch mb-3">
-      <input class="form-check-input" type="checkbox" role="switch" id="private" name="private">
+      <input class="form-check-input" type="checkbox" role="switch" id="private" name="private" onchange="switchCheck('private')">
       <label class="form-check-label" for="private"><small>Your profile will not appear in search results.<br>
         Only users who you've contacted can see your profile.
       </small></label>
@@ -98,6 +105,18 @@
       preview.src = reader.result;
     }
     reader.readAsDataURL(event.target.files[0]);
+  }
+
+  function switchCheck(id) {
+    const sourceEl = document.getElementById(id)
+    const targetId = id == 'professional' ? 'private' : 'professional'
+    const targetEl = document.getElementById(targetId)
+    if (sourceEl.checked) {
+      targetEl.removeAttribute('checked')
+      targetEl.setAttribute('disabled', true)
+    } else {
+      targetEl.removeAttribute('disabled')
+    }
   }
 
   document.addEventListener('DOMContentLoaded', async (event) => {
@@ -122,7 +141,7 @@
       }
 
     // populate language selection
-    const speakList = document.getElementById('lang_speak');
+    const teachList = document.getElementById('lang_teach');
     const learnList = document.getElementById('lang_learn');
     const languages = Object.keys(langList).sort((a,b) => {
             if (langList[b] < langList[a]) return 1
@@ -130,9 +149,9 @@
             if (langList[a] == langList[b]) return 0
           })
     for (lang of languages) {
-      speakList.innerHTML += `
+      teachList.innerHTML += `
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" name="lang_speak" value="${lang}" id="speak-${lang}">
+          <input class="form-check-input" type="checkbox" name="lang_teach" value="${lang}" id="speak-${lang}">
           <label class="form-check-label" for="speak-${lang}"><img src="/images/${lang}.svg" class="lang-flag"> ${getLanguageName(lang)}</label>
         </div>
       `
@@ -145,10 +164,10 @@
     }
 
     // disabling/enabling of checkboxes
-    const speakCheckboxes = document.querySelectorAll('input[name="lang_speak"]');
+    const teachCheckboxes = document.querySelectorAll('input[name="lang_teach"]');
     const learnCheckboxes = document.querySelectorAll('input[name="lang_learn"]');
     
-    speakCheckboxes.forEach(checkbox => {
+    teachCheckboxes.forEach(checkbox => {
         checkbox.addEventListener('change', () => {
             const learnCheckbox = document.getElementById('learn-' + checkbox.value);
             if (checkbox.checked) {
@@ -161,11 +180,11 @@
 
     learnCheckboxes.forEach(checkbox => {
         checkbox.addEventListener('change', () => {
-            const speakCheckbox = document.getElementById('speak-' + checkbox.value);
+            const teachCheckbox = document.getElementById('speak-' + checkbox.value);
             if (checkbox.checked) {
-                speakCheckbox.disabled = true;
+                teachCheckbox.disabled = true;
             } else {
-                speakCheckbox.disabled = false;
+                teachCheckbox.disabled = false;
             }
         });
     });

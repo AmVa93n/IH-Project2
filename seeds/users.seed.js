@@ -8,8 +8,8 @@ async function seedDatabase() {
   const names = await getRandomNames(100)
   const users = []
   for (let i = 0; i < 100; i++) {
-    let lang_speak = getRandomSubset(langList)
-    const remainingLangs = langList.filter(l => !lang_speak.includes(l))
+    let lang_teach = getRandomSubset(langList)
+    const remainingLangs = langList.filter(l => !lang_teach.includes(l))
     let lang_learn = getRandomSubset(remainingLangs)
     let user = {
       username: names[i],
@@ -19,7 +19,7 @@ async function seedDatabase() {
       birthdate: "30th June 1999",
       country: "Germany",
       profilePic: null,
-      lang_speak,
+      lang_teach,
       lang_learn,
       private: false,
     }

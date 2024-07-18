@@ -1,0 +1,72 @@
+<div class="content-box" style="width: 35%; position:relative">
+    <h2 class="mb-3 center">{{viewedUser.username}}</h2>
+    <div class="mb-4 mx-auto circle-crop">
+        {{#if viewedUser.profilePic}}
+        <img id="profile-pic-preview" src="/uploads/{{viewedUser.profilePic}}">
+        {{else}}
+        <img id="profile-pic-preview" src="/images/Profile-PNG-File.png">
+        {{/if}}
+    </div>
+
+    <div class="row fs-6 mb-2">
+        <p class="col-4 fw-bold">Gender</p>
+        <div class="col" id="gender">
+          <span>{{viewedUser.gender}}</span>
+        </div>
+    </div>
+
+    <div class="row fs-6 mb-2">
+        <p class="col-4 fw-bold">Birthdate</p>
+        <div class="col" id="birthdate">
+          <span>{{viewedUser.birthdate}}</span>
+        </div>
+    </div>
+
+    <div class="row fs-6 mb-4">
+        <p class="col-4 fw-bold">Country</p>
+        <div class="col" id="country">
+          <span>{{viewedUser.country}}</span>
+        </div>
+    </div>
+
+    <div class="row fs-6 mb-2">
+        <p class="col-4 fw-bold">Wants to teach</p>
+        <div class="col">
+          <div id="lang_teach">
+            {{#each viewedUser.lang_teach}}
+              <div class="me-1">
+                <img src="/images/{{this}}.svg" class="lang-flag">
+                <span class="lang-name">{{this}}</span>
+              </div>
+            {{/each}}
+          </div>
+        </div>
+    </div>
+
+    <div class="row fs-6 mb-2">
+        <p class="col-4 fw-bold">Wants to learn</p>
+        <div class="col">
+          <div id="lang_learn">
+            {{#each viewedUser.lang_learn}}
+              <div class="me-1">
+                <img src="/images/{{this}}.svg" class="lang-flag">
+                <span class="lang-name">{{this}}</span>
+              </div>
+            {{/each}}
+          </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // populate languages
+    const teachList = [...document.querySelectorAll('#lang_teach .lang-name')];
+    for (lang of teachList) {
+      lang.innerText = getLanguageName(lang.innerText)
+    }
+
+    const learnList = [...document.querySelectorAll('#lang_learn .lang-name')];
+    for (lang of learnList) {
+      lang.innerText = getLanguageName(lang.innerText)
+    }
+</script>

@@ -32,7 +32,7 @@ const userSchema = new Schema(
     profilePic: {
       type: String,
     },
-    lang_speak: {
+    lang_teach: {
       type: [ String ],
     },
     lang_learn: {
