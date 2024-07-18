@@ -1,0 +1,85 @@
+
+  <div id="conversations" style="float: left; width: 20%;">
+    <h3>Conversations</h3>
+    <ul id="conversation-list"></ul>
+  </div>
+  <div id="messages" style="float: left; width: 75%;">
+    <h3 id="conversation-with"></h3>
+    <form id="start-conversation-form">
+      <input id="new-recipient" autocomplete="off" placeholder="Recipient" class="form-control" /><br />
+      <button type="submit" class="btn btn-primary">Start Conversation</button>
+    </form>
+    <ul id="message-list"></ul>
+    <form id="form" action="">
+      <input id="input" autocomplete="off" placeholder="Message" class="form-control" /><br />
+      <button class="btn btn-primary">Send</button>
+    </form>
+  </div>
+
+  <script>
+    const socket = io();
+
+    const form = document.getElementById('form');
+    const input = document.getElementById('input');
+    const messageList = document.getElementById('message-list');
+    const conversationList = document.getElementById('conversation-list');
+    const conversationWith = document.getElementById('conversation-with');
+    const startConversationForm = document.getElementById('start-conversation-form');
+    const newRecipient = document.getElementById('new-recipient');
+
+    let currentConversation = '';
+
+    socket.on('init', (conversations) => {
+      conversationList.innerHTML = '';
+      for (const user in conversations) {
+        const item = document.createElement('li');
+        item.textContent = user;
+        item.onclick = () => {
+          currentConversation = user;
+          conversationWith.textContent = `Conversation with ${user}`;
+          messageList.innerHTML = '';
+          conversations[user].forEach((msg) => {
+            const item = document.createElement('li');
+            item.textContent = `${msg.sender}: ${msg.message}`;
+            messageList.appendChild(item);
+          });
+        };
+        conversationList.appendChild(item);
+      }
+    });
+
+    socket.on('private message', (msg) => {
+      if (msg.sender === currentConversation || msg.recipient === currentConversation) {
+        const item = document.createElement('li');
+        item.textContent = `${msg.sender}: ${msg.message}`;
+        messageList.appendChild(item);
+        window.scrollTo(0, document.body.scrollHeight);
+      }
+    });
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (input.value && currentConversation) {
+        socket.emit('private message', {
+          recipient: currentConversation,
+          message: input.value,
+        });
+        input.value = '';
+      }
+    });
+
+    startConversationForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const recipient = newRecipient.value;
+      if (recipient) {
+        currentConversation = recipient;
+        conversationWith.textContent = `Conversation with ${recipient}`;
+        messageList.innerHTML = ''; // Clear the message list for the new conversation
+        newRecipient.value = ''; // Clear the input field
+      }
+    });
+
+    // Replace this with actual login mechanism
+    const username = '{{ user.username }}'; // This should be dynamically set based on the logged-in user
+    socket.emit('join', username);
+  </script>
