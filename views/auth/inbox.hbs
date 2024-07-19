@@ -3,7 +3,9 @@
 
   <div class="col-2" style="border-right: 1px solid rgb(199, 199, 199)">
     <div class="p-3 fs-3">Chats</div>
-    <div class="row-auto" id="conversation-list"></div>
+    <div class="row-auto" id="conversation-list" style="max-height: 561px; overflow-y:scroll">
+
+    </div>
   </div>
 
   <div class="col-7 g-0 d-flex flex-column" style="max-height: 625px; border-right: 1px solid rgb(199, 199, 199)">
@@ -34,45 +36,57 @@
     const conversationList = document.getElementById('conversation-list');
     const conversationWith = document.getElementById('conversation-with');
 
-    let currentConversation = '';
+    let activeChatUsername = '{{ targetUsername }}' || '';
 
-    socket.on('init', (conversations) => {
+    socket.on('init', (data) => {
       conversationList.innerHTML = '';
-      for (let otherUserId in conversations) {
-        const conversation = conversations[otherUserId];
-        const userData = conversation.user; // The user object
-        const chat = createChat(userData);
+      for (let key in data) {
+        const chatData = data[key];
+        const userData = chatData.user; // The user object
+        const chat = createChat(chatData);
         
-        chat.onclick = () => {
-          currentConversation = userData.username;
-          conversationWith.textContent = `Chat with ${userData.username}`;
-          messageList.innerHTML = '';
-          conversation.messages.forEach((msg) => {
-            createMessage(msg.message, msg.sender, msg.timestamp)
-            messageList.scrollTo(0, messageList.scrollHeight);
-          });
-        };
-
+        if (activeChatUsername == userData.username) refreshChatWindow(chatData) // initialize from query
       }
     });
 
-    function createChat(userData) {
+    function createChat(chatData) {
+      const userData = chatData.user; // The user object
       let profilePicSrc = userData.profilePic ? `/uploads/${userData.profilePic}` : "/images/Profile-PNG-File.png"
       let profBadge = userData.professional ? `
         <span class="badge rounded-pill text-bg-primary position-absolute" style="top:-8;right:-8">Professional</span>`
         : ""
-      conversationList.innerHTML += `
-        <div class="mx-3">
-          <div class="d-flex align-items-center mb-3 position-relative">
-              <div class="circle-crop me-2" style="width:50px;height:50px;display:inline-flex">
-                <img src=${profilePicSrc}>
-              </div>
-              <span class="fs-5">${userData.username}</span>
-              ${profBadge}
+      let div = document.createElement('div')
+      div.classList.add("mx-3")
+      conversationList.appendChild(div)
+      div.innerHTML += `
+        <div class="d-flex align-items-center mb-3 position-relative">
+          <div class="circle-crop me-2" style="width:50px;height:50px;display:inline-flex">
+            <img src=${profilePicSrc}>
           </div>
-      `
-      let index = conversationList.children.length-1
-      return conversationList.children[index]
+          <span class="fs-5">${userData.username}</span>
+          ${profBadge}`
+
+      div.addEventListener('click', () => {
+          console.log("Chat clicked for user:", userData.username);
+          refreshChatWindow(chatData);
+      });
+    }
+
+    function refreshChatWindow(chatData) {
+      const userData = chatData.user; // The user object
+      activeChatUsername = userData.username;
+      conversationWith.textContent = `Chat with ${userData.username}`;
+      messageList.innerHTML = '';
+      let curDate = ''
+      chatData.messages.forEach((msg) => {
+        let msgDate = getMsgDate(msg.timestamp)
+        if (curDate != msgDate) { // new day, add separator
+          curDate = msgDate
+          messageList.innerHTML += `<span class="center timestamp fw-bold">${curDate}</span><hr>`
+        }
+        createMessage(msg.message, msg.sender, msg.timestamp)
+        messageList.scrollTo(0, messageList.scrollHeight);
+      });
     }
 
     function createMessage(msgBody, authorData, timestamp) {
@@ -90,7 +104,7 @@
     }
 
     socket.on('private message', (msg) => {
-      if (msg.sender.username === currentConversation || msg.recipient.username === currentConversation) {
+      if (msg.sender.username === activeChatUsername || msg.recipient.username === activeChatUsername) {
         createMessage(msg.message, msg.sender, msg.timestamp)
         messageList.scrollTo(0, messageList.scrollHeight);
       }
@@ -98,9 +112,9 @@
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      if (input.value && currentConversation) {
+      if (input.value && activeChatUsername) {
         socket.emit('private message', {
-          recipient: currentConversation,
+          recipient: activeChatUsername,
           message: input.value,
         });
         input.value = '';

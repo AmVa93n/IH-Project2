@@ -11,13 +11,14 @@ function getLanguageCode(langName) {
   }
 }
 
+const months = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
+
 function formatDate(birthdate) {
   let date = new Date(birthdate);
-  const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-  ];
-
+  
   const day = date.getUTCDate();
   const month = months[date.getUTCMonth()];
   const year = date.getUTCFullYear();
@@ -53,6 +54,13 @@ function getUserAge(birthdate) {
 function getMsgTime(timestamp) {
   const date = new Date(timestamp); // Parse the timestamp into a Date object
   return date.toLocaleTimeString().slice(0, 5)
+}
+
+function getMsgDate(timestamp) {
+  const date = new Date(timestamp); // Parse the timestamp into a Date object
+  const day = date.getDate()
+  const month = months[date.getMonth()]
+  return day + " " + month
 }
 
 const langList = {

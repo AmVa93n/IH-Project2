@@ -6,8 +6,8 @@
     <a href="/users/{{this.username}}" class="link-text">
     <div class="d-flex align-items-center mb-3 position-relative">
         <div class="circle-crop me-2" style="width:50px;height:50px;display:inline-flex">
-            {{#if user.profilePic}}
-            <img src="/uploads/{{user.profilePic}}">
+            {{#if this.profilePic}}
+            <img src="/uploads/{{this.profilePic}}">
             {{else}}
             <img src="/images/Profile-PNG-File.png">
             {{/if}}
@@ -47,7 +47,7 @@
 
     <div class="row">
         <div class="col d-flex justify-content-center align-items-end">
-            <button class="btn btn-primary mx-1"><i class="bi bi-envelope-fill me-1"></i>Message</button>
+            <button class="btn btn-primary mx-1" onclick="sendMessage('{{this.username}}')"><i class="bi bi-envelope-fill me-1"></i>Message</button>
             {{#if this.professional}}
             <button class="btn btn-warning mx-1"><i class="bi bi-cash-coin me-1"></i>Offers</button>
             {{/if}}
@@ -67,4 +67,21 @@
     for (lang of spans) {
       lang.innerText = getLanguageName(lang.innerText)
     }
+
+    const socket = io();
+    const userUsername = '{{ user.username }}';
+
+    function sendMessage(targetUsername) {
+        socket.emit('private message', {
+          recipient: targetUsername,
+          message: `Hello! I'm ${userUsername}`,
+        });
+        console.log(userUsername,targetUsername)
+    }
+
+    socket.on('private message', (msg) => {
+      window.location.href = `/auth/inbox?target=${msg.recipient.username}`;
+    });
+
+    socket.emit('join', userUsername);
 </script>

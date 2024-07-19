@@ -338,7 +338,9 @@ router.get("/matches", isLoggedIn, async (req, res) => {
 // GET route inbox
 router.get("/inbox", isLoggedIn, async (req, res) => {
   const user = req.session.currentUser
-  res.render("auth/inbox", {user});
+  const targetUsername = req.query.target || null; // The target user's username from the query parameter
+
+  res.render("auth/inbox", {user, targetUsername});
 });
 
 module.exports = router;
