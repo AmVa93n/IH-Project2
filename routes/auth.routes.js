@@ -335,4 +335,10 @@ router.get("/matches", isLoggedIn, async (req, res) => {
   res.render("auth/matches", {user, matches});
 });
 
+// GET route inbox
+router.get("/inbox", isLoggedIn, async (req, res) => {
+  const user = req.session.currentUser
+  res.render("auth/inbox", {user});
+});
+
 module.exports = router;

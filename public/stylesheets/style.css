@@ -67,3 +67,8 @@ body {
   margin-right: 150px;
   
 }
+
+.timestamp {
+  font-size: 10px;
+  margin: 0 5px;
+}

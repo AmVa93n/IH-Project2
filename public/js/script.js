@@ -50,6 +50,11 @@ function getUserAge(birthdate) {
   return age;
 }
 
+function getMsgTime(timestamp) {
+  const date = new Date(timestamp); // Parse the timestamp into a Date object
+  return date.toLocaleTimeString().slice(0, 5)
+}
+
 const langList = {
   'es': 'Spanish',
   'it': 'Italian',

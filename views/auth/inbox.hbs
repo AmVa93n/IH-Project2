@@ -1,20 +1,29 @@
+<div class="row" style="width: 100%; height: 625px">
 
-  <div id="conversations" style="float: left; width: 20%;">
-    <h3>Conversations</h3>
-    <ul id="conversation-list"></ul>
+
+  <div class="col-2" style="border-right: 1px solid rgb(199, 199, 199)">
+    <div class="p-3 fs-3">Chats</div>
+    <div class="row-auto" id="conversation-list"></div>
   </div>
-  <div id="messages" style="float: left; width: 75%;">
-    <h3 id="conversation-with"></h3>
-    <form id="start-conversation-form">
-      <input id="new-recipient" autocomplete="off" placeholder="Recipient" class="form-control" /><br />
-      <button type="submit" class="btn btn-primary">Start Conversation</button>
-    </form>
-    <ul id="message-list"></ul>
-    <form id="form" action="">
-      <input id="input" autocomplete="off" placeholder="Message" class="form-control" /><br />
-      <button class="btn btn-primary">Send</button>
-    </form>
+
+  <div class="col-7 g-0 d-flex flex-column" style="max-height: 625px; border-right: 1px solid rgb(199, 199, 199)">
+    <div class="p-3" style="flex: 0 0 auto; border-bottom: 1px solid rgb(199, 199, 199)">
+      <span id="conversation-with" class="fs-3" >Placeholder</span>
+    </div>
+    
+    <div class="p-3 d-flex flex-column" id="message-list" style="flex: 1 1 auto;overflow-y:scroll;background-color:white">
+
+    </div>
+
+    <div class="p-3" style="flex: 0 0 auto;  border-top: 1px solid rgb(199, 199, 199)">
+      <form id="form" action="" class="d-flex align-items-center">
+        <input id="input" autocomplete="off" placeholder="Message" class="form-control rounded-pill me-2" />
+        <button class="btn btn-primary d-flex align-items-center"><i class="bi bi-send-fill me-2"></i>Send</button>
+      </form>
+    </div>
   </div>
+
+</div>
 
   <script>
     const socket = io();
@@ -24,36 +33,66 @@
     const messageList = document.getElementById('message-list');
     const conversationList = document.getElementById('conversation-list');
     const conversationWith = document.getElementById('conversation-with');
-    const startConversationForm = document.getElementById('start-conversation-form');
-    const newRecipient = document.getElementById('new-recipient');
 
     let currentConversation = '';
 
     socket.on('init', (conversations) => {
       conversationList.innerHTML = '';
-      for (const user in conversations) {
-        const item = document.createElement('li');
-        item.textContent = user;
-        item.onclick = () => {
-          currentConversation = user;
-          conversationWith.textContent = `Conversation with ${user}`;
+      for (let otherUserId in conversations) {
+        const conversation = conversations[otherUserId];
+        const userData = conversation.user; // The user object
+        const chat = createChat(userData);
+        
+        chat.onclick = () => {
+          currentConversation = userData.username;
+          conversationWith.textContent = `Chat with ${userData.username}`;
           messageList.innerHTML = '';
-          conversations[user].forEach((msg) => {
-            const item = document.createElement('li');
-            item.textContent = `${msg.sender}: ${msg.message}`;
-            messageList.appendChild(item);
+          conversation.messages.forEach((msg) => {
+            createMessage(msg.message, msg.sender, msg.timestamp)
+            messageList.scrollTo(0, messageList.scrollHeight);
           });
         };
-        conversationList.appendChild(item);
+
       }
     });
 
+    function createChat(userData) {
+      let profilePicSrc = userData.profilePic ? `/uploads/${userData.profilePic}` : "/images/Profile-PNG-File.png"
+      let profBadge = userData.professional ? `
+        <span class="badge rounded-pill text-bg-primary position-absolute" style="top:-8;right:-8">Professional</span>`
+        : ""
+      conversationList.innerHTML += `
+        <div class="mx-3">
+          <div class="d-flex align-items-center mb-3 position-relative">
+              <div class="circle-crop me-2" style="width:50px;height:50px;display:inline-flex">
+                <img src=${profilePicSrc}>
+              </div>
+              <span class="fs-5">${userData.username}</span>
+              ${profBadge}
+          </div>
+      `
+      let index = conversationList.children.length-1
+      return conversationList.children[index]
+    }
+
+    function createMessage(msgBody, authorData, timestamp) {
+      let dynClasses = authorData.username == '{{ user.username }}' ? 'bg-primary' : ''
+      let alignment = authorData.username == '{{ user.username }}' ? 'align-self: flex-end' : 'align-self: flex-start'
+      let order = authorData.username == '{{ user.username }}' ? 'flex-row-reverse' : ''
+      let dynStylesMsg = authorData.username == '{{ user.username }}' ? 'color: white;' : 'background-color: rgb(200, 200, 200);'
+      messageList.innerHTML += `
+        <div class="d-flex align-items-center ${order}" style="width: fit-content; ${alignment}">
+          <div class="${dynClasses} rounded-pill p-2 mb-1" style="${dynStylesMsg}">
+            <span>${msgBody}</span>
+          </div>
+          <span class="timestamp">${getMsgTime(timestamp)}</span>
+        </div>`
+    }
+
     socket.on('private message', (msg) => {
-      if (msg.sender === currentConversation || msg.recipient === currentConversation) {
-        const item = document.createElement('li');
-        item.textContent = `${msg.sender}: ${msg.message}`;
-        messageList.appendChild(item);
-        window.scrollTo(0, document.body.scrollHeight);
+      if (msg.sender.username === currentConversation || msg.recipient.username === currentConversation) {
+        createMessage(msg.message, msg.sender, msg.timestamp)
+        messageList.scrollTo(0, messageList.scrollHeight);
       }
     });
 
@@ -68,18 +107,6 @@
       }
     });
 
-    startConversationForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const recipient = newRecipient.value;
-      if (recipient) {
-        currentConversation = recipient;
-        conversationWith.textContent = `Conversation with ${recipient}`;
-        messageList.innerHTML = ''; // Clear the message list for the new conversation
-        newRecipient.value = ''; // Clear the input field
-      }
-    });
-
-    // Replace this with actual login mechanism
     const username = '{{ user.username }}'; // This should be dynamically set based on the logged-in user
     socket.emit('join', username);
   </script>
