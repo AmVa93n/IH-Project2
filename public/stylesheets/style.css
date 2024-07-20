@@ -62,10 +62,14 @@ body {
   color: black;
 }
 
-.testify {
-  border: 1px black solid;
-  margin-right: 150px;
-  
+.overlay-lid {
+  position: absolute; 
+  background-color: white; 
+  padding: 10px; 
+  border: 1px solid #ccc; 
+  z-index: 9999; 
+  width: calc(100% - 20px); 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .timestamp {

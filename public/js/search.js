@@ -43,7 +43,8 @@ document.addEventListener("DOMContentLoaded", () => {
         users.forEach(user => {
           const li = document.createElement('li');
           li.textContent = `${user.username} - ${user.country}`;
-          results.appendChild(li);
+          
+          results.appendChild(li);  
         });
       }
     } catch (error) {
