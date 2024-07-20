@@ -52,7 +52,8 @@
                 <button type="submit" class="btn btn-primary mx-1"><i class="bi bi-envelope-fill me-1"></i>Message</button>
             </form>
             {{#if this.professional}}
-            <button class="btn btn-warning mx-1"><i class="bi bi-cash-coin me-1"></i>Offers</button>
+            <a href="/users/{{this.username}}/offers">
+            <button class="btn btn-warning mx-1"><i class="bi bi-cash-coin me-1"></i>Offers</button></a>
             {{/if}}
         </div>
     </div>
