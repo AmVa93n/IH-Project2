@@ -1,8 +1,8 @@
-<h3 class="center">My offers</h3>
+<h3 class="center">My Offers</h3>
 <div class="d-flex justify-content-center flex-wrap px-auto" style="width: 100%;">
 {{#each offers}}
 
-<div class="card offer-card text-center mx-3 mb-4">
+<div class="card offer-card text-left mx-3 mb-4">
   <h5 class="card-header center">{{this.name}}</h5>
   <div class="card-body">
     <p class="card-text"> 
@@ -18,8 +18,8 @@
     <span class="card-text">(Up to {{this.maxGroupSize}} students)</span>
     {{/if}}
     </p>
-    <p class="card-text"><i class="bi bi-clock me-2"></i>{{this.duration}} Minutes</p>
-    <p class="card-text">{{this.price}} $</p>
+    <p class="card-text"><i class="bi bi-clock-fill me-2"></i>{{this.duration}} Minutes</p>
+    <p class="card-text"><i class="bi bi-tag-fill me-2"></i>{{this.price}} $</p>
 
     <div class="d-flex justify-content-center mt-3">
         <a href="/auth/myoffers/{{this._id}}/edit" class="btn btn-secondary mx-1"><i class="bi bi-pencil-square me-2"></i>Edit</a>

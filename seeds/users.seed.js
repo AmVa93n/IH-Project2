@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const User = require('../models/User.model');
+
 const MONGO_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/ironhack-project2';
+
 const langList = ['es','it','pt','fr','de','ru','nl','zh','hu','he','ar','kr','jp','ro','pl']
 
 // seed database with 100 users with randomized names and languages
@@ -18,19 +20,24 @@ async function seedDatabase() {
     let day = getRandomNumber(1,28).toString().padStart(2, '0')
     let month = getRandomNumber(1,12).toString().padStart(2, '0')
     let year = getRandomNumber(1960,2005)
+    let professional = randomChance(20)
+
     let user = {
       username: names[i],
       email: "user"+i+"@gmail.com",
       password: "Ab123456",
       gender: randomChance(50) ? "male" : "female",
       birthdate: `${year}-${month}-${day}`,
-      country: countries[getRandomNumber(0,countries.length)],
+      country: randomElement(countries),
       profilePic: null,
       lang_teach,
       lang_learn,
       private: randomChance(5),
-      professional: randomChance(20),
+      professional,
+      chats: [],
+      offers: []
     }
+
     users.push(user)
   }
 
@@ -64,6 +71,11 @@ async function getRandomNames(count) {
   } catch (error) {
     console.error('Error fetching random names:', error);
   }
+}
+
+function randomElement(array) {
+  let index = getRandomNumber(0,array.length-1)
+  return array[index]
 }
 
 function randomChance(percentage) {

@@ -45,7 +45,6 @@ router.get("/signup", isLoggedOut, (req, res) => {
 
 // POST /auth/signup
 router.post("/signup", upload.single('profilepic'), isLoggedOut, (req, res) => {
-  console.log(req.body)
   const { username, email, password, gender, birthdate, country, lang_teach, lang_learn, professional, private} = req.body;
   const profilePic = req.file ? req.file.filename : null;
   const isPrivate = !!private
@@ -323,8 +322,8 @@ router.post('/profile/edit/pfp', upload.single('edit-pfp'), isLoggedIn, async (r
   }
 });
 
-// GET route matches
-router.get("/matches", isLoggedIn, async (req, res) => {
+// GET route find tandem
+router.get("/match/tandem", isLoggedIn, async (req, res) => {
   const user = req.session.currentUser
   const user_teach = user.lang_teach
   const user_learn = user.lang_learn
@@ -333,6 +332,17 @@ router.get("/matches", isLoggedIn, async (req, res) => {
   for (let match of matches) { // filter irrelevant languages
     match.lang_teach = match.lang_teach.filter(lang => user_learn.includes(lang))
     match.lang_learn = match.lang_learn.filter(lang => user_teach.includes(lang))
+  }
+  res.render("auth/matches", {user, matches});
+});
+
+// GET route find teacher
+router.get("/match/teacher", isLoggedIn, async (req, res) => {
+  const user = req.session.currentUser
+  const user_learn = user.lang_learn
+  let matches = await User.find({lang_teach: { $in: user_learn }, professional: true})
+  for (let match of matches) { // filter irrelevant languages
+    match.lang_teach = match.lang_teach.filter(lang => user_learn.includes(lang))
   }
   res.render("auth/matches", {user, matches});
 });
