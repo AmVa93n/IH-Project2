@@ -35,7 +35,7 @@ async function searchItems(query) {
     } else {
       users.forEach(user => {
         const li = document.createElement('li');
-        li.textContent = `${user.username} - ${user.country}`;
+        li.textContent = `${user.profilePic} <br> ${user.username} - ${user.country}`;
         results.appendChild(li);
       });
     }
