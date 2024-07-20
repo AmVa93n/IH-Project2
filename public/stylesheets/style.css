@@ -79,20 +79,20 @@ body {
 #results-container {
   position: relative;
   width: 100%;
+  margin-top: 0px;
+  display: flex;
+  justify-content: center;
 }
 
 #results {
   position: absolute;
   top: 100%;
-  left: 0;
-  width: 100%;
   background-color: white;
-  border: 1px solid #ccc;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   max-height: 200px;
   overflow-y: auto;
-  margin: 0;
+  margin: auto;
   padding: 0;
   list-style: none;
 }
