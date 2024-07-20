@@ -62,17 +62,47 @@ body {
   color: black;
 }
 
-.overlay-lid {
-  position: absolute; 
-  background-color: white; 
-  padding: 10px; 
-  border: 1px solid #ccc; 
-  z-index: 9999; 
-  width: calc(100% - 20px); 
+.overlay-li {
+  position: absolute;
+  background-color: white;
+  padding: 10px;
+  border: 1px solid #ccc;
+  z-index: 9999;
+  width: calc(100% - 20px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .timestamp {
   font-size: 10px;
   margin: 0 5px;
+}
+#results-container {
+  position: relative;
+  width: 100%;
+}
+
+#results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background-color: white;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 200px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#results li {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+  background-color: white;
+}
+
+#results li:last-child {
+  border-bottom: none;
 }
