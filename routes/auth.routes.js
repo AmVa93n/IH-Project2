@@ -10,6 +10,7 @@ const saltRounds = 10;
 
 // Require the User model in order to interact with the database
 const User = require("../models/User.model");
+const Chat = require("../models/Chat.model");
 
 // Require necessary (isLoggedOut and isLiggedIn) middleware in order to control access to specific routes
 const isLoggedOut = require("../middleware/isLoggedOut");
@@ -93,7 +94,7 @@ router.post("/signup", upload.single('profilepic'), isLoggedOut, (req, res) => {
     .then((hashedPassword) => {
       // Create a user and save it in the database
       return User.create({ username, email, password: hashedPassword, gender, birthdate, country, 
-        profilePic, lang_teach, lang_learn, private: isPrivate, professional: isProfessional });
+        profilePic, lang_teach, lang_learn, private: isPrivate, professional: isProfessional, chats: []});
     })
     .then((user) => {
       res.redirect("/auth/login");
@@ -338,9 +339,42 @@ router.get("/matches", isLoggedIn, async (req, res) => {
 // GET route inbox
 router.get("/inbox", isLoggedIn, async (req, res) => {
   const user = req.session.currentUser
-  const targetUsername = req.query.target || null; // The target user's username from the query parameter
+  res.render("auth/inbox", {user});
+});
 
-  res.render("auth/inbox", {user, targetUsername});
+// GET route specific chat 
+router.get("/inbox/:chatId", isLoggedIn, async (req, res) => {
+  const user = req.session.currentUser
+  const chatId = req.params.chatId;
+  res.render("auth/inbox", {user, chatId});
+});
+
+// POST route start a new chat
+router.post('/inbox', isLoggedIn, async (req, res) => {
+  const { targetUsername } = req.body;
+  const user = req.session.currentUser
+  const initUser = await User.findOne({ username: user.username });
+  const targetUser = await User.findOne({ username: targetUsername });
+
+  // Check if a chat already exists
+  const existingChat = await Chat.findOne({
+    participants: { $all: [initUser._id, targetUser._id] }
+  });
+  if (existingChat) {
+    res.redirect(`/auth/inbox/${existingChat._id}`);
+    return
+  }
+
+  const newChat = new Chat({
+    participants: [user._id, targetUser._id],
+    messages: []
+  });
+  await newChat.save();
+  initUser.chats.push(newChat._id);
+  targetUser.chats.push(newChat._id);
+  await initUser.save();
+  await targetUser.save();
+  res.redirect(`/auth/inbox/${newChat._id}`);
 });
 
 module.exports = router;

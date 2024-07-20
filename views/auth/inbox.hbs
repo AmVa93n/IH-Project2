@@ -1,9 +1,9 @@
 <div class="row" style="width: 100%; height: 625px">
 
 
-  <div class="col-2" style="border-right: 1px solid rgb(199, 199, 199)">
+  <div class="col-2" style="border-right: 1px solid rgb(199, 199, 199); max-height: 625px;">
     <div class="p-3 fs-3">Chats</div>
-    <div class="row-auto" id="conversation-list" style="max-height: 561px; overflow-y:scroll">
+    <div class="row-auto" id="conversation-list" style="height: 550px; overflow-y:scroll">
 
     </div>
   </div>
@@ -33,52 +33,54 @@
     const form = document.getElementById('form');
     const input = document.getElementById('input');
     const messageList = document.getElementById('message-list');
-    const conversationList = document.getElementById('conversation-list');
-    const conversationWith = document.getElementById('conversation-with');
+    const chatList = document.getElementById('conversation-list');
+    const chatTitle = document.getElementById('conversation-with');
 
-    let activeChatUsername = '{{ targetUsername }}' || '';
+    let activeChatId = '{{ chatId }}' || "";
+    let activeChat = null
 
-    socket.on('init', (data) => {
-      conversationList.innerHTML = '';
-      for (let key in data) {
-        const chatData = data[key];
-        const userData = chatData.user; // The user object
-        const chat = createChat(chatData);
-        
-        if (activeChatUsername == userData.username) refreshChatWindow(chatData) // initialize from query
+    socket.on('init', (chats) => {
+      chatList.innerHTML = '';
+      for (let chat of chats) {
+        let chatElement = createChat(chat);
+        if (activeChatId == chat._id) setActiveChat(chat, chatElement)
       }
+      if (!activeChatId) setActiveChat(chats[0], chatList.children[0]) // default to first chat
     });
 
-    function createChat(chatData) {
-      const userData = chatData.user; // The user object
-      let profilePicSrc = userData.profilePic ? `/uploads/${userData.profilePic}` : "/images/Profile-PNG-File.png"
-      let profBadge = userData.professional ? `
+    function createChat(chat) {
+      const otherParty = chat.participants.find(party => party.username != username); // The other party
+      let profilePicSrc = otherParty.profilePic ? `/uploads/${otherParty.profilePic}` : "/images/Profile-PNG-File.png"
+      let profBadge = otherParty.professional ? `
         <span class="badge rounded-pill text-bg-primary position-absolute" style="top:-8;right:-8">Professional</span>`
         : ""
       let div = document.createElement('div')
-      div.classList.add("mx-3")
-      conversationList.appendChild(div)
+      div.id = chat._id
+      div.classList.add("chatbox")
+      chatList.appendChild(div)
       div.innerHTML += `
-        <div class="d-flex align-items-center mb-3 position-relative">
+        <div class="d-flex align-items-center position-relative">
           <div class="circle-crop me-2" style="width:50px;height:50px;display:inline-flex">
             <img src=${profilePicSrc}>
           </div>
-          <span class="fs-5">${userData.username}</span>
+          <span class="fs-5">${otherParty.username}</span>
           ${profBadge}`
 
       div.addEventListener('click', () => {
-          console.log("Chat clicked for user:", userData.username);
-          refreshChatWindow(chatData);
+          window.location.href = `/auth/inbox/${chat._id}`;
       });
+      return div
     }
 
-    function refreshChatWindow(chatData) {
-      const userData = chatData.user; // The user object
-      activeChatUsername = userData.username;
-      conversationWith.textContent = `Chat with ${userData.username}`;
+    function setActiveChat(chat, chatElement) {
+      const otherParty = chat.participants.find(party => party.username != username); // The other party
+      activeChatId = chat._id;
+      activeChat = chat
+      chatElement.classList.add("chatbox-active")
+      chatTitle.textContent = `Chat with ${otherParty.username}`;
       messageList.innerHTML = '';
       let curDate = ''
-      chatData.messages.forEach((msg) => {
+      chat.messages.forEach((msg) => {
         let msgDate = getMsgDate(msg.timestamp)
         if (curDate != msgDate) { // new day, add separator
           curDate = msgDate
@@ -104,7 +106,8 @@
     }
 
     socket.on('private message', (msg) => {
-      if (msg.sender.username === activeChatUsername || msg.recipient.username === activeChatUsername) {
+      const otherParty = activeChat.participants.find(party => party.username != username).username
+      if (msg.sender.username === otherParty || msg.recipient.username === otherParty) {
         createMessage(msg.message, msg.sender, msg.timestamp)
         messageList.scrollTo(0, messageList.scrollHeight);
       }
@@ -112,10 +115,14 @@
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      if (input.value && activeChatUsername) {
+      if (input.value && activeChat) {
+        let chatDiv = document.getElementById(activeChatId)
+        chatList.insertBefore(chatDiv, chatList.firstChild);
+        const otherParty = activeChat.participants.find(party => party.username != username).username
         socket.emit('private message', {
-          recipient: activeChatUsername,
+          recipient: otherParty,
           message: input.value,
+          chatId: activeChatId,
         });
         input.value = '';
       }

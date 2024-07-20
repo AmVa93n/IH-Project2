@@ -4,6 +4,7 @@ const app = require("./app");
 const http = require('http');
 const socketIo = require('socket.io');
 const Message = require('./models/Message.model');
+const Chat = require('./models/Chat.model');
 const User = require('./models/User.model');
 const server = http.createServer(app);
 const io = socketIo(server);
@@ -18,24 +19,23 @@ io.on('connection', (socket) => {
     console.log(`${username} joined their room`);
 
     try {
-      const messages = await Message.find({ $or: [{ sender: userfromDB._id }, { recipient: userfromDB._id }] })
-        .sort({ timestamp: 1 })
-        .populate('sender recipient')
-        .exec();
-
-      const conversations = await messages.reduce(async (accPromise, message) => {
-        const acc = await accPromise;
-        const otherUserId = message.sender.username === username ? message.recipient._id : message.sender._id;
-        const otherUser = message.sender.username === username ? message.recipient : message.sender;
-        if (!acc[otherUserId]) {
-          const userInfo = await User.findById(otherUser._id).lean().exec(); // Fetch additional user data
-          acc[otherUserId] = { user: userInfo, messages: [] };
-        }
-        acc[otherUserId].messages.push(message);
-        return acc;
-      }, Promise.resolve({}));
-
-      socket.emit('init', conversations);
+      const Chats = await Chat.find({ participants: { $in: [userfromDB._id] } })
+      .populate({
+        path: 'messages',
+        populate: [
+          { path: 'sender', select: 'username profilePic' },
+          { path: 'recipient', select: 'username profilePic' }
+        ],
+        options: { sort: { timestamp: 1 } }
+      })
+      .populate({
+        path: 'participants',
+        select: 'username profilePic professional'
+      })
+      .sort({ lastMessageTimestamp: -1 })
+      .lean()
+      .exec();
+      socket.emit('init', Chats);
     } catch (err) {
       console.error(err);
     }
@@ -44,6 +44,7 @@ io.on('connection', (socket) => {
   socket.on('private message', async (msg) => {
     const senderfromDB = await User.findOne({ username: socket.username })
     const recipientFromDB = await User.findOne({ username: msg.recipient })
+    const chat = await Chat.findById(msg.chatId)
     const newMessage = new Message({
       sender: senderfromDB._id, // Use the username stored in the socket
       recipient: recipientFromDB._id,
@@ -52,6 +53,9 @@ io.on('connection', (socket) => {
 
     try {
       await newMessage.save();
+      chat.messages.push(newMessage._id);
+      chat.lastMessageTimestamp = newMessage.timestamp;
+      await chat.save();
       await newMessage.populate('sender recipient','username')
       io.to(msg.recipient).emit('private message', newMessage); // Emit to recipient's room
       io.to(socket.username).emit('private message', newMessage); // Emit to sender's room
