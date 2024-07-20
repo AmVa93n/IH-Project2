@@ -31,11 +31,25 @@ async function searchItems(query) {
     if (users.length === 0) {
       const li = document.createElement('li');
       li.textContent = 'No users or languages found';
+      li.classList.add('overlay-li', 'list-group-item');
       results.appendChild(li);
     } else {
       users.forEach(user => {
         const li = document.createElement('li');
-        li.textContent = `${user.profilePic} <br> ${user.username} - ${user.country}`;
+        li.classList.add('overlay-li', 'list-group-item', 'd-flex', 'align-items-center');
+
+        const img = document.createElement('img');
+        img.src = user.profilePic || 'public/Profile-PNG-File.png';
+        img.alt = `${user.username}'s profile picture`;
+        img.classList.add('rounded-circle', 'me-3');
+        img.style.width = '50px';
+        img.style.height = '50px';
+
+        const userInfo = document.createElement('span');
+        userInfo.textContent = `${user.username} - ${user.country}`;
+
+        li.appendChild(img);
+        li.appendChild(userInfo);
         results.appendChild(li);
       });
     }
