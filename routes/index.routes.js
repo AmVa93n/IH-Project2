@@ -33,7 +33,7 @@ router.get("/users/:username/offers", async (req, res) => {
   const viewedUsername = decodeURIComponent(req.params.username);
   
   try {
-    const viewedUser = await User.findOne({ username: viewedUsername });
+    const viewedUser = await User.findOne({ username: viewedUsername }).populate('offers');
     if (!viewedUser) {
       return res.status(404).render("error", { message: "User not found" });
     }

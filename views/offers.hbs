@@ -1,15 +1,38 @@
 <h3 class="center">{{ viewedUser.username }}'s offers</h3>
-
+<div class="d-flex justify-content-center flex-wrap px-auto" style="width: 100%;">
 {{#each viewedUser.offers}}
 
-<div class="offer-card">
-    <p>name: {{this.name}}</p>
-    <p>language: {{this.language}}</p>
-    <p>location: {{this.location}}</p>
-    <p>duration: {{this.duration}}</p>
-    <p>classType: {{this.classType}}</p>
-    <p>maxGroupSize: {{this.maxGroupSize}}</p>
-    <p>price: {{this.price}}</p>
+<div class="card offer-card text-center mx-3 mb-4">
+  <h5 class="card-header center">{{this.name}}</h5>
+  <div class="card-body">
+    <p class="card-text"> 
+        <img src="/images/{{this.language}}.svg" class="lang-flag">
+        <span class="lang-name">{{this.language}}</span>
+    </p>
+    <p class="card-text">{{this.locationType}}</p>
+    {{#if this.location}}
+    <p class="card-text">{{this.location}}</p>
+    {{/if}}
+    <p class="card-text">{{this.classType}}
+    {{#if this.maxGroupSize}}
+    <span class="card-text">(Up to {{this.maxGroupSize}} students)</span>
+    {{/if}}
+    </p>
+    <p class="card-text"><i class="bi bi-clock me-2"></i>{{this.duration}} Minutes</p>
+    <p class="card-text">{{this.price}} $</p>
+
+    <div class="d-flex justify-content-center mt-3">
+        <a href="/auth/offers/{{this._id}}/book" class="btn btn-warning"><i class="bi bi-calendar2-check-fill me-2"></i>Book</a>
+    </div>
+  </div>
 </div>
 
 {{/each}}
+</div>
+
+<script>
+    const spans = [...document.querySelectorAll('.lang-name')];
+        for (lang of spans) {
+        lang.innerText = getLanguageName(lang.innerText)
+    }
+</script>

@@ -10,7 +10,7 @@
 
   <div class="col-7 g-0 d-flex flex-column" style="max-height: 625px; border-right: 1px solid rgb(199, 199, 199)">
     <div class="p-3" style="flex: 0 0 auto; border-bottom: 1px solid rgb(199, 199, 199)">
-      <span id="conversation-with" class="fs-3" >Placeholder</span>
+      <span id="conversation-with" class="fs-3" >You have no chats</span>
     </div>
     
     <div class="p-3 d-flex flex-column" id="message-list" style="flex: 1 1 auto;overflow-y:scroll;background-color:white">
@@ -45,7 +45,7 @@
         let chatElement = createChat(chat);
         if (activeChatId == chat._id) setActiveChat(chat, chatElement)
       }
-      if (!activeChatId) setActiveChat(chats[0], chatList.children[0]) // default to first chat
+      if (!activeChatId && chats.length > 0) setActiveChat(chats[0], chatList.children[0]) // default to first chat
     });
 
     function createChat(chat) {

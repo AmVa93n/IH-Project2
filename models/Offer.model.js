@@ -9,9 +9,12 @@ const offerSchema = new Schema({
     type: String,
     required: true,
   },
-  location: {
+  locationType: {
     type: String,
     required: true,
+  },
+  location: {
+    type: String,
   },
   duration: {
     type: Number,
@@ -23,8 +26,7 @@ const offerSchema = new Schema({
   },
   maxGroupSize: {
     type: Number,
-    required: true,
-    default: 1
+    default: 2
   },
   price: {
     type: Number,

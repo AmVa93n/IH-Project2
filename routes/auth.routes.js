@@ -381,20 +381,72 @@ router.post('/inbox', isLoggedIn, async (req, res) => {
 // GET route offers
 router.get('/myoffers', isLoggedIn, async (req, res) => {
   const user = req.session.currentUser
-  res.render('auth/myoffers', {user})
+  const userDB = await User.findOne({ username: user.username }).populate('offers')
+  const offers = userDB.offers
+  res.render('auth/myoffers', {user, offers})
 });
 
 // GET route create new offer
 router.get('/myoffers/new', isLoggedIn, async (req, res) => {
   const user = req.session.currentUser
-  res.render('auth/myoffers/new', {user})
+  res.render('auth/offer-create', {user})
 });
 
 // POST route create new offer
 router.post('/myoffers/new', isLoggedIn, async (req, res) => {
   const user = req.session.currentUser
-  const { name, language, location, duration, classType, maxGroupSize, price} = req.body;
-  User.create({ name, language, location, duration, classType, maxGroupSize, price});
+  const userDB = await User.findOne({ username: user.username });
+  const { name, language, locationType, location, duration, classType, maxGroupSize, price} = req.body;
+
+  // Check that all fields are provided
+  if ([name,language,locationType,classType,duration,price].some(field => !field)) {
+    res.status(400).render("auth/offer-create", {
+      errorMessage:
+        "Some mandatory fields are missing. Please try again",
+    });
+    return;
+  }
+
+  const offer = await Offer.create({ name, language, locationType, location, duration, classType, maxGroupSize, price});
+  userDB.offers.push(offer._id);
+  await userDB.save();
+  res.redirect('/auth/myoffers')
+});
+
+// GET route to edit offer
+router.get('/myoffers/:offerId/edit', isLoggedIn, async (req, res) => {
+  const user = req.session.currentUser
+  const offerId = req.params.offerId
+  const offer = await Offer.findById(offerId)
+  res.render('auth/offer-edit', {user, offer})
+});
+
+// POST route to edit offer
+router.post('/myoffers/:offerId/edit', isLoggedIn, async (req, res) => {
+  const { name, language, locationType, location, duration, classType, maxGroupSize, price } = req.body;
+  const offerId = req.params.offerId
+
+  // Check that all fields are provided
+  if ([name,language,locationType,classType,duration,price].some(field => !field)) {
+    res.status(400).render("auth/offer-create", {
+      errorMessage:
+        "Some mandatory fields are missing. Please try again",
+    });
+    return;
+  }
+
+  try {
+    await Offer.findByIdAndUpdate(offerId, {  name, language, locationType, location, duration, classType, maxGroupSize, price });
+    res.redirect('/auth/myoffers'); // Redirect to my offers page
+  } catch (err) {
+    res.status(500).render('auth/offer-edit', { errorMessage: 'Failed to update offer. Please try again.' });
+  }
+});
+
+// GET route to delete offer
+router.get('/myoffers/:offerId/delete', isLoggedIn, async (req, res) => {
+  const offerId = req.params.offerId
+  await Offer.findByIdAndDelete(offerId)
   res.redirect('/auth/myoffers')
 });
 

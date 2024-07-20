@@ -1,0 +1,102 @@
+{{#if errorMessage}}
+<div class="alert alert-danger d-flex align-items-center justify-content-center" role="alert">
+  <i class="bi bi-exclamation-triangle-fill me-2"></i>
+  {{errorMessage}}
+</div>
+{{/if}}
+
+<div class="content-box" style="min-width: 20%;">
+  <h2 class="center mb-3">Edit your offer</h2>
+  <form action="/auth/myoffers/{{ offer._id }}/edit" method="POST">
+
+    <div class="form-floating mb-3">
+      <input type="text" name="name" id="name" value="{{ offer.name }}" class="form-control">
+      <label for="name">Name</label>
+    </div>
+
+    <div class="form-floating mb-3">
+      <select class="form-select" id="language" name="language">
+      </select>
+      <label for="language">Language</label>
+    </div>
+
+    <fieldset class="row mb-3">
+      <legend class="col-form-label col-sm-3 pt-0">Type</legend>
+      <div class="col-sm-9">
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="locationType" id="online", value="online" checked>
+          <label class="form-check-label" for="private">Online</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="locationType" id="at-student", value="at-student">
+          <label class="form-check-label" for="group">In-person (at the student)</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="locationType" id="at-teacher", value="at-teacher">
+          <label class="form-check-label" for="group">In-person (at the teacher)</label>
+        </div>
+      </div>
+    </fieldset>
+
+    <div class="form-floating mb-3">
+      <input type="address" name="location" id="location" value="{{ offer.location }}" placeholder="" class="form-control" disabled>
+      <label for="name">Location</label>
+    </div>
+
+    <fieldset class="row mb-3">
+      <legend class="col-form-label col-sm-3 pt-0">Type</legend>
+      <div class="col-sm-9">
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="classType" id="private", value="private" checked>
+          <label class="form-check-label" for="private">Private</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="classType" id="group", value="group">
+          <label class="form-check-label" for="group">Group</label>
+        </div>
+      </div>
+    </fieldset>
+
+    <div class="input-group mb-3" id="maxGroupSize" style="display: none;">
+        <span class="input-group-text" id="addon-wrapping">Max. Group Size</span>
+        <input type="number" class="form-control" min="2" max="15" placeholder="2" name="maxGroupSize" value="{{ offer.maxGroupSize }}">
+    </div>
+
+    <div class="mb-3">
+        <div class="input-group" id="duration">
+            <span class="input-group-text" id="addon-wrapping">Duration</span>
+            <input type="number" class="form-control" min="60" max="180" placeholder="60" name="duration" value="{{ offer.duration }}">
+        </div>
+        <small class="ms-1 mt-1">* Class duration in minutes</small>
+    </div>
+
+    <div class="mb-3">
+        <div class="input-group">
+            <span class="input-group-text">Price</span>
+            <input type="number" class="form-control" min="10" max="100" placeholder="10"  name="price" value="{{ offer.price }}">
+            <span class="input-group-text">$</span>
+        </div>
+        <small class="ms-1 mt-1">* Price is calculated per class per student</small>
+    </div>
+
+    <div class="d-flex justify-content-center">
+      <button type="submit" class="btn btn-primary rounded-pill"><i class="bi bi-floppy2-fill me-2"></i>Save Changes</button>
+    </div>
+  </form>
+</div>
+
+<script>
+    const selectLang = document.getElementById("language")
+    const defaultLang = '{{ offer.language }}'
+    const languages = '{{ user.lang_teach }}'.split(",")
+    languages.sort((a,b) => {
+        if (langList[b] < langList[a]) return 1
+        if (langList[a] < langList[b]) return -1
+        if (langList[a] == langList[b]) return 0
+    })
+    for (lang of languages) {
+      let langName = getLanguageName(lang)
+      let selected = lang == defaultLang ? "selected" : ""
+      selectLang.innerHTML += `<option value=${lang} ${selected}><img src="/images/${lang}.svg" class="lang-flag"> ${langName}</option>`
+    }
+</script>
