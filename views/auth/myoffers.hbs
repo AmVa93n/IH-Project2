@@ -1,0 +1,15 @@
+<h3 class="center">My offers</h3>
+
+{{#each user.offers}}
+
+<div class="offer-card">
+    <p>name: {{this.name}}</p>
+    <p>language: {{this.language}}</p>
+    <p>location: {{this.location}}</p>
+    <p>duration: {{this.duration}}</p>
+    <p>classType: {{this.classType}}</p>
+    <p>maxGroupSize: {{this.maxGroupSize}}</p>
+    <p>price: {{this.price}}</p>
+</div>
+
+{{/each}}

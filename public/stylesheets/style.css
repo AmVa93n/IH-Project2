@@ -88,7 +88,6 @@ body {
   left: 0;
   width: 100%;
   background-color: white;
-  border: 1px solid #ccc;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   max-height: 200px;
@@ -119,4 +118,12 @@ body {
 
 .chatbox:hover {
   background-color: rgb(128, 191, 255);
+}
+
+.offer-card {
+  background-color: rgba(250, 250, 250, 0.8);
+  border-radius: 20px;
+  width: 265px;
+  padding: 20px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }

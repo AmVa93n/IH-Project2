@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Product = require('../models/Product.model');
+const Offer = require('../models/Offer.model');
 const User = require("../models/User.model");
 
 /* GET home page */
@@ -20,10 +20,25 @@ router.get("/users/:username", async (req, res) => {
       return res.status(404).render("error", { message: "User not found" });
     }
     
-    // Example of querying products
-    const products = await Product.find({ owner: viewedUser._id }).exec();
+    res.render("user", { viewedUser, user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).render("error", { message: "Internal Server Error" });
+  }
+});
+
+// GET another user's offers
+router.get("/users/:username/offers", async (req, res) => {
+  const user = req.session.currentUser;
+  const viewedUsername = decodeURIComponent(req.params.username);
+  
+  try {
+    const viewedUser = await User.findOne({ username: viewedUsername });
+    if (!viewedUser) {
+      return res.status(404).render("error", { message: "User not found" });
+    }
     
-    res.render("user", { viewedUser, user, products });
+    res.render("offers", { viewedUser, user });
   } catch (error) {
     console.error(error);
     res.status(500).render("error", { message: "Internal Server Error" });
@@ -40,7 +55,7 @@ router.get("/search", async (req, res) => {
   const regex = new RegExp(query, 'i');
 
   try {
-    const products = await Product.find({ name: regex }).exec();
+    const offers = await Offer.find({ name: regex }).exec();
     const users = await User.find({
       $or: [
         { username: regex },
@@ -48,7 +63,7 @@ router.get("/search", async (req, res) => {
       ]
     }).exec();
     
-    res.json({ products, users });
+    res.json({ offers, users });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });

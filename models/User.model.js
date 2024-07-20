@@ -46,7 +46,8 @@ const userSchema = new Schema(
     professional: {
       type: Boolean,
     },
-    chats: [{ type: Schema.Types.ObjectId, ref: 'Chat' }]
+    chats: [{ type: Schema.Types.ObjectId, ref: 'Chat' }],
+    offers: [{ type: Schema.Types.ObjectId, ref: 'Offer' }]
   },
   {
     // this second object adds extra properties: `createdAt` and `updatedAt`

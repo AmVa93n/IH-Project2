@@ -11,6 +11,7 @@ const saltRounds = 10;
 // Require the User model in order to interact with the database
 const User = require("../models/User.model");
 const Chat = require("../models/Chat.model");
+const Offer = require("../models/Offer.model");
 
 // Require necessary (isLoggedOut and isLiggedIn) middleware in order to control access to specific routes
 const isLoggedOut = require("../middleware/isLoggedOut");
@@ -94,7 +95,7 @@ router.post("/signup", upload.single('profilepic'), isLoggedOut, (req, res) => {
     .then((hashedPassword) => {
       // Create a user and save it in the database
       return User.create({ username, email, password: hashedPassword, gender, birthdate, country, 
-        profilePic, lang_teach, lang_learn, private: isPrivate, professional: isProfessional, chats: []});
+        profilePic, lang_teach, lang_learn, private: isPrivate, professional: isProfessional, chats: [], offers: []});
     })
     .then((user) => {
       res.redirect("/auth/login");
@@ -375,6 +376,26 @@ router.post('/inbox', isLoggedIn, async (req, res) => {
   await initUser.save();
   await targetUser.save();
   res.redirect(`/auth/inbox/${newChat._id}`);
+});
+
+// GET route offers
+router.get('/myoffers', isLoggedIn, async (req, res) => {
+  const user = req.session.currentUser
+  res.render('auth/myoffers', {user})
+});
+
+// GET route create new offer
+router.get('/myoffers/new', isLoggedIn, async (req, res) => {
+  const user = req.session.currentUser
+  res.render('auth/myoffers/new', {user})
+});
+
+// POST route create new offer
+router.post('/myoffers/new', isLoggedIn, async (req, res) => {
+  const user = req.session.currentUser
+  const { name, language, location, duration, classType, maxGroupSize, price} = req.body;
+  User.create({ name, language, location, duration, classType, maxGroupSize, price});
+  res.redirect('/auth/myoffers')
 });
 
 module.exports = router;
