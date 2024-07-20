@@ -24,10 +24,23 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
 
-          <form id="searchForm" class="d-flex mx-auto" role="search">
-            <input id="search" class="form-control rounded-start-pill" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn rounded-end-pill" type="submit" style="background-color: rgb(192, 192, 192);"><i class="bi bi-search"></i></button>
-          </form>
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+      <form id="searchForm" class="d-flex" role="search">
+        <input id="search" class="form-control rounded-start-pill" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn rounded-end-pill" type="submit" style="background-color: rgb(192, 192, 192);">
+          <i class="bi bi-search"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+  <div id="results-container" class="position-relative mt-3">
+    <ul id="results" class="list-unstyled"></ul>
+  </div>
+</div>
+
+
           {{#if user}}
           <a href="/auth/matches"><button class="btn btn-info rounded-pill"><i class="bi bi-rocket-takeoff-fill me-1"></i>Match me!</button></a>
           
@@ -64,7 +77,7 @@
         </div>
       </div>
     </nav>
-<ul id="results" class="list-group mt-3" style="display: none;"></ul>  
+<ul id="results" class="list-group mt-3"></ul>
     
     <script src="/js/script.js"></script>
     <script src="/js/search.js"></script>
