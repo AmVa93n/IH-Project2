@@ -203,103 +203,19 @@ router.get("/profile/delete", isLoggedIn, (req, res) => {
     });
 });
 
-// POST route to handle edit username
-router.post('/profile/edit/username', isLoggedIn, async (req, res) => {
-  const { username } = req.body;
-  const userId = req.session.currentUser._id;
-
-  try {
-    const updatedUser = await User.findByIdAndUpdate(userId, { username }, { new: true });
-    req.session.currentUser = updatedUser; // Update current user in session
-    res.redirect('/auth/profile'); // Redirect to profile page
-  } catch (err) {
-    res.status(500).render('auth/profile', { errorMessage: 'Failed to update username. Please try again.' });
-  }
-});
-
-// POST route to handle edit email
-router.post('/profile/edit/email', isLoggedIn, async (req, res) => {
-  const { email } = req.body;
-  const userId = req.session.currentUser._id;
-
-  try {
-    const updatedUser = await User.findByIdAndUpdate(userId, { email }, { new: true });
-    req.session.currentUser = updatedUser; // Update current user in session
-    res.redirect('/auth/profile'); // Redirect to profile page
-  } catch (err) {
-    res.status(500).render('auth/profile', { errorMessage: 'Failed to update email. Please try again.' });
-  }
-});
-
-// POST route to handle edit gender
-router.post('/profile/edit/gender', isLoggedIn, async (req, res) => {
-  const { gender } = req.body;
-  const userId = req.session.currentUser._id;
-
-  try {
-    const updatedUser = await User.findByIdAndUpdate(userId, { gender }, { new: true });
-    req.session.currentUser = updatedUser; // Update current user in session
-    res.redirect('/auth/profile'); // Redirect to profile page
-  } catch (err) {
-    res.status(500).render('auth/profile', { errorMessage: 'Failed to update gender. Please try again.' });
-  }
-});
-
-// POST route to handle edit birthdate
-router.post('/profile/edit/birthdate', isLoggedIn, async (req, res) => {
-  const { birthdate } = req.body;
-  const formattedDate = formatDate(new Date(birthdate))
-  const userId = req.session.currentUser._id;
-
-  try {
-    const updatedUser = await User.findByIdAndUpdate(userId, { birthdate: formattedDate }, { new: true });
-    req.session.currentUser = updatedUser; // Update current user in session
-    res.redirect('/auth/profile'); // Redirect to profile page
-  } catch (err) {
-    res.status(500).render('auth/profile', { errorMessage: 'Failed to update birthdate. Please try again.' });
-  }
-});
-
-// POST route to handle edit country
-router.post('/profile/edit/country', isLoggedIn, async (req, res) => {
-  const { country } = req.body;
-  const userId = req.session.currentUser._id;
-
-  try {
-    const updatedUser = await User.findByIdAndUpdate(userId, { country }, { new: true });
-    req.session.currentUser = updatedUser; // Update current user in session
-    res.redirect('/auth/profile'); // Redirect to profile page
-  } catch (err) {
-    res.status(500).render('auth/profile', { errorMessage: 'Failed to update country. Please try again.' });
-  }
-});
-
-// POST route to handle edit language user wants to teach
-router.post('/profile/edit/lang_teach', isLoggedIn, async (req, res) => {
-  let { lang_teach } = req.body;
+// POST route to handle edit profile
+router.post('/profile/edit', isLoggedIn, async (req, res) => {
+  const { username, email, gender, birthdate, country, lang_teach, lang_learn } = req.body;
   if (!lang_teach) lang_teach = []
+  if (!lang_learn) lang_learn = []
   const userId = req.session.currentUser._id;
 
   try {
-    const updatedUser = await User.findByIdAndUpdate(userId, { lang_teach }, { new: true });
+    const updatedUser = await User.findByIdAndUpdate(userId, { username, email, gender, birthdate, country, lang_teach, lang_learn }, { new: true });
     req.session.currentUser = updatedUser; // Update current user in session
     res.redirect('/auth/profile'); // Redirect to profile page
   } catch (err) {
-    res.status(500).render('auth/profile', { errorMessage: 'Failed to update languages. Please try again.' });
-  }
-});
-
-// POST route to handle edit language user wants to learn
-router.post('/profile/edit/lang_learn', isLoggedIn, async (req, res) => {
-  let { lang_learn } = req.body;
-  const userId = req.session.currentUser._id;
-
-  try {
-    const updatedUser = await User.findByIdAndUpdate(userId, { lang_learn }, { new: true });
-    req.session.currentUser = updatedUser; // Update current user in session
-    res.redirect('/auth/profile'); // Redirect to profile page
-  } catch (err) {
-    res.status(500).render('auth/profile', { errorMessage: 'Failed to update languages. Please try again.' });
+    res.status(500).render('auth/profile', { errorMessage: 'Failed to update profile. Please try again.' });
   }
 });
 
@@ -340,10 +256,12 @@ router.get("/match/tandem", isLoggedIn, async (req, res) => {
 router.get("/match/teacher", isLoggedIn, async (req, res) => {
   const user = req.session.currentUser
   const user_learn = user.lang_learn
-  let matches = await User.find({lang_teach: { $in: user_learn }, professional: true})
+  let matches = await User.find({lang_teach: { $in: user_learn }, professional: true}).populate('offers')
   for (let match of matches) { // filter irrelevant languages
     match.lang_teach = match.lang_teach.filter(lang => user_learn.includes(lang))
   }
+  // filter teachers with at least one offer of a language that the user wants to learn
+  matches = matches.filter(match => match.offers.some(offer => user_learn.includes(offer.language)))
   res.render("auth/matches", {user, matches});
 });
 
@@ -406,10 +324,10 @@ router.get('/myoffers/new', isLoggedIn, async (req, res) => {
 router.post('/myoffers/new', isLoggedIn, async (req, res) => {
   const user = req.session.currentUser
   const userDB = await User.findOne({ username: user.username });
-  const { name, language, locationType, location, duration, classType, maxGroupSize, price} = req.body;
+  const { name, language, level, locationType, location, duration, classType, maxGroupSize, price} = req.body;
 
   // Check that all fields are provided
-  if ([name,language,locationType,classType,duration,price].some(field => !field)) {
+  if ([name,language,level,locationType,classType,duration,price].some(field => !field)) {
     res.status(400).render("auth/offer-create", {
       errorMessage:
         "Some mandatory fields are missing. Please try again",
@@ -417,7 +335,7 @@ router.post('/myoffers/new', isLoggedIn, async (req, res) => {
     return;
   }
 
-  const offer = await Offer.create({ name, language, locationType, location, duration, classType, maxGroupSize, price});
+  const offer = await Offer.create({ name, language, level, locationType, location, duration, classType, maxGroupSize, price});
   userDB.offers.push(offer._id);
   await userDB.save();
   res.redirect('/auth/myoffers')
@@ -433,11 +351,11 @@ router.get('/myoffers/:offerId/edit', isLoggedIn, async (req, res) => {
 
 // POST route to edit offer
 router.post('/myoffers/:offerId/edit', isLoggedIn, async (req, res) => {
-  const { name, language, locationType, location, duration, classType, maxGroupSize, price } = req.body;
+  const { name, language, level, locationType, location, duration, classType, maxGroupSize, price } = req.body;
   const offerId = req.params.offerId
 
   // Check that all fields are provided
-  if ([name,language,locationType,classType,duration,price].some(field => !field)) {
+  if ([name,language,level,locationType,classType,duration,price].some(field => !field)) {
     res.status(400).render("auth/offer-create", {
       errorMessage:
         "Some mandatory fields are missing. Please try again",
@@ -446,7 +364,7 @@ router.post('/myoffers/:offerId/edit', isLoggedIn, async (req, res) => {
   }
 
   try {
-    await Offer.findByIdAndUpdate(offerId, {  name, language, locationType, location, duration, classType, maxGroupSize, price });
+    await Offer.findByIdAndUpdate(offerId, {  name, language, level, locationType, location, duration, classType, maxGroupSize, price });
     res.redirect('/auth/myoffers'); // Redirect to my offers page
   } catch (err) {
     res.status(500).render('auth/offer-edit', { errorMessage: 'Failed to update offer. Please try again.' });
@@ -458,6 +376,56 @@ router.get('/myoffers/:offerId/delete', isLoggedIn, async (req, res) => {
   const offerId = req.params.offerId
   await Offer.findByIdAndDelete(offerId)
   res.redirect('/auth/myoffers')
+});
+
+// checkout session
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const PORT = process.env.PORT || 3000;
+
+router.get('/offers/:offerId/book', isLoggedIn, (req, res) => {
+  const offerId = req.params.offerId
+  const user = req.session.currentUser
+  res.render('auth/checkout', { stripePublicKey: process.env.STRIPE_PUBLIC_KEY, offerId, user });
+});
+
+router.post('/offers/:offerId/book', isLoggedIn, async (req, res) => {
+  const offerId = req.params.offerId
+  const offer = await Offer.findById(offerId)
+  const user = req.session.currentUser
+  const session = await stripe.checkout.sessions.create({
+    ui_mode: 'embedded',
+    customer_email: user.email,
+    payment_method_types: ['card'],
+    line_items: [
+      {
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: offer.name,
+          },
+          unit_amount: offer.price * 100,
+        },
+        quantity: 1,
+      },
+    ],
+    mode: 'payment',
+    return_url: `http://localhost:${PORT}/auth/offers/${offerId}/return?session_id={CHECKOUT_SESSION_ID}`,
+  });
+  res.send({clientSecret: session.client_secret});
+});
+
+router.get('/offers/:offerId/return', isLoggedIn, (req, res) => {
+  const offerId = req.params.offerId
+  res.render('auth/checkout-return', { offerId });
+});
+
+router.get('/session-status', isLoggedIn, async (req, res) => {
+  const session = await stripe.checkout.sessions.retrieve(req.query.session_id);
+
+  res.send({
+    status: session.status,
+    customer_email: session.customer_details.email
+  });
 });
 
 module.exports = router;

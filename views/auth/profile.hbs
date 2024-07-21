@@ -144,7 +144,6 @@
         </div>`
     }
     list_edit.innerHTML += `
-      <button type="submit" class="btn btn-secondary btn-sm me-2 mini-btn">Save</button>
       <button type="button" class="btn btn-secondary btn-sm mini-btn" onclick="cancelLang('${list}')">Cancel</button>
       `
   }
@@ -191,7 +190,7 @@
             <input class="form-check-input" type="radio" name="gender" id="other", value="other" ${other}>
             <label class="form-check-label me-2" for="other">Other</label>
           </div>
-          <button type="submit" class="btn btn-secondary btn-sm me-2 mini-btn">Save</button>
+          
           <button type="button" class="btn btn-secondary btn-sm mini-btn" onclick="cancel('gender')">Cancel</button>
         </form>`
         return
@@ -200,8 +199,8 @@
     if (field == 'birthdate') {
       field_el.innerHTML = `
         <form action="/auth/profile/edit/birthdate" method="POST" class="d-flex align-items-center">
-          <input type="date" id="birthdate" name="birthdate" class="form-control me-2">
-          <button type="submit" class="btn btn-secondary btn-sm me-2 mini-btn">Save</button>
+          <input type="date" id="birthdate" name="birthdate" class="form-control me-2" value={{ user.birthdate }}>
+          
           <button type="button" class="btn btn-secondary btn-sm mini-btn" onclick="cancel('birthdate')">Cancel</button>
         </form>`
         return
@@ -211,7 +210,7 @@
       field_el.innerHTML = `
         <form action="/auth/profile/edit/country" method="POST" class="d-flex align-items-center">
           <select class="form-select me-2" id="countrySelect" name="country"></select>
-          <button type="submit" class="btn btn-secondary btn-sm me-2 mini-btn">Save</button>
+          
           <button type="button" class="btn btn-secondary btn-sm mini-btn" onclick="cancel('country')">Cancel</button>
         </form>`
         populateCountries()
@@ -223,7 +222,7 @@
     field_el.innerHTML = `
     <form action="/auth/profile/edit/${field}" method="POST" class="d-flex align-items-center">
       <input type="text" name="${field}" value="${fieldValue}" class="form-control me-2 mb-2">
-      <button type="submit" class="btn btn-secondary btn-sm me-2 mini-btn">Save</button>
+      
       <button type="button" class="btn btn-secondary btn-sm mini-btn" onclick="cancel('${field}')">Cancel</button>
     </form>`
   }
@@ -261,8 +260,9 @@
 
           // Populate the country select element
           countries.forEach(country => {
+              let selected = country.name.common == '{{ user.country }}' ? 'selected' : ''
               countrySelect.innerHTML += `
-              <option value="${country.name.common}">${country.name.common}</option>`
+              <option value="${country.name.common}" ${selected}>${country.name.common}</option>`
           });
       } catch (error) {
           console.error('Error fetching countries:', error);

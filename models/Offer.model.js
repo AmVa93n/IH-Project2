@@ -9,6 +9,10 @@ const offerSchema = new Schema({
     type: String,
     required: true,
   },
+  level: {
+    type: String,
+    required: true,
+  },
   locationType: {
     type: String,
     required: true,

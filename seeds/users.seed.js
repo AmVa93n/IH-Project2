@@ -7,10 +7,7 @@ const langList = ['es','it','pt','fr','de','ru','nl','zh','hu','he','ar','kr','j
 
 // seed database with 100 users with randomized names and languages
 async function seedDatabase() {
-  const names = await getRandomNames(100)
-  const response = await fetch('https://restcountries.com/v3.1/all');
-  const data = await response.json();
-  const countries = data.map(country => country.name.common)
+  const fakeUsers = await getRandomUsers(100)
   const users = []
 
   for (let i = 0; i < 100; i++) {
@@ -21,15 +18,17 @@ async function seedDatabase() {
     let month = getRandomNumber(1,12).toString().padStart(2, '0')
     let year = getRandomNumber(1960,2005)
     let professional = randomChance(20)
+    let gender = fakeUsers[i].gender
+    let avatarIndex = gender == "male" ? 5 : 4
 
     let user = {
-      username: names[i],
-      email: "user"+i+"@gmail.com",
-      password: "Ab123456",
-      gender: randomChance(50) ? "male" : "female",
+      username: fakeUsers[i].name.first,
+      email: fakeUsers[i].email,
+      password: fakeUsers[i].login.password,
+      gender,
       birthdate: `${year}-${month}-${day}`,
-      country: randomElement(countries),
-      profilePic: null,
+      country: fakeUsers[i].location.country,
+      profilePic: "avatar-"+gender+getRandomNumber(1,avatarIndex)+".jpg",
       lang_teach,
       lang_learn,
       private: randomChance(5),
@@ -62,12 +61,11 @@ function getRandomSubset(arr) {
   return result;
 }
 
-async function getRandomNames(count) {
+async function getRandomUsers(count) {
   try {
     const response = await fetch(`https://randomuser.me/api/?results=${count}`);
     const data = await response.json();
-    const names = data.results.map(user => `${user.name.first}`);
-    return names;
+    return data.results;
   } catch (error) {
     console.error('Error fetching random names:', error);
   }

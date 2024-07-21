@@ -4,6 +4,11 @@ const Offer = require('../models/Offer.model');
 
 const MONGO_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/ironhack-project2';
 
+const locTypes = ['online','at-student','at-teacher']
+const classTypes = ['private','group']
+const levels = ['beginner','intermediate','advanced']
+const durations = [45,60,90,120,150,180]
+
 // seed database with 1-5 offers per professional profile
 async function seedDatabase() {
     await mongoose.connect(MONGO_URI)
@@ -11,18 +16,18 @@ async function seedDatabase() {
     
     for (let user of profUsers) {
         let offerCount = getRandomNumber(1,5)
-        const locTypes = ['online','at-student','at-teacher']
-        const classTypes = ['private','group']
+
         for (let i = 1; i < offerCount+1; i++) {
             let classType = randomElement(classTypes)
             let maxGroupSize = classType == 'group' ? getRandomNumber(2,15) : null
             let offer = {
                 name: "my amazing offer "+i,
                 language: randomElement(user.lang_teach),
+                level: randomElement(levels),
                 locationType: randomElement(locTypes),
                 classType,
                 maxGroupSize,
-                duration: getRandomNumber(60,180),
+                duration: randomElement(durations),
                 price: getRandomNumber(10,100),
             }
             let offerDB = await Offer.create(offer);

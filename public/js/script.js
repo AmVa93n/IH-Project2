@@ -53,7 +53,8 @@ function getUserAge(birthdate) {
 
 function getMsgTime(timestamp) {
   const date = new Date(timestamp); // Parse the timestamp into a Date object
-  return date.toLocaleTimeString().slice(0, 5)
+  const index = date.toLocaleTimeString()[0] == "0" ? 4 : 5 // 0 is not 00, so need to slice 1 character earlier
+  return date.toLocaleTimeString().slice(0, index)
 }
 
 function getMsgDate(timestamp) {

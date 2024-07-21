@@ -1,0 +1,34 @@
+<script src="https://js.stripe.com/v3/"></script>
+
+<h1>Checkout</h1>
+
+<!-- Display a payment form -->
+
+<div id="checkout" class="content-box">
+<!-- Checkout will insert the payment form here -->
+</div>
+
+<script>
+    // This is your test secret API key.
+const stripe = Stripe('{{stripePublicKey}}');
+
+initialize();
+
+// Create a Checkout Session
+async function initialize() {
+  const fetchClientSecret = async () => {
+    const response = await fetch("/auth/offers/{{offerId}}/book", {
+      method: "POST",
+    });
+    const { clientSecret } = await response.json();
+    return clientSecret;
+  };
+
+  const checkout = await stripe.initEmbeddedCheckout({
+    fetchClientSecret,
+  });
+
+  // Mount Checkout
+  checkout.mount('#checkout');
+}
+</script>
