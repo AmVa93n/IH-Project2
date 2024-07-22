@@ -180,7 +180,7 @@
 
     learnCheckboxes.forEach(checkbox => {
         checkbox.addEventListener('change', () => {
-            const teachCheckbox = document.getElementById('speak-' + checkbox.value);
+            const teachCheckbox = document.getElementById('teach-' + checkbox.value);
             if (checkbox.checked) {
                 teachCheckbox.disabled = true;
             } else {

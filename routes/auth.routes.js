@@ -204,37 +204,38 @@ router.get("/profile/delete", isLoggedIn, (req, res) => {
 });
 
 // POST route to handle edit profile
-router.post('/profile/edit', isLoggedIn, async (req, res) => {
+router.post('/profile/edit', upload.single('pfp'), isLoggedIn, async (req, res) => {
   const { username, email, gender, birthdate, country, lang_teach, lang_learn } = req.body;
-  if (!lang_teach) lang_teach = []
-  if (!lang_learn) lang_learn = []
-  const userId = req.session.currentUser._id;
-
-  try {
-    const updatedUser = await User.findByIdAndUpdate(userId, { username, email, gender, birthdate, country, lang_teach, lang_learn }, { new: true });
-    req.session.currentUser = updatedUser; // Update current user in session
-    res.redirect('/auth/profile'); // Redirect to profile page
-  } catch (err) {
-    res.status(500).render('auth/profile', { errorMessage: 'Failed to update profile. Please try again.' });
-  }
-});
-
-// POST route to handle edit profile picture
-router.post('/profile/edit/pfp', upload.single('edit-pfp'), isLoggedIn, async (req, res) => {
   const profilePic = req.file ? req.file.filename : null;
   const user = req.session.currentUser
   const userId = req.session.currentUser._id;
 
+  if ([username,email,birthdate,country].some(field => field === "")) {
+    res.status(400).render("auth/profile", {
+      errorMessage:
+        "Some mandatory fields are missing. Please provide your username, email, birth date and country of residence.",
+    });
+    return;
+  }
+
+  if (!lang_learn && !lang_teach) {
+    res.status(400).render("auth/profile", {
+      errorMessage:
+        "Please choose at least one language you'd like to teach or learn",
+    });
+    return;
+  }
+
   try {
-    if (user.profilePic) { // delete old profile picture from file system, if it exists
+    if (user.profilePic && profilePic ) { // delete old profile picture from file system, if it exists and user chose one
       const oldPfpPath = path.join(__dirname, '../public/uploads', user.profilePic);
       fs.unlinkSync(oldPfpPath)
     } 
-    const updatedUser = await User.findByIdAndUpdate(userId, { profilePic }, { new: true });
+    const updatedUser = await User.findByIdAndUpdate(userId, { username, email, gender, birthdate, country, lang_teach, lang_learn, profilePic }, { new: true });
     req.session.currentUser = updatedUser; // Update current user in session
     res.redirect('/auth/profile'); // Redirect to profile page
   } catch (err) {
-    res.status(500).render('auth/profile', { errorMessage: 'Failed to update profile picture. Please try again.' });
+    res.status(500).render('auth/profile', { errorMessage: 'Failed to update profile. Please try again.' });
   }
 });
 

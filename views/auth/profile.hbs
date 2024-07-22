@@ -7,152 +7,157 @@
 
 <div class="content-box" style="width: 35%; position:relative">
     <h2 class="mb-3 center">My Profile</h2>
-    <div class="mb-3 mx-auto circle-crop">
-        {{#if user.profilePic}}
-        <img id="profile-pic-preview" src="/uploads/{{user.profilePic}}">
-        {{else}}
-        <img id="profile-pic-preview" src="/images/Profile-PNG-File.png">
-        {{/if}}
-    </div>
-    <button id="edit-pfp-btn" class="btn btn-secondary btn-sm circle-btn" style="position: absolute;top:230;right:200">
-        <i class="bi bi-pencil-square"></i>
-    </button>
-    <div id="save-cancel-pfp" class="d-flex justify-content-center mt-3" style="visibility: hidden;">
-      <form action="/auth/profile/edit/pfp" method="POST" enctype="multipart/form-data">
-        <input type="file" id="edit-pfp" name="edit-pfp" style="display: none;" onchange="previewImage(event)" />
-        <button type="submit" class="btn btn-secondary btn-sm mini-btn mb-3">Save</button>
-        <button type="button" class="btn btn-secondary btn-sm mini-btn mb-3" onclick="cancel(`pfp`)">Cancel</button>
-      </form>
-    </div>
+    <form action="/auth/profile/edit" method="POST" enctype="multipart/form-data">
+      <div class="mb-3 mx-auto circle-crop">
+          {{#if user.profilePic}}
+          <img id="profile-pic-preview" src="/uploads/{{user.profilePic}}">
+          {{else}}
+          <img id="profile-pic-preview" src="/images/Profile-PNG-File.png">
+          {{/if}}
+      </div>
+      <button type="button" id="edit-pfp-btn" class="btn btn-secondary btn-sm circle-btn" style="position: absolute;top:230;right:200">
+          <i class="bi bi-pencil-square"></i>
+      </button>
 
-    <div class="row fs-6 mb-2">
-        <p class="col-4 fw-bold">Username</p>
-        <div class="col" id="username">
-          <span>{{user.username}}</span>
-          <button class="btn btn-secondary btn-sm mini-btn" onclick="edit(`username`)">Edit</button>
-        </div>
+      <div class="d-flex justify-content-center my-3">
+          <input type="file" id="pfp" name="pfp" value="{{user.profilePic}}" style="display: none;" onchange="previewImage(event)" />
+          <button type="button" class="btn btn-sm pfp-cancel d-none" onclick="cancel(`pfp`)"><i class="bi bi-x-circle-fill"></i></button>
+      </div>
+
+      <div class="row fs-6 mb-3 align-items-center">
+          <span class="col-4 fw-bold">Username</span>
+          <div class="col">
+            <span class="username-edit">{{user.username}}</span>
+            <input class="form-control username-cancel d-none" type="text" name="username" value="{{user.username}}">
+          </div>
+          <div class="col-3">
+            <button type="button" class="btn btn-sm username-edit" onclick="edit(`username`)"><i class="bi bi-pencil-fill"></i></button>
+            <button type="button" class="btn btn-sm username-cancel d-none" onclick="cancel('username')"><i class="bi bi-x-circle-fill"></i></button>
+          </div>
+      </div>
+      
+      <div class="row fs-6 mb-3 align-items-center">
+          <span class="col-4 fw-bold">Email</span>
+          <div class="col">
+            <span class="email-edit">{{user.email}}</span>
+            <input class="form-control email-cancel d-none" type="text" name="email" value="{{user.email}}">
+          </div>
+          <div class="col-3">
+            <button type="button" class="btn btn-sm email-edit" onclick="edit(`email`)"><i class="bi bi-pencil-fill"></i></button>
+            <button type="button" class="btn btn-sm email-cancel d-none" onclick="cancel('email')"><i class="bi bi-x-circle-fill"></i></button>
+          </div>
+      </div>
+
+      <div class="row fs-6 mb-3 align-items-center">
+          <span class="col-4 fw-bold">Gender</span>
+          <div class="col">
+            <span class="gender-edit">{{user.gender}}</span>
+            <div class="form-check gender-cancel d-none">
+              <input class="form-check-input" type="radio" name="gender" id="male", value="male" ${male}>
+              <label class="form-check-label me-2" for="male">Male</label>
+            </div>
+            <div class="form-check gender-cancel d-none">
+              <input class="form-check-input" type="radio" name="gender" id="female", value="female" ${female}>
+              <label class="form-check-label me-2" for="female">Female</label>
+            </div>
+            <div class="form-check gender-cancel d-none">
+              <input class="form-check-input" type="radio" name="gender" id="other", value="other" ${other}>
+              <label class="form-check-label me-2" for="other">Other</label>
+            </div>
+          </div>
+          <div class="col-3">
+            <button type="button" class="btn btn-sm gender-edit" onclick="edit(`gender`)"><i class="bi bi-pencil-fill"></i></button>
+            <button type="button" class="btn btn-sm gender-cancel d-none" onclick="cancel('gender')"><i class="bi bi-x-circle-fill"></i></button>
+          </div>
+      </div>
+
+      <div class="row fs-6 mb-3 align-items-center">
+          <span class="col-4 fw-bold">Birthdate</span>
+          <div class="col">
+            <span class="date birthdate-edit">{{user.birthdate}}</span>
+            <input class="form-control birthdate-cancel d-none" type="date" name="birthdate" value={{user.birthdate}}>
+          </div>
+          <div class="col-3">
+            <button type="button" class="btn btn-sm birthdate-edit" onclick="edit(`birthdate`)"><i class="bi bi-pencil-fill"></i></button>
+            <button type="button" class="btn btn-sm birthdate-cancel d-none" onclick="cancel('birthdate')"><i class="bi bi-x-circle-fill"></i></button>
+          </div>
+      </div>
+
+      <div class="row fs-6 mb-4 align-items-center">
+          <span class="col-4 fw-bold">Country</span>
+          <div class="col">
+            <span class="country-edit">{{user.country}}</span>
+            <select class="form-select country-cancel d-none" name="country"></select>
+          </div>
+          <div class="col-3">
+            <button type="button" class="btn btn-sm country-edit" onclick="edit(`country`)"><i class="bi bi-pencil-fill"></i></button>
+            <button type="button" class="btn btn-sm country-cancel d-none" onclick="cancel('country')"><i class="bi bi-x-circle-fill"></i></button>
+          </div>
+      </div>
+
+      <div class="row fs-6 mb-2">
+          <p class="col-4 fw-bold">I want to teach</p>
+          <div class="col">
+            <div class="teach-edit">
+              {{#each user.lang_teach}}
+                <div class="me-1">
+                  <img src="/images/{{this}}.svg" class="lang-flag">
+                  <span class="lang-name">{{this}}</span>
+                </div>
+              {{/each}}
+            </div>
+            <div class="teach-cancel d-none">
+
+            </div>
+          </div>
+          <div class="col-3">
+            <button type="button" class="btn btn-sm teach-edit" onclick="edit('teach')"><i class="bi bi-pencil-fill"></i></button>
+            <button type="button" class="btn btn-sm teach-cancel d-none" onclick="cancel('teach')"><i class="bi bi-x-circle-fill"></i></button>
+          </div>
+      </div>
+
+      <div class="row fs-6 mb-2">
+          <p class="col-4 fw-bold">I want to learn</p>
+          <div class="col">
+            <div class="learn-edit">
+              {{#each user.lang_learn}}
+                <div class="me-1">
+                  <img src="/images/{{this}}.svg" class="lang-flag">
+                  <span class="lang-name">{{this}}</span>
+                </div>
+              {{/each}}
+            </div>
+            <div class="learn-cancel d-none">
+
+            </div>
+          </div>
+          <div class="col-3">
+            <button type="button" class="btn btn-sm learn-edit" onclick="edit('learn')"><i class="bi bi-pencil-fill"></i></button>
+            <button type="button" class="btn btn-sm learn-cancel d-none" onclick="cancel('learn')"><i class="bi bi-x-circle-fill"></i></button>
+          </div>
+      </div>
+
+      <div class="d-flex justify-content-center mt-3">
+        <button type="submit" class="btn btn-primary rounded-pill"><i class="bi bi-floppy2-fill me-2"></i>Save Changes</button>
+      </div>
+    </form>
+
+    <div class="d-flex justify-content-center mt-3">
+      <a href="/auth/profile/delete"><button class="btn btn-sm btn-outline-danger"></i>Delete Account</button></a>
     </div>
     
-    <div class="row fs-6 mb-2">
-        <p class="col-4 fw-bold">Email</p>
-        <div class="col" id="email">
-          <span>{{user.email}}</span>
-          <button class="btn btn-secondary btn-sm mini-btn" onclick="edit(`email`)">Edit</button>
-        </div>
-    </div>
-
-    <div class="row fs-6 mb-2">
-        <p class="col-4 fw-bold">Gender</p>
-        <div class="col" id="gender">
-          <span>{{user.gender}}</span>
-          <button class="btn btn-secondary btn-sm mini-btn" onclick="edit(`gender`)">Edit</button>
-        </div>
-    </div>
-
-    <div class="row fs-6 mb-2">
-        <p class="col-4 fw-bold">Birthdate</p>
-        <div class="col" id="birthdate">
-          <span class="date">{{user.birthdate}}</span>
-          <button class="btn btn-secondary btn-sm mini-btn" onclick="edit(`birthdate`)">Edit</button>
-        </div>
-    </div>
-
-    <div class="row fs-6 mb-4">
-        <p class="col-4 fw-bold">Country</p>
-        <div class="col" id="country">
-          <span>{{user.country}}</span>
-          <button class="btn btn-secondary btn-sm mini-btn" onclick="edit(`country`)">Edit</button>
-        </div>
-    </div>
-
-    <div class="row fs-6 mb-2">
-        <p class="col-4 fw-bold">I want to teach</p>
-        <div class="col">
-          <div id="lang_teach">
-            {{#each user.lang_teach}}
-              <div class="me-1">
-                <img src="/images/{{this}}.svg" class="lang-flag">
-                <span class="lang-name">{{this}}</span>
-              </div>
-            {{/each}}
-            <button class="btn btn-secondary btn-sm mini-btn" onclick="editLang('lang_teach')">Edit</button>
-          </div>
-          <form action="/auth/profile/edit/lang_teach" method="POST" id="lang_teach-edit"></form>
-        </div>
-    </div>
-
-    <div class="row fs-6 mb-2">
-        <p class="col-4 fw-bold">I want to learn</p>
-        <div class="col">
-          <div id="lang_learn">
-            {{#each user.lang_learn}}
-              <div class="me-1">
-                <img src="/images/{{this}}.svg" class="lang-flag">
-                <span class="lang-name">{{this}}</span>
-              </div>
-            {{/each}}
-            <button class="btn btn-secondary btn-sm mini-btn" onclick="editLang('lang_learn')">Edit</button>
-          </div>
-          <form action="/auth/profile/edit/lang_learn" method="POST" id="lang_learn-edit"></form>
-        </div>
-    </div>
-
-    <form action="/auth/profile/delete" method="GET">
-        <div class="d-flex justify-content-center mt-3">
-        <button type="submit" class="btn btn-danger">Delete Account</button>
-        </div>
-    </form>
 </div>
 
 <script>
   document.getElementById('edit-pfp-btn').addEventListener('click', function() {
-      document.getElementById('edit-pfp').click();
+      document.getElementById('pfp').click();
   });
 
   document.querySelector('.date').innerText = formatDate(document.querySelector('.date').innerText)
 
-  // populate languages
-    const teachList = [...document.querySelectorAll('#lang_teach .lang-name')];
-    for (lang of teachList) {
-      lang.innerText = getLanguageName(lang.innerText)
-    }
-
-    const learnList = [...document.querySelectorAll('#lang_learn .lang-name')];
-    for (lang of learnList) {
-      lang.innerText = getLanguageName(lang.innerText)
-    }
-
-  function editLang(list) {
-    const languages = Object.keys(langList).sort((a,b) => {
-            if (langList[b] < langList[a]) return 1
-            if (langList[a] < langList[b]) return -1
-            if (langList[a] == langList[b]) return 0
-          })
-    let currentList_el = list == "lang_teach" ? teachList : learnList
-    let inverseList_el = list == "lang_teach" ? learnList : teachList
-    let currentList = currentList_el.map(el => el.innerText)
-    let inverseList = inverseList_el.map(el => el.innerText)
-    const list_edit = document.getElementById(list+"-edit");
-    document.getElementById(list).style.display = "none"
-    for (lang of languages) {
-      let langName = getLanguageName(lang)
-      let attr = currentList.includes(langName) ? "checked" : inverseList.includes(langName) ? "disabled" : ""
-      list_edit.innerHTML += `
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" name="${list}" value="${lang}" id="teach-${lang}" ${attr}>
-          <label class="form-check-label" for="teach-${lang}"><img src="/images/${lang}.svg" class="lang-flag"> ${langName}</label>
-        </div>`
-    }
-    list_edit.innerHTML += `
-      <button type="button" class="btn btn-secondary btn-sm mini-btn" onclick="cancelLang('${list}')">Cancel</button>
-      `
-  }
-
-  function cancelLang(list) {
-    document.getElementById(list).style.display = "block"
-    const editChildren = [...document.querySelectorAll(`#${list}-edit *`)]
-    editChildren.forEach(el => el.remove())
-  }
+  populateLanguages()
+  populateCountries()
+  document.getElementById('{{user.gender}}').setAttribute('checked',true)
 
   function previewImage(event) {
     const reader = new FileReader();
@@ -161,93 +166,48 @@
       preview.src = reader.result;
     }
     reader.readAsDataURL(event.target.files[0]);
-    document.getElementById('save-cancel-pfp').style.visibility = "visible"
+    edit('pfp')
   }
 
   function edit(field) {
-    if (field == 'pfp') {
-      document.getElementById('save-cancel-pfp').style.visibility = "hidden"
-      return
-    }
-
-    const field_el = document.getElementById(field)
-
-    if (field == 'gender') {
-      let male = '{{user.gender}}' == 'male' ? 'checked' : ""
-      let female = '{{user.gender}}' == 'female' ? 'checked' : ""
-      let other = '{{user.gender}}' == 'other' ? 'checked' : ""
-      field_el.innerHTML = `
-        <form action="/auth/profile/edit/gender" method="POST" class="d-flex align-items-center">
-          <div class="form-check">
-          <input class="form-check-input" type="radio" name="gender" id="male", value="male" ${male}>
-          <label class="form-check-label me-2" for="male">Male</label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="gender" id="female", value="female" ${female}>
-            <label class="form-check-label me-2" for="female">Female</label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="gender" id="other", value="other" ${other}>
-            <label class="form-check-label me-2" for="other">Other</label>
-          </div>
-          
-          <button type="button" class="btn btn-secondary btn-sm mini-btn" onclick="cancel('gender')">Cancel</button>
-        </form>`
-        return
-    }
-
-    if (field == 'birthdate') {
-      field_el.innerHTML = `
-        <form action="/auth/profile/edit/birthdate" method="POST" class="d-flex align-items-center">
-          <input type="date" id="birthdate" name="birthdate" class="form-control me-2" value={{ user.birthdate }}>
-          
-          <button type="button" class="btn btn-secondary btn-sm mini-btn" onclick="cancel('birthdate')">Cancel</button>
-        </form>`
-        return
-    }
- 
-    if (field == 'country') {
-      field_el.innerHTML = `
-        <form action="/auth/profile/edit/country" method="POST" class="d-flex align-items-center">
-          <select class="form-select me-2" id="countrySelect" name="country"></select>
-          
-          <button type="button" class="btn btn-secondary btn-sm mini-btn" onclick="cancel('country')">Cancel</button>
-        </form>`
-        populateCountries()
-        return
-    }
-
-    let fieldValue = field == 'username' ? `{{ user.username }}` 
-      : field =='email' ? `{{ user.email }}` : ""
-    field_el.innerHTML = `
-    <form action="/auth/profile/edit/${field}" method="POST" class="d-flex align-items-center">
-      <input type="text" name="${field}" value="${fieldValue}" class="form-control me-2 mb-2">
-      
-      <button type="button" class="btn btn-secondary btn-sm mini-btn" onclick="cancel('${field}')">Cancel</button>
-    </form>`
-  }
+    [...document.querySelectorAll(`.${field}-edit`)].forEach(el => el.classList.add('d-none'));
+    [...document.querySelectorAll(`.${field}-cancel`)].forEach(el => el.classList.remove('d-none'));
+  };
 
   function cancel(field) {
-    if (field == 'pfp') {
-      document.getElementById('profile-pic-preview').src = "/uploads/{{user.profilePic}}"
-      document.getElementById('save-cancel-pfp').style.visibility = "hidden"
-      return
-    }
+    resetValue(field);
+    [...document.querySelectorAll(`.${field}-edit`)].forEach(el => el.classList.remove('d-none'));
+    [...document.querySelectorAll(`.${field}-cancel`)].forEach(el => el.classList.add('d-none'));
+  };
 
-    const field_el = document.getElementById(field)
-    let fieldValue = field == 'username' ? `{{ user.username }}` 
-      : field =='email' ? `{{ user.email }}`
-      : field =='gender' ? `{{ user.gender }}`
-      : field =='birthdate' ? `{{ user.birthdate }}` 
-      : field =='country' ? `{{ user.country }}` 
-      : ""
-    field_el.innerHTML = `
-      <span>${fieldValue}</span>
-      <button class="btn btn-secondary btn-sm mini-btn" onclick="edit('${field}')">Edit</button>`
+  function resetValue(field) {
+    if (field == 'pfp') {
+      let src = '{{ user.profilePic }}' ? "/uploads/{{user.profilePic}}" : "/images/Profile-PNG-File.png"
+      document.getElementById('profile-pic-preview').src = src
+    }
+    if (field == "gender") document.getElementById('{{user.gender}}').checked = true
+    if (field == "teach") {
+      let elements = [...document.querySelectorAll(`input[name="lang_teach"]`)]
+      elements.forEach(el => el.checked = '{{ user.lang_teach }}'.includes(el.id.slice(6)))
+    }
+    if (field == "learn") {
+      let elements = [...document.querySelectorAll(`input[name="lang_learn"]`)]
+      elements.forEach(el => el.checked = '{{ user.lang_learn }}'.includes(el.id.slice(6)))
+    }
+    
+    if (["username","email","birthdate","country"].includes(field)) {
+      let tag, hbs
+      switch (field) {
+        case "username": tag = "input", hbs = '{{user.username}}';break
+        case "email": tag = "input", hbs = '{{user.email}}';break
+        case "birthdate": tag = "input", hbs = '{{user.birthdate}}';break
+        case "country": tag = "select", hbs = '{{user.country}}';break
+      }
+      document.querySelector(`${tag}[name=${field}]`).value = hbs
+    } 
   }
 
   async function populateCountries() {
-    const countrySelect = document.getElementById('countrySelect');
       // Fetch list of countries
       try {
           const response = await fetch('https://restcountries.com/v3.1/all');
@@ -259,13 +219,64 @@
           })
 
           // Populate the country select element
+          const select = document.querySelector(`select[name="country"]`)
           countries.forEach(country => {
-              let selected = country.name.common == '{{ user.country }}' ? 'selected' : ''
-              countrySelect.innerHTML += `
-              <option value="${country.name.common}" ${selected}>${country.name.common}</option>`
+            select.innerHTML += `<option value="${country.name.common}">${country.name.common}</option>`
           });
       } catch (error) {
           console.error('Error fetching countries:', error);
       }
+    document.querySelector("option[value='{{user.country}}']").setAttribute('selected',true)
   }
+
+  function populateLanguages() {
+    const spans = [...document.querySelectorAll('.lang-name')];
+      for (let lang of spans) {
+        lang.innerText = getLanguageName(lang.innerText)
+      }
+
+    const languages = Object.keys(langList).sort((a,b) => {
+        if (langList[b] < langList[a]) return 1
+        if (langList[a] < langList[b]) return -1
+        if (langList[a] == langList[b]) return 0
+      })
+
+    const editTeach = document.getElementsByClassName('teach-cancel')[0]
+    const editLearn = document.getElementsByClassName('learn-cancel')[0]
+
+    for (let lang of languages) {
+      let langName = getLanguageName(lang)
+      let attr_teach = '{{ user.lang_teach }}'.includes(lang) ? "checked" : '{{ user.lang_learn }}'.includes(lang) ? "disabled" : ""
+      editTeach.innerHTML += `
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="lang_teach" value="${lang}" id="teach-${lang}" ${attr_teach}>
+          <label class="form-check-label" for="teach-${lang}"><img src="/images/${lang}.svg" class="lang-flag"> ${langName}</label>
+        </div>`
+
+      let attr_learn = '{{ user.lang_learn }}'.includes(lang) ? "checked" : '{{ user.lang_teach }}'.includes(lang) ? "disabled" : ""
+      editLearn.innerHTML += `
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="lang_learn" value="${lang}" id="learn-${lang}" ${attr_learn}>
+          <label class="form-check-label" for="learn-${lang}"><img src="/images/${lang}.svg" class="lang-flag"> ${langName}</label>
+        </div>`
+    }
+  }
+
+  // disabling/enabling of checkboxes
+  const teachCheckboxes = document.querySelectorAll('input[name="lang_teach"]');
+  const learnCheckboxes = document.querySelectorAll('input[name="lang_learn"]');
+  
+  teachCheckboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', () => {
+          const learnCheckbox = document.getElementById('learn-' + checkbox.value);
+          learnCheckbox.disabled = checkbox.checked;
+      });
+  });
+
+  learnCheckboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', () => {
+          const teachCheckbox = document.getElementById('teach-' + checkbox.value);
+          teachCheckbox.disabled = checkbox.checked;
+      });
+  });
 </script>

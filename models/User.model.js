@@ -34,10 +34,11 @@ const userSchema = new Schema(
     },
     lang_teach: {
       type: [ String ],
+      default: []
     },
     lang_learn: {
       type: [ String ],
-      required: true,
+      default: []
     },
     private: {
       type: Boolean,
