@@ -116,7 +116,7 @@
           </div>
       </div>
 
-      <div class="row fs-6 mb-2">
+      <div class="row fs-6 mb-4">
           <p class="col-4 fw-bold">I want to learn</p>
           <div class="col">
             <div class="learn-edit">
@@ -135,6 +135,25 @@
             <button type="button" class="btn btn-sm learn-edit" onclick="edit('learn')"><i class="bi bi-pencil-fill"></i></button>
             <button type="button" class="btn btn-sm learn-cancel d-none" onclick="cancel('learn')"><i class="bi bi-x-circle-fill"></i></button>
           </div>
+      </div>
+
+      <div class="row mb-2">
+        <p class="col-4 fw-bold">Professional Profile</p>
+        <div class="form-check form-switch col">
+          <input class="form-check-input" type="checkbox" id="professional" name="professional" onchange="switchCheck('professional')">
+          <label class="form-check-label" for="professional"><small>I want to offer paid classes and educational content.
+          </small></label>
+        </div>
+      </div>
+      
+      <div class="row mb-2">
+        <p class="col-4 fw-bold">Private Profile</p>
+        <div class="form-check form-switch col">
+          <input class="form-check-input" type="checkbox" id="private" name="private" onchange="switchCheck('private')">
+          <label class="form-check-label" for="private"><small>Your profile will not appear in search results.<br>
+            Only users who you've contacted can see your profile.
+          </small></label>
+        </div>
       </div>
 
       <div class="d-flex justify-content-center mt-3">
@@ -158,6 +177,8 @@
   populateLanguages()
   populateCountries()
   document.getElementById('{{user.gender}}').setAttribute('checked',true)
+  if ({{user.professional}}) document.getElementById('professional').setAttribute('checked',true)
+  if ({{user.private}}) document.getElementById('private').setAttribute('checked',true)
 
   function previewImage(event) {
     const reader = new FileReader();
@@ -261,6 +282,18 @@
         </div>`
     }
   }
+
+  function switchCheck(id) {
+      const sourceEl = document.getElementById(id)
+      const targetId = id == 'professional' ? 'private' : 'professional'
+      const targetEl = document.getElementById(targetId)
+      if (sourceEl.checked) {
+        targetEl.removeAttribute('checked')
+        targetEl.setAttribute('disabled', true)
+      } else {
+        targetEl.removeAttribute('disabled')
+      }
+    }
 
   // disabling/enabling of checkboxes
   const teachCheckboxes = document.querySelectorAll('input[name="lang_teach"]');

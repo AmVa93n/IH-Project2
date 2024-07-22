@@ -9,18 +9,19 @@
         <img src="/images/{{this.language}}.svg" class="lang-flag">
         <span class="lang-name">{{this.language}}</span>
     </p>
-    <p class="card-text">{{this.level}}</p>
-    <p class="card-text">{{this.locationType}}</p>
+    <p class="card-text stylize">{{this.level}}</p>
+    <p class="card-text stylize">{{this.locationType}}</p>
     {{#if this.location}}
     <p class="card-text">{{this.location}}</p>
     {{/if}}
-    <p class="card-text">{{this.classType}}
-    {{#if this.maxGroupSize}}
-    <span class="card-text">(max. {{this.maxGroupSize}} students)</span>
-    {{/if}}
+    <p class="card-text">
+      <span class="stylize">{{this.classType}}</span>
+      {{#if this.maxGroupSize}}
+      <span>(max. {{this.maxGroupSize}} students)</span>
+      {{/if}}
     </p>
     <p class="card-text"><i class="bi bi-clock-fill me-2"></i>{{this.duration}} Minutes</p>
-    <p class="card-text"><i class="bi bi-tag-fill me-2"></i>{{this.price}} $</p>
+    <p class="card-text"><i class="bi bi-tag-fill me-2"></i><span class="price">$</span>{{this.price}}.00</p>
 
     <div class="d-flex justify-content-center mt-3">
         <a href="/auth/offers/{{this._id}}/book" class="btn btn-warning"><i class="bi bi-calendar2-check-fill me-2"></i>Book</a>
@@ -33,7 +34,11 @@
 
 <script>
     const spans = [...document.querySelectorAll('.lang-name')];
-        for (lang of spans) {
+        for (let lang of spans) {
         lang.innerText = getLanguageName(lang.innerText)
+    }
+    const text = [...document.querySelectorAll('.stylize')];
+        for (let span of text) {
+        span.innerHTML = stylizeText(span.innerText)
     }
 </script>

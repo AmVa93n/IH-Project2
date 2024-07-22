@@ -18,13 +18,15 @@ async function seedDatabase() {
         let offerCount = getRandomNumber(1,5)
 
         for (let i = 1; i < offerCount+1; i++) {
+            let locationType = randomElement(locTypes)
             let classType = randomElement(classTypes)
+            if (locationType != "online") classType = "private"
             let maxGroupSize = classType == 'group' ? getRandomNumber(2,15) : null
             let offer = {
                 name: "my amazing offer "+i,
                 language: randomElement(user.lang_teach),
                 level: randomElement(levels),
-                locationType: randomElement(locTypes),
+                locationType,
                 classType,
                 maxGroupSize,
                 duration: randomElement(durations),

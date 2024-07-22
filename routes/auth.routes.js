@@ -12,6 +12,7 @@ const saltRounds = 10;
 const User = require("../models/User.model");
 const Chat = require("../models/Chat.model");
 const Offer = require("../models/Offer.model");
+const Class = require("../models/Class.model");
 
 // Require necessary (isLoggedOut and isLiggedIn) middleware in order to control access to specific routes
 const isLoggedOut = require("../middleware/isLoggedOut");
@@ -38,12 +39,14 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 } // Limit file size to 10MB (adjust as needed)
 });
 
-// GET /auth/signup
+//================//
+// SIGNUP 
+//================//
+
 router.get("/signup", isLoggedOut, (req, res) => {
   res.render("auth/signup");
 });
 
-// POST /auth/signup
 router.post("/signup", upload.single('profilepic'), isLoggedOut, (req, res) => {
   const { username, email, password, gender, birthdate, country, lang_teach, lang_learn, professional, private} = req.body;
   const profilePic = req.file ? req.file.filename : null;
@@ -113,12 +116,14 @@ router.post("/signup", upload.single('profilepic'), isLoggedOut, (req, res) => {
     });
 });
 
-// GET /auth/login
+//================//
+// LOGIN 
+//================//
+
 router.get("/login", isLoggedOut, (req, res) => {
   res.render("auth/login");
 });
 
-// POST /auth/login
 router.post("/login", isLoggedOut, (req, res, next) => {
   const { username, password } = req.body;
 
@@ -166,7 +171,6 @@ router.post("/login", isLoggedOut, (req, res, next) => {
     .catch((err) => next(err));
 });
 
-// GET /auth/logout
 router.get("/logout", isLoggedIn, (req, res) => {
   req.session.destroy((err) => {
     if (err) {
@@ -178,13 +182,15 @@ router.get("/logout", isLoggedIn, (req, res) => {
   });
 });
 
-// GET /profile
+//================//
+// PROFILE
+//================//
+
 router.get("/profile", isLoggedIn, (req, res) => {
   let user = req.session.currentUser
   res.render("auth/profile", {user});
 });
 
-// GET /profile/delete
 router.get("/profile/delete", isLoggedIn, (req, res) => {
   const user = req.session.currentUser
   const username = user.username
@@ -203,11 +209,12 @@ router.get("/profile/delete", isLoggedIn, (req, res) => {
     });
 });
 
-// POST route to handle edit profile
 router.post('/profile/edit', upload.single('pfp'), isLoggedIn, async (req, res) => {
-  const { username, email, gender, birthdate, country, lang_teach, lang_learn } = req.body;
-  const profilePic = req.file ? req.file.filename : null;
   const user = req.session.currentUser
+  const { username, email, gender, birthdate, country, lang_teach, lang_learn, professional, private } = req.body;
+  const profilePic = req.file ? req.file.filename : user.profilePic;
+  const isPrivate = !!private
+  const isProfessional = !!professional
   const userId = req.session.currentUser._id;
 
   if ([username,email,birthdate,country].some(field => field === "")) {
@@ -227,11 +234,12 @@ router.post('/profile/edit', upload.single('pfp'), isLoggedIn, async (req, res) 
   }
 
   try {
-    if (user.profilePic && profilePic ) { // delete old profile picture from file system, if it exists and user chose one
+    if (user.profilePic && profilePic) { // delete old profile picture from file system, if it exists and user chose one
       const oldPfpPath = path.join(__dirname, '../public/uploads', user.profilePic);
       fs.unlinkSync(oldPfpPath)
     } 
-    const updatedUser = await User.findByIdAndUpdate(userId, { username, email, gender, birthdate, country, lang_teach, lang_learn, profilePic }, { new: true });
+    const updatedUser = await User.findByIdAndUpdate(userId, { username, email, gender, birthdate, country, 
+      lang_teach, lang_learn, profilePic, professional: isProfessional, private: isPrivate }, { new: true });
     req.session.currentUser = updatedUser; // Update current user in session
     res.redirect('/auth/profile'); // Redirect to profile page
   } catch (err) {
@@ -239,7 +247,10 @@ router.post('/profile/edit', upload.single('pfp'), isLoggedIn, async (req, res) 
   }
 });
 
-// GET route find tandem
+//================//
+// FIND MATCHES
+//================//
+
 router.get("/match/tandem", isLoggedIn, async (req, res) => {
   const user = req.session.currentUser
   const user_teach = user.lang_teach
@@ -253,7 +264,6 @@ router.get("/match/tandem", isLoggedIn, async (req, res) => {
   res.render("auth/matches", {user, matches});
 });
 
-// GET route find teacher
 router.get("/match/teacher", isLoggedIn, async (req, res) => {
   const user = req.session.currentUser
   const user_learn = user.lang_learn
@@ -266,20 +276,21 @@ router.get("/match/teacher", isLoggedIn, async (req, res) => {
   res.render("auth/matches", {user, matches});
 });
 
-// GET route inbox
+//================//
+// MESSAGING
+//================//
+
 router.get("/inbox", isLoggedIn, async (req, res) => {
   const user = req.session.currentUser
   res.render("auth/inbox", {user});
 });
 
-// GET route specific chat 
 router.get("/inbox/:chatId", isLoggedIn, async (req, res) => {
   const user = req.session.currentUser
   const chatId = req.params.chatId;
   res.render("auth/inbox", {user, chatId});
 });
 
-// POST route start a new chat
 router.post('/inbox', isLoggedIn, async (req, res) => {
   const { targetUsername } = req.body;
   const user = req.session.currentUser
@@ -307,7 +318,10 @@ router.post('/inbox', isLoggedIn, async (req, res) => {
   res.redirect(`/auth/inbox/${newChat._id}`);
 });
 
-// GET route offers
+//================//
+// OFFERS
+//================//
+
 router.get('/myoffers', isLoggedIn, async (req, res) => {
   const user = req.session.currentUser
   const userDB = await User.findOne({ username: user.username }).populate('offers')
@@ -315,13 +329,11 @@ router.get('/myoffers', isLoggedIn, async (req, res) => {
   res.render('auth/myoffers', {user, offers})
 });
 
-// GET route create new offer
 router.get('/myoffers/new', isLoggedIn, async (req, res) => {
   const user = req.session.currentUser
   res.render('auth/offer-create', {user})
 });
 
-// POST route create new offer
 router.post('/myoffers/new', isLoggedIn, async (req, res) => {
   const user = req.session.currentUser
   const userDB = await User.findOne({ username: user.username });
@@ -342,7 +354,6 @@ router.post('/myoffers/new', isLoggedIn, async (req, res) => {
   res.redirect('/auth/myoffers')
 });
 
-// GET route to edit offer
 router.get('/myoffers/:offerId/edit', isLoggedIn, async (req, res) => {
   const user = req.session.currentUser
   const offerId = req.params.offerId
@@ -350,7 +361,6 @@ router.get('/myoffers/:offerId/edit', isLoggedIn, async (req, res) => {
   res.render('auth/offer-edit', {user, offer})
 });
 
-// POST route to edit offer
 router.post('/myoffers/:offerId/edit', isLoggedIn, async (req, res) => {
   const { name, language, level, locationType, location, duration, classType, maxGroupSize, price } = req.body;
   const offerId = req.params.offerId
@@ -372,14 +382,16 @@ router.post('/myoffers/:offerId/edit', isLoggedIn, async (req, res) => {
   }
 });
 
-// GET route to delete offer
 router.get('/myoffers/:offerId/delete', isLoggedIn, async (req, res) => {
   const offerId = req.params.offerId
   await Offer.findByIdAndDelete(offerId)
   res.redirect('/auth/myoffers')
 });
 
-// checkout session
+//================//
+// CHECKOUT
+//================//
+
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const PORT = process.env.PORT || 3000;
 
@@ -415,18 +427,58 @@ router.post('/offers/:offerId/book', isLoggedIn, async (req, res) => {
   res.send({clientSecret: session.client_secret});
 });
 
-router.get('/offers/:offerId/return', isLoggedIn, (req, res) => {
+router.get('/offers/:offerId/return', isLoggedIn, async (req, res) => {
+  const user = req.session.currentUser
   const offerId = req.params.offerId
-  res.render('auth/checkout-return', { offerId });
+  const offer = await Offer.findById(offerId)
+  res.render('auth/checkout-return', { offer, user });
 });
 
-router.get('/session-status', isLoggedIn, async (req, res) => {
+router.get('/offers/:offerId/session-status', isLoggedIn, async (req, res) => {
   const session = await stripe.checkout.sessions.retrieve(req.query.session_id);
-
   res.send({
     status: session.status,
     customer_email: session.customer_details.email
   });
+});
+
+router.post('/offers/:offerId/return', isLoggedIn, async (req, res) => {
+  const { sessionId } = req.body;
+  // Retrieve the session to get more details if needed
+  const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+  if (session.payment_status === 'paid') {
+    const user = req.session.currentUser
+    const offerId = req.params.offerId
+    const offer = await Offer.findById(offerId)
+    const teacher = await User.findOne({ offers: offerId })
+    await Class.create({ 
+      student: user,
+      teacher: teacher._id,
+      date: "22-07-2024",
+      language: offer.language,
+      level: offer.level,
+      classType: offer.classType,
+      maxGroupSize: offer.maxGroupSize,
+      locationType: offer.locationType,
+      location: offer.location,
+      duration: offer.duration,
+    })
+
+    res.redirect('/auth/classes');
+  } else {
+    res.render({ errorMessage: 'Payment not successful.' });
+  }
+});
+
+//================//
+// CLASSES
+//================//
+
+router.get('/classes', isLoggedIn, async (req, res) => {
+  const user = req.session.currentUser
+  const classes = await Class.find({ student: user._id }).populate('teacher')
+  res.render('auth/classes', {user, classes})
 });
 
 module.exports = router;

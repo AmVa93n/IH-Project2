@@ -81,3 +81,24 @@ const langList = {
   'jp': 'Japanese',
   'kr': 'Korean',
 };
+
+function stylizeText(plainText) {
+  switch(plainText) {
+    case "private":
+      return '<i class="bi bi-person-fill me-2"></i>Private'
+    case "group":
+      return '<i class="bi bi-people-fill me-2"></i>Group'
+    case "beginner":
+      return '<i class="bi bi-mortarboard-fill me-2"></i>Beginner'
+    case "intermediate":
+      return '<i class="bi bi-mortarboard-fill me-2"></i>Intermediate'
+    case "advanced":
+      return '<i class="bi bi-mortarboard-fill me-2"></i>Advanced'
+    case "online":
+      return '<i class="bi bi-wifi me-2"></i>Online'
+    case "at-student":
+      return `<i class="bi bi-house-fill me-2"></i>At the student's home`
+    case "at-teacher":
+      return `<i class="bi bi-house-fill me-2"></i>At the teacher's home`
+  }
+}
