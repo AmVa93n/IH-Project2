@@ -212,7 +212,7 @@ router.get("/profile/delete", isLoggedIn, (req, res) => {
 router.post('/profile/edit', upload.single('pfp'), isLoggedIn, async (req, res) => {
   const user = req.session.currentUser
   const { username, email, gender, birthdate, country, lang_teach, lang_learn, professional, private } = req.body;
-  const profilePic = req.file ? req.file.filename : user.profilePic;
+  const newProfilePic = req.file ? req.file.filename : null;
   const isPrivate = !!private
   const isProfessional = !!professional
   const userId = req.session.currentUser._id;
@@ -234,12 +234,16 @@ router.post('/profile/edit', upload.single('pfp'), isLoggedIn, async (req, res) 
   }
 
   try {
-    if (user.profilePic && profilePic) { // delete old profile picture from file system, if it exists and user chose one
-      const oldPfpPath = path.join(__dirname, '../public/uploads', user.profilePic);
-      fs.unlinkSync(oldPfpPath)
-    } 
     const updatedUser = await User.findByIdAndUpdate(userId, { username, email, gender, birthdate, country, 
-      lang_teach, lang_learn, profilePic, professional: isProfessional, private: isPrivate }, { new: true });
+      lang_teach, lang_learn, professional: isProfessional, private: isPrivate }, { new: true });
+    if (newProfilePic) {
+      if (user.profilePic) {
+        const oldPfpPath = path.join(__dirname, '../public/uploads', user.profilePic); // delete old profile picture from file system, if it exists
+        fs.unlinkSync(oldPfpPath)
+      }
+      updatedUser.profilePic = newProfilePic
+      await updatedUser.save()
+    }
     req.session.currentUser = updatedUser; // Update current user in session
     res.redirect('/auth/profile'); // Redirect to profile page
   } catch (err) {
