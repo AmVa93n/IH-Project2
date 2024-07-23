@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (searchInput) {
     searchInput.value = '';
+    searchInput.setAttribute('autocomplete', 'off');
   }
 
   if (searchInput && searchForm) {
