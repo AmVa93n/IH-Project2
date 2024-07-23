@@ -68,16 +68,6 @@ body {
   color: black;
 }
 
-.overlay-li {
-  position: absolute;
-  background-color: white;
-  padding: 10px;
-  border: 1px solid #ccc;
-  z-index: 9999;
-  width: calc(100% - 20px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
 .timestamp {
   font-size: 10px;
   margin: 0 5px;
@@ -86,7 +76,7 @@ body {
 #results-container {
   position: relative;
   width: 100%;
-  margin-top: 0px;
+  margin-top: 0;
   display: flex;
   justify-content: center;
 }
@@ -99,9 +89,9 @@ body {
   z-index: 1000;
   max-height: 200px;
   overflow-y: auto;
-  margin: auto;
   padding: 0;
   list-style: none;
+  box-sizing: border-box;
 }
 
 #results li {
@@ -121,6 +111,17 @@ body {
   height: 50px;
   margin-right: 10px;
   border-radius: 50%;
+}
+
+.overlay-li {
+  /* position: absolute; */
+  background-color: white;
+  padding: 10px;
+  border: 1px solid #ccc;
+  z-index: 9999;
+  width: calc(100% - 20px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
 }
 
 .chatbox {

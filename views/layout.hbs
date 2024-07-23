@@ -23,6 +23,8 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          
+{{!-- create a child to the search form --}}
 
 <div class="container" style="width: 70%;">
   <div class="row g-0 justify-content-center">
@@ -35,8 +37,9 @@
       </form>
     </div>
   </div>
-  <div id="results-container" class="position-relative mt-3" style="display: none;">
-    <ul id="results" class="list-unstyled" style="display: none;"></ul>
+  
+  <ul id="results" class="list-group mt-3"></ul>
+    
   </div>
 </div>
 
@@ -82,9 +85,7 @@
           </ul>
         </div>
       </div>
-    </nav>
-<ul id="results" class="list-group mt-3"></ul>
-    
+    </nav>    
     <script src="/js/script.js"></script>
     <script src="/js/search.js"></script>
 
