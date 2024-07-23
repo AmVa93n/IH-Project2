@@ -84,14 +84,15 @@ body {
 #results {
   position: absolute;
   top: 100%;
+  width: 20%;
   background-color: white;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   max-height: 200px;
-  overflow-y: auto;
+  overflow-y: auto; 
+  margin: 0; 
   padding: 0;
   list-style: none;
-  box-sizing: border-box;
 }
 
 #results li {
