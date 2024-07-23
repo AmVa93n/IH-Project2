@@ -485,4 +485,14 @@ router.get('/classes', isLoggedIn, async (req, res) => {
   res.render('account/classes', {user, classes})
 });
 
+//================//
+// CALENDAR
+//================//
+
+router.get('/calendar', isLoggedIn, async (req, res) => {
+  const user = req.session.currentUser
+  const classes = await Class.find({ teacher: user._id }).populate('student').lean()
+  res.render('account/calendar', {user, classes: JSON.stringify(classes)})
+});
+
 module.exports = router;
