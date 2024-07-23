@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const User = require('../models/User.model');
-
+require("dotenv").config();
 const MONGO_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/ironhack-project2';
 
 const langList = ['es','it','pt','fr','de','ru','nl','zh','hu','he','ar','kr','jp','ro','pl']

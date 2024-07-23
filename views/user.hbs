@@ -127,13 +127,4 @@
 
 <script>
     document.querySelector('.date').innerText = getUserAge(document.querySelector('.date').innerText)
-
-    const spans = [...document.querySelectorAll('.lang-name')];
-        for (let lang of spans) {
-        lang.innerText = getLanguageName(lang.innerText)
-    }
-    const text = [...document.querySelectorAll('.stylize')];
-        for (let span of text) {
-        span.innerHTML = stylizeText(span.innerText)
-    }
 </script>

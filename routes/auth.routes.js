@@ -341,10 +341,11 @@ router.get('/offers/new', isLoggedIn, async (req, res) => {
 router.post('/offers/new', isLoggedIn, async (req, res) => {
   const user = req.session.currentUser
   const userDB = await User.findOne({ username: user.username });
-  const { name, language, level, locationType, location, duration, classType, maxGroupSize, price} = req.body;
+  const { name, language, level, locationType, location, weekdays, timeslots, 
+    duration, classType, maxGroupSize, price} = req.body;
 
   // Check that all fields are provided
-  if ([name,language,level,locationType,classType,duration,price].some(field => !field)) {
+  if ([name,language,level,locationType,classType,weekdays,timeslots,duration,price].some(field => !field)) {
     res.status(400).render("account/offer-create", {
       errorMessage:
         "Some mandatory fields are missing. Please try again",
@@ -352,7 +353,8 @@ router.post('/offers/new', isLoggedIn, async (req, res) => {
     return;
   }
 
-  const offer = await Offer.create({ name, language, level, locationType, location, duration, classType, maxGroupSize, price});
+  const offer = await Offer.create({ name, language, level, locationType, location, weekdays, timeslots, 
+    duration, classType, maxGroupSize, price});
   userDB.offers.push(offer._id);
   await userDB.save();
   res.redirect('/auth/offers')
@@ -366,11 +368,12 @@ router.get('/offers/:offerId/edit', isLoggedIn, async (req, res) => {
 });
 
 router.post('/offers/:offerId/edit', isLoggedIn, async (req, res) => {
-  const { name, language, level, locationType, location, duration, classType, maxGroupSize, price } = req.body;
+  const { name, language, level, locationType, location, weekdays, timeslots, 
+    duration, classType, maxGroupSize, price } = req.body;
   const offerId = req.params.offerId
 
   // Check that all fields are provided
-  if ([name,language,level,locationType,classType,duration,price].some(field => !field)) {
+  if ([name,language,level,locationType,classType,weekdays,timeslots,duration,price].some(field => !field)) {
     res.status(400).render("account/offer-edit", {
       errorMessage:
         "Some mandatory fields are missing. Please try again",
@@ -379,8 +382,9 @@ router.post('/offers/:offerId/edit', isLoggedIn, async (req, res) => {
   }
 
   try {
-    await Offer.findByIdAndUpdate(offerId, {  name, language, level, locationType, location, duration, classType, maxGroupSize, price });
-    res.redirect('/auth/myoffers'); // Redirect to my offers page
+    await Offer.findByIdAndUpdate(offerId, {  name, language, level, locationType, location, weekdays, timeslots, 
+      duration, classType, maxGroupSize, price });
+    res.redirect('/auth/offers'); // Redirect to my offers page
   } catch (err) {
     res.status(500).render('account/offer-edit', { errorMessage: 'Failed to update offer. Please try again.' });
   }
@@ -399,10 +403,13 @@ router.get('/offers/:offerId/delete', isLoggedIn, async (req, res) => {
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const PORT = process.env.PORT || 3000;
 
-router.get('/offers/:offerId/book', isLoggedIn, (req, res) => {
+router.get('/offers/:offerId/book', isLoggedIn, async (req, res) => {
   const offerId = req.params.offerId
+  const offer = await Offer.findById(offerId)
+  const teacher = await User.findOne({ offers: offerId })
   const user = req.session.currentUser
-  res.render('checkout/book', { stripePublicKey: process.env.STRIPE_PUBLIC_KEY, offerId, user });
+  offer.timeslots.sort()
+  res.render('checkout/book', { stripePublicKey: process.env.STRIPE_PUBLIC_KEY, offer, teacher, user });
 });
 
 router.post('/offers/:offerId/book', isLoggedIn, async (req, res) => {

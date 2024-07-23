@@ -251,11 +251,6 @@
   }
 
   function populateLanguages() {
-    const spans = [...document.querySelectorAll('.lang-name')];
-      for (let lang of spans) {
-        lang.innerText = getLanguageName(lang.innerText)
-      }
-
     const languages = Object.keys(langList).sort((a,b) => {
         if (langList[b] < langList[a]) return 1
         if (langList[a] < langList[b]) return -1

@@ -31,6 +31,15 @@
     </div>
 
     <div class="row mb-2">
+        <span class="card-text col">
+            <i class="bi bi-calendar-fill me-2"></i>{{#each this.weekdays}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</span>
+    </div>
+    <div class="row mb-2">
+        <span class="card-text col">
+            <i class="bi bi-clock-fill me-2"></i>{{#each this.timeslots}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</span>
+    </div>
+
+    <div class="row mb-2">
         <span class="card-text col"><i class="bi bi-clock-fill me-2"></i>{{this.duration}} Minutes</span>
         <span class="card-text col"><i class="bi bi-tag-fill me-2"></i><span class="price">$</span>{{this.price}}.00</span>
     </div>
@@ -49,15 +58,3 @@
     <a href="/auth/offers/new">
     <button class="btn btn-primary mx-auto"><i class="bi bi-clipboard2-plus-fill me-2"></i>Create Offer</button></a>
 </div>
-
-<script>
-    const spans = [...document.querySelectorAll('.lang-name')];
-        for (let lang of spans) {
-        lang.innerText = getLanguageName(lang.innerText)
-    }
-
-    const text = [...document.querySelectorAll('.stylize')];
-        for (let span of text) {
-        span.innerHTML = stylizeText(span.innerText)
-    }
-</script>

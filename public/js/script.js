@@ -1,4 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const languageSpans = [...document.querySelectorAll('.lang-name')];
+  for (let span of languageSpans) {
+      span.innerText = getLanguageName(span.innerText)
+  }
+  const spansToStylize = [...document.querySelectorAll('.stylize')];
+  for (let span of spansToStylize) {
+      span.innerHTML = stylizeText(span.innerText)
+  }
 });
 
 function getLanguageName(langCode) {
@@ -102,3 +110,4 @@ function stylizeText(plainText) {
       return `<i class="bi bi-house-fill me-2"></i>At the teacher's home`
   }
 }
+

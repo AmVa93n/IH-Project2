@@ -36,6 +36,14 @@ const offerSchema = new Schema({
     type: Number,
     required: true,
   },
+  timeslots: {
+    type: [ String ],
+    required: true,
+  },
+  weekdays: {
+    type: [ String ],
+    required: true,
+  }
 });
 
 const Offer = model('Offer', offerSchema);

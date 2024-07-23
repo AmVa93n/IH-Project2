@@ -171,3 +171,29 @@ body {
   position: relative;
   z-index: 2; /* Ensure content is above the pseudo-element */
 }
+
+#calendar {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 10px;
+  background-color: white;
+  border-top: solid 5px rgb(255, 187, 59);
+}
+
+/* Custom styles for bootstrap-datepicker */
+.datepicker {
+  background-color: #f8f9fa; /* Light background */
+  border: 1px solid #dee2e6; /* Border color */
+  border-radius: 0.25rem; /* Border radius */
+}
+
+.datepicker-days .day.disabled {
+  background-color: #e9ecef; /* Disabled date background */
+  color: #b7b7b7; /* Disabled date text color */
+}
+
+.datepicker-days .day.selected,
+.datepicker-days .day:hover {
+  background-color: #007bff; /* Selected and hovered date background */
+  color: #fff; /* Selected and hovered date text color */
+}

@@ -71,6 +71,29 @@
         <input type="number" class="form-control" min="2" max="15" placeholder="2" name="maxGroupSize" value="{{ offer.maxGroupSize }}">
     </div>
 
+    <div class="row mb-3">
+      <label class="col-3 pt-0" for="weekdays">Weekdays</label>
+      <div class="col-9">
+        <select class="form-select" id="weekdays" name="weekdays" size="7" multiple> 
+          <option value="Monday">Monday</option>
+          <option value="Tuesday">Tuesday</option>
+          <option value="Wednesday">Wednesday</option>
+          <option value="Thursday">Thursday</option>
+          <option value="Friday">Friday</option>
+          <option value="Saturday">Saturday</option>
+          <option value="Sunday">Sunday</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <label class="col-3 pt-0" for="timeslots">Timeslots</label>
+      <div class="col-9">
+        <select class="form-select" id="timeslots" name="timeslots" size="10" style="overflow-y: scroll;" multiple> 
+        </select>
+      </div>
+    </div>
+
     <div class="mb-3">
         <div class="input-group" id="duration">
             <span class="input-group-text" id="addon-wrapping">Duration</span>
@@ -107,5 +130,26 @@
       let langName = getLanguageName(lang)
       let selected = lang == defaultLang ? "selected" : ""
       selectLang.innerHTML += `<option value=${lang} ${selected}><img src="/images/${lang}.svg" class="lang-flag"> ${langName}</option>`
+    }
+
+    const timeslots = document.getElementById("timeslots")
+    const defaultTimeslots = '{{ offer.timeslots }}'.split(",")
+    for (let hr = 0; hr < 24; hr++) {
+      for (let min of [0,15,30,45]) {
+        let hour = hr.toString().padStart(2, '0')
+        let minute = min.toString().padStart(2, '0')
+        let slot = `${hour}:${minute}`
+        const option = document.createElement('option');
+        option.value = slot;
+        option.textContent = slot;
+        if (defaultTimeslots.includes(slot)) option.setAttribute('selected', true)
+        timeslots.appendChild(option);
+      }
+    }
+
+    const weekdays = document.getElementById("weekdays")
+    const defaultDays = '{{ offer.weekdays }}'.split(",")
+    for (let day of weekdays.children) {
+      if (defaultDays.includes(day.innerText)) day.setAttribute('selected', true)
     }
 </script>
