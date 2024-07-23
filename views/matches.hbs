@@ -1,8 +1,8 @@
-<h3 class="center">{{matches.length}} matches found</h3>
-<div class="d-flex justify-content-center flex-wrap px-auto" style="width: 100%;">
+<h4 class="center my-3">{{matches.length}} matches found</h4>
+<div class="d-flex flex-wrap mx-auto" style="width: 92%;">
 {{#each matches}}
 
-<div class="user-card mx-3 mb-4">
+<div class="user-card mb-3 mx-2">
     <a href="/users/{{this.username}}" class="link-text">
     <div class="d-flex align-items-center mb-3 position-relative">
         <div class="circle-crop me-2" style="width:50px;height:50px;display:inline-flex">
@@ -21,8 +21,8 @@
         {{/if}}
     </div></a>
 
-    <div class="row mb-2">
-        <span class="fw-bold col-auto" style="width: 125px;">Wants to teach</span> 
+    <div class="row mb-2 align-items-center">
+        <span class="fw-bold col-auto" style="width: 125px;">Can teach</span> 
         <div class="col">
             {{#each this.lang_teach}}
             <div>
@@ -33,7 +33,7 @@
         </div>
     </div>
     
-    <div class="row mb-4">
+    <div class="row mb-2 align-items-center">
         <span class="fw-bold col-auto" style="width: 125px;">Wants to learn</span>
         <div class="col">
             {{#each this.lang_learn}}
@@ -51,10 +51,6 @@
                 <input style="display: none;" value="{{this.username}}" name="targetUsername">
                 <button type="submit" class="btn btn-primary mx-1"><i class="bi bi-envelope-fill me-1"></i>Message</button>
             </form>
-            {{#if this.professional}}
-            <a href="/users/{{this.username}}/offers">
-            <button class="btn btn-warning mx-1"><i class="bi bi-cash-coin me-1"></i>Offers</button></a>
-            {{/if}}
         </div>
     </div>
     

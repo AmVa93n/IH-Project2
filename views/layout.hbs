@@ -15,8 +15,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
   </head>
 
-  <body class="bg-primary-subtle">
-    <nav class="navbar navbar-expand bg-primary py-1" style="box-shadow:rgba(0, 0, 0, 0.5) 0px 1px 6px 0px;z-index:3">
+  <body>
+    <nav class="navbar navbar-expand bg-light py-1" style="box-shadow:rgba(0, 0, 0, 0.5) 0px 1px 6px 0px;z-index:3">
       <div class="container-fluid">
         <a class="navbar-brand" href="/"><img src="/images/logo.png" width="200px"></a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,8 +41,8 @@
 </div>
 
           {{#if user}}
-          <a href="/auth/match/tandem" class="nav-link d-flex flex-column align-items-center mt-auto me-4"><i class="bi bi-chat-text-fill mb-2 fs-2"></i>Partners</a>
-          <a href="/auth/match/teacher" class="nav-link d-flex flex-column align-items-center mt-auto me-4"><i class="bi bi-mortarboard-fill mb-2 fs-2"></i>Teachers</a>
+          <a href="/auth/match/tandem" class="nav-link d-flex flex-column align-items-center me-4"><i class="bi bi-chat-text-fill mb-1 fs-2"></i>Partners</a>
+          <a href="/auth/match/teacher" class="nav-link d-flex flex-column align-items-center me-4"><i class="bi bi-mortarboard-fill mb-1 fs-2"></i>Teachers</a>
           {{/if}}
 
           <div class="navbar-nav d-flex align-items-center">
@@ -58,7 +58,6 @@
                       <img src="/images/Profile-PNG-File.png">
                       {{/if}}
                     </div>
-                    {{user.username}}
                   </div>
                 
                 </button>
@@ -67,7 +66,7 @@
                   <li><a class="dropdown-item d-flex gap-2 align-items-center" href="/auth/inbox"><i class="bi bi-inbox-fill me-2"></i>Inbox</a></li>
                   <li><a class="dropdown-item d-flex gap-2 align-items-center" href="/auth/classes"><i class="bi bi-easel3-fill me-2"></i>Classes</a></li>
                   {{#if user.professional}}
-                  <li><a class="dropdown-item d-flex gap-2 align-items-center" href="/auth/myoffers"><i class="bi bi-cash-coin me-2"></i>Offers</a></li>
+                  <li><a class="dropdown-item d-flex gap-2 align-items-center" href="/auth/offers"><i class="bi bi-cash-coin me-2"></i>Offers</a></li>
                   <li><a class="dropdown-item d-flex gap-2 align-items-center" href="/auth/calendar"><i class="bi bi-calendar-week me-2"></i>Calendar</a></li>
                   <li><a class="dropdown-item d-flex gap-2 align-items-center" href="/auth/reviews"><i class="bi bi-star-fill me-2"></i>Reviews</a></li>
                   {{/if}}

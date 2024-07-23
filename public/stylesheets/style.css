@@ -1,6 +1,8 @@
 body {
   font-family: "Roboto", Helvetica, Arial, sans-serif; 
   font-size: 14px;
+  background-image: url('/images/background.jpg');
+  background-size: cover;
 }
 
 .center {
@@ -28,8 +30,9 @@ body {
 
 .user-card {
   background-color: rgba(250, 250, 250, 0.8);
-  border-radius: 20px;
+  border-radius: 10px;
   width: 265px;
+  height: 245px;
   padding: 20px;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   display: flex;

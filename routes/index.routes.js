@@ -15,30 +15,12 @@ router.get("/users/:username", async (req, res) => {
   const viewedUsername = decodeURIComponent(req.params.username);
   
   try {
-    const viewedUser = await User.findOne({ username: viewedUsername });
-    if (!viewedUser) {
-      return res.status(404).render("error", { message: "User not found" });
-    }
-    
-    res.render("user", { viewedUser, user });
-  } catch (error) {
-    console.error(error);
-    res.status(500).render("error", { message: "Internal Server Error" });
-  }
-});
-
-// GET another user's offers
-router.get("/users/:username/offers", async (req, res) => {
-  const user = req.session.currentUser;
-  const viewedUsername = decodeURIComponent(req.params.username);
-  
-  try {
     const viewedUser = await User.findOne({ username: viewedUsername }).populate('offers');
     if (!viewedUser) {
       return res.status(404).render("error", { message: "User not found" });
     }
     
-    res.render("offers", { viewedUser, user });
+    res.render("user", { viewedUser, user });
   } catch (error) {
     console.error(error);
     res.status(500).render("error", { message: "Internal Server Error" });

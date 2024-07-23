@@ -188,7 +188,7 @@ router.get("/logout", isLoggedIn, (req, res) => {
 
 router.get("/profile", isLoggedIn, (req, res) => {
   let user = req.session.currentUser
-  res.render("auth/profile", {user});
+  res.render("account/profile", {user});
 });
 
 router.get("/profile/delete", isLoggedIn, (req, res) => {
@@ -205,7 +205,7 @@ router.get("/profile/delete", isLoggedIn, (req, res) => {
       })
     })
     .catch((err) => {
-      res.status(500).render("auth/profile", { errorMessage: "An error occurred while deleting your account." });
+      res.status(500).render("account/profile", { errorMessage: "An error occurred while deleting your account." });
     });
 });
 
@@ -218,7 +218,7 @@ router.post('/profile/edit', upload.single('pfp'), isLoggedIn, async (req, res) 
   const userId = req.session.currentUser._id;
 
   if ([username,email,birthdate,country].some(field => field === "")) {
-    res.status(400).render("auth/profile", {
+    res.status(400).render("account/profile", {
       errorMessage:
         "Some mandatory fields are missing. Please provide your username, email, birth date and country of residence.",
     });
@@ -226,7 +226,7 @@ router.post('/profile/edit', upload.single('pfp'), isLoggedIn, async (req, res) 
   }
 
   if (!lang_learn && !lang_teach) {
-    res.status(400).render("auth/profile", {
+    res.status(400).render("account/profile", {
       errorMessage:
         "Please choose at least one language you'd like to teach or learn",
     });
@@ -247,7 +247,7 @@ router.post('/profile/edit', upload.single('pfp'), isLoggedIn, async (req, res) 
     req.session.currentUser = updatedUser; // Update current user in session
     res.redirect('/auth/profile'); // Redirect to profile page
   } catch (err) {
-    res.status(500).render('auth/profile', { errorMessage: 'Failed to update profile. Please try again.' });
+    res.status(500).render('account/profile', { errorMessage: 'Failed to update profile. Please try again.' });
   }
 });
 
@@ -265,7 +265,7 @@ router.get("/match/tandem", isLoggedIn, async (req, res) => {
     match.lang_teach = match.lang_teach.filter(lang => user_learn.includes(lang))
     match.lang_learn = match.lang_learn.filter(lang => user_teach.includes(lang))
   }
-  res.render("auth/matches", {user, matches});
+  res.render("matches", {user, matches});
 });
 
 router.get("/match/teacher", isLoggedIn, async (req, res) => {
@@ -277,7 +277,7 @@ router.get("/match/teacher", isLoggedIn, async (req, res) => {
   }
   // filter teachers with at least one offer of a language that the user wants to learn
   matches = matches.filter(match => match.offers.some(offer => user_learn.includes(offer.language)))
-  res.render("auth/matches", {user, matches});
+  res.render("matches", {user, matches});
 });
 
 //================//
@@ -286,13 +286,13 @@ router.get("/match/teacher", isLoggedIn, async (req, res) => {
 
 router.get("/inbox", isLoggedIn, async (req, res) => {
   const user = req.session.currentUser
-  res.render("auth/inbox", {user});
+  res.render("account/inbox", {user});
 });
 
 router.get("/inbox/:chatId", isLoggedIn, async (req, res) => {
   const user = req.session.currentUser
   const chatId = req.params.chatId;
-  res.render("auth/inbox", {user, chatId});
+  res.render("account/inbox", {user, chatId});
 });
 
 router.post('/inbox', isLoggedIn, async (req, res) => {
@@ -326,26 +326,26 @@ router.post('/inbox', isLoggedIn, async (req, res) => {
 // OFFERS
 //================//
 
-router.get('/myoffers', isLoggedIn, async (req, res) => {
+router.get('/offers', isLoggedIn, async (req, res) => {
   const user = req.session.currentUser
   const userDB = await User.findOne({ username: user.username }).populate('offers')
   const offers = userDB.offers
-  res.render('auth/myoffers', {user, offers})
+  res.render('account/offers', {user, offers})
 });
 
-router.get('/myoffers/new', isLoggedIn, async (req, res) => {
+router.get('/offers/new', isLoggedIn, async (req, res) => {
   const user = req.session.currentUser
-  res.render('auth/offer-create', {user})
+  res.render('account/offer-create', {user})
 });
 
-router.post('/myoffers/new', isLoggedIn, async (req, res) => {
+router.post('/offers/new', isLoggedIn, async (req, res) => {
   const user = req.session.currentUser
   const userDB = await User.findOne({ username: user.username });
   const { name, language, level, locationType, location, duration, classType, maxGroupSize, price} = req.body;
 
   // Check that all fields are provided
   if ([name,language,level,locationType,classType,duration,price].some(field => !field)) {
-    res.status(400).render("auth/offer-create", {
+    res.status(400).render("account/offer-create", {
       errorMessage:
         "Some mandatory fields are missing. Please try again",
     });
@@ -355,23 +355,23 @@ router.post('/myoffers/new', isLoggedIn, async (req, res) => {
   const offer = await Offer.create({ name, language, level, locationType, location, duration, classType, maxGroupSize, price});
   userDB.offers.push(offer._id);
   await userDB.save();
-  res.redirect('/auth/myoffers')
+  res.redirect('/auth/offers')
 });
 
-router.get('/myoffers/:offerId/edit', isLoggedIn, async (req, res) => {
+router.get('/offers/:offerId/edit', isLoggedIn, async (req, res) => {
   const user = req.session.currentUser
   const offerId = req.params.offerId
   const offer = await Offer.findById(offerId)
-  res.render('auth/offer-edit', {user, offer})
+  res.render('account/offer-edit', {user, offer})
 });
 
-router.post('/myoffers/:offerId/edit', isLoggedIn, async (req, res) => {
+router.post('/offers/:offerId/edit', isLoggedIn, async (req, res) => {
   const { name, language, level, locationType, location, duration, classType, maxGroupSize, price } = req.body;
   const offerId = req.params.offerId
 
   // Check that all fields are provided
   if ([name,language,level,locationType,classType,duration,price].some(field => !field)) {
-    res.status(400).render("auth/offer-create", {
+    res.status(400).render("account/offer-edit", {
       errorMessage:
         "Some mandatory fields are missing. Please try again",
     });
@@ -382,14 +382,14 @@ router.post('/myoffers/:offerId/edit', isLoggedIn, async (req, res) => {
     await Offer.findByIdAndUpdate(offerId, {  name, language, level, locationType, location, duration, classType, maxGroupSize, price });
     res.redirect('/auth/myoffers'); // Redirect to my offers page
   } catch (err) {
-    res.status(500).render('auth/offer-edit', { errorMessage: 'Failed to update offer. Please try again.' });
+    res.status(500).render('account/offer-edit', { errorMessage: 'Failed to update offer. Please try again.' });
   }
 });
 
-router.get('/myoffers/:offerId/delete', isLoggedIn, async (req, res) => {
+router.get('/offers/:offerId/delete', isLoggedIn, async (req, res) => {
   const offerId = req.params.offerId
   await Offer.findByIdAndDelete(offerId)
-  res.redirect('/auth/myoffers')
+  res.redirect('/auth/offers')
 });
 
 //================//
@@ -402,7 +402,7 @@ const PORT = process.env.PORT || 3000;
 router.get('/offers/:offerId/book', isLoggedIn, (req, res) => {
   const offerId = req.params.offerId
   const user = req.session.currentUser
-  res.render('auth/checkout', { stripePublicKey: process.env.STRIPE_PUBLIC_KEY, offerId, user });
+  res.render('checkout/book', { stripePublicKey: process.env.STRIPE_PUBLIC_KEY, offerId, user });
 });
 
 router.post('/offers/:offerId/book', isLoggedIn, async (req, res) => {
@@ -435,7 +435,7 @@ router.get('/offers/:offerId/return', isLoggedIn, async (req, res) => {
   const user = req.session.currentUser
   const offerId = req.params.offerId
   const offer = await Offer.findById(offerId)
-  res.render('auth/checkout-return', { offer, user });
+  res.render('checkout/return', { offer, user });
 });
 
 router.get('/offers/:offerId/session-status', isLoggedIn, async (req, res) => {
@@ -471,7 +471,7 @@ router.post('/offers/:offerId/return', isLoggedIn, async (req, res) => {
 
     res.redirect('/auth/classes');
   } else {
-    res.render({ errorMessage: 'Payment not successful.' });
+    res.render('checkout/return', { errorMessage: 'Payment not successful.' });
   }
 });
 
@@ -482,7 +482,7 @@ router.post('/offers/:offerId/return', isLoggedIn, async (req, res) => {
 router.get('/classes', isLoggedIn, async (req, res) => {
   const user = req.session.currentUser
   const classes = await Class.find({ student: user._id }).populate('teacher')
-  res.render('auth/classes', {user, classes})
+  res.render('account/classes', {user, classes})
 });
 
 module.exports = router;

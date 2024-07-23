@@ -1,4 +1,6 @@
-<div class="content-box" style="width: 35%; position:relative">
+<div class="d-flex justify-content-center" style="width:100%;">
+
+<div class="content-box mx-0 mt-3" style="width: 35%; position:relative; height:fit-content">
     <h2 class="mb-3 center">{{viewedUser.username}}</h2>
     <div class="mb-4 mx-auto circle-crop">
         {{#if viewedUser.profilePic}}
@@ -8,29 +10,34 @@
         {{/if}}
     </div>
 
+    {{#if viewedUser.professional}}
+        <span class="badge rounded-pill text-bg-primary position-absolute fs-6" style="top:8;right:8">
+          <i class="bi bi-award-fill me-1"></i>Professional</span>
+    {{/if}}
+
     <div class="row fs-6 mb-2">
-        <p class="col-4 fw-bold">Gender</p>
+        <span class="col-4 fw-bold">Gender</span>
         <div class="col" id="gender">
           <span>{{viewedUser.gender}}</span>
         </div>
     </div>
 
     <div class="row fs-6 mb-2">
-        <p class="col-4 fw-bold">Age</p>
+        <span class="col-4 fw-bold">Age</span>
         <div class="col" id="birthdate">
           <span class="date">{{viewedUser.birthdate}}</span>
         </div>
     </div>
 
     <div class="row fs-6 mb-4">
-        <p class="col-4 fw-bold">Country</p>
+        <span class="col-4 fw-bold">Country</span>
         <div class="col" id="country">
           <span>{{viewedUser.country}}</span>
         </div>
     </div>
 
     <div class="row fs-6 mb-2">
-        <p class="col-4 fw-bold">Wants to teach</p>
+        <p class="col-4 fw-bold">Can teach</p>
         <div class="col">
           <div id="lang_teach">
             {{#each viewedUser.lang_teach}}
@@ -56,19 +63,77 @@
           </div>
         </div>
     </div>
+
+    <div class="d-flex justify-content-center mt-4">
+        <form action="/auth/inbox" method="POST">
+            <input style="display: none;" value="{{viewedUser.username}}" name="targetUsername">
+            <button type="submit" class="btn btn-primary mx-1">
+              <i class="bi bi-envelope-fill me-1"></i>Message {{ viewedUser.username }}
+            </button>
+        </form>
+    </div>
+</div>
+
+{{#if viewedUser.professional}}
+<div class="ms-5" style="width: 40%;">
+  <h4 class="center my-3 rounded-pill text-bg-light mx-auto px-3 py-1" style="width: fit-content;">
+    <i class="bi bi-cash-coin me-1"></i>
+    {{ viewedUser.username }}'s Offers</h4>
+  <div class="d-flex justify-content-center flex-wrap px-auto">
+
+  {{#each viewedUser.offers}}
+  <div class="card offer-card text-left mx-3 mb-4">
+    <h5 class="card-header center">{{this.name}}</h5>
+    <div class="card-body">
+
+      <div class="row mb-2">
+        <span class="card-text col"> 
+          <img src="/images/{{this.language}}.svg" class="lang-flag">
+          <span class="lang-name">{{this.language}}</span>
+        </span>
+        <span class="card-text col stylize">{{this.level}}</span>
+      </div>
+      
+      <div class="row mb-2">
+        <span class="card-text col stylize">{{this.locationType}}</span>
+      </div>
+
+      <div class="row mb-2">
+        <span class="card-text col">
+          <span class="stylize">{{this.classType}}</span>
+          {{#if this.maxGroupSize}}
+          <span>(max. {{this.maxGroupSize}} students)</span>
+          {{/if}}
+        </span>
+      </div>
+      
+      <div class="row mb-2">
+        <span class="card-text col"><i class="bi bi-clock-fill me-2"></i>{{this.duration}} Minutes</span>
+        <span class="card-text col"><i class="bi bi-tag-fill me-2"></i><span class="price">$</span>{{this.price}}.00</span>
+      </div>
+
+      <div class="d-flex justify-content-center mt-3">
+          <a href="/auth/offers/{{this._id}}/book" class="btn btn-warning"><i class="bi bi-calendar2-check-fill me-2"></i>Book</a>
+      </div>
+    </div>
+  </div>
+  {{/each}}
+
+  </div>
+</div>
+{{/if}}
+
 </div>
 
 <script>
     document.querySelector('.date').innerText = getUserAge(document.querySelector('.date').innerText)
 
-    // populate languages
-    const teachList = [...document.querySelectorAll('#lang_teach .lang-name')];
-    for (lang of teachList) {
-      lang.innerText = getLanguageName(lang.innerText)
+    const spans = [...document.querySelectorAll('.lang-name')];
+        for (let lang of spans) {
+        lang.innerText = getLanguageName(lang.innerText)
     }
-
-    const learnList = [...document.querySelectorAll('#lang_learn .lang-name')];
-    for (lang of learnList) {
-      lang.innerText = getLanguageName(lang.innerText)
+    const text = [...document.querySelectorAll('.stylize')];
+        for (let span of text) {
+        span.innerHTML = stylizeText(span.innerText)
     }
 </script>
