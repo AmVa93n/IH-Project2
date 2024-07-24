@@ -1,0 +1,121 @@
+{{#if errorMessage}}
+<div class="alert alert-danger d-flex align-items-center justify-content-center" role="alert">
+  <i class="bi bi-exclamation-triangle-fill me-2"></i>
+  {{errorMessage}}
+</div>
+{{/if}}
+
+<div class="content-box" style="min-width: 25%;">
+  <h2 class="center mb-3">Write a review</h2>
+
+    <div class="card text-left mx-3 mb-4">
+        <h5 class="card-header center"><span class="fs-6">{{class.date}}</span><br>{{class.timeslot}}</h5>
+        <div class="card-body">
+            <div class="d-flex align-items-center mb-2">
+                <div class="circle-crop me-2" style="width:50px;height:50px;display:inline-flex">
+                    {{#if class.teacher.profilePic}}
+                    <img src="/uploads/{{class.teacher.profilePic}}">
+                    {{else}}
+                    <img src="/images/Profile-PNG-File.png">
+                    {{/if}}
+                </div>
+                <span class="fs-5">{{class.teacher.username}}</span>
+            </div>
+
+            <div class="row mb-2">
+                <span class="card-text col"> 
+                <img src="/images/{{class.language}}.svg" class="lang-flag">
+                <span class="lang-name">{{class.language}}</span>
+                </span>
+                <span class="card-text col stylize">{{class.level}}</span>
+            </div>
+
+            <div class="row mb-2">
+                <span class="card-text col stylize">{{class.locationType}}</span>
+                {{#if class.location}}
+                <span>({{class.location}})</span>
+                {{/if}}
+            </div>
+
+            <div class="row mb-2">
+                <span class="card-text col">
+                <span class="stylize">{{class.classType}}</span>
+                {{#if class.maxGroupSize}}
+                <span>(max. {{class.maxGroupSize}} students)</span>
+                {{/if}}
+                </span>
+            </div>
+
+            <div class="row mb-2">
+                <span class="card-text col"><i class="bi bi-clock-fill me-2"></i>{{class.duration}} Minutes</span>
+            </div>
+        </div>
+    </div>
+
+  <form action="/account/classes/{{class._id}}/rate" method="POST">
+
+    <p class="mb-2">How was your class with {{class.teacher.username}}?</p>
+    <div class="form-floating mb-4">
+      <textarea class="form-control" placeholder="Leave a comment here" name="text" id="text" class="form-control" style="height: 200px"></textarea>
+      <label for="text">Describe your experience...</label>
+    </div>
+
+    <span>Rate your class</span>
+    <div class="star-rating mb-3">
+        <span class="star" data-value="1">&#9733;</span>
+        <span class="star" data-value="2">&#9733;</span>
+        <span class="star" data-value="3">&#9733;</span>
+        <span class="star" data-value="4">&#9733;</span>
+        <span class="star" data-value="5">&#9733;</span>
+        <span class="star" data-value="6">&#9733;</span>
+        <span class="star" data-value="7">&#9733;</span>
+        <span class="star" data-value="8">&#9733;</span>
+        <span class="star" data-value="9">&#9733;</span>
+        <span class="star" data-value="10">&#9733;</span>
+        <input type="hidden" value="0" name="rating" id="rating">
+    </div>
+
+    <div class="d-flex justify-content-center">
+      <button type="submit" class="btn btn-primary rounded-pill">Submit</button>
+    </div>
+  </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const stars = document.querySelectorAll('.star');
+    
+
+    stars.forEach(star => {
+        star.addEventListener('mouseover', handleMouseOver);
+        star.addEventListener('mouseout', handleMouseOut);
+        star.addEventListener('click', handleClick);
+    });
+
+    function handleMouseOver(event) {
+        const value = parseInt(event.target.getAttribute('data-value'));
+        highlightStars(value);
+    }
+
+    function handleMouseOut() {
+        let currentRating = document.getElementById("rating").value
+        highlightStars(currentRating);
+    }
+
+    function handleClick(event) {
+        document.getElementById("rating").value = parseInt(event.target.getAttribute('data-value'));
+        let currentRating = document.getElementById("rating").value
+        highlightStars(currentRating);
+    }
+
+    function highlightStars(rating) {
+        stars.forEach(star => {
+            if (parseInt(star.getAttribute('data-value')) <= rating) {
+                star.classList.add('active');
+            } else {
+                star.classList.remove('active');
+            }
+        });
+    }
+});
+</script>

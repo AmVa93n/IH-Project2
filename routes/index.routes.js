@@ -1,7 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const Offer = require('../models/Offer.model');
+const Review = require('../models/Review.model');
 const User = require("../models/User.model");
+
+// Require necessary middleware in order to control access to specific routes
+const isLoggedIn = require("../middleware/isLoggedIn");
 
 /* GET home page */
 router.get("/", (req, res, next) => {
@@ -19,6 +23,7 @@ router.get("/users/:userId", async (req, res) => {
     if (!viewedUser) {
       return res.status(404).render("error", { message: "User not found" });
     }
+    viewedUser.reviews = await Review.find({ subject: viewedUserId }).populate('author')
     
     res.render("user", { viewedUser, user });
   } catch (error) {
@@ -50,6 +55,42 @@ router.get("/search", async (req, res) => {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
+});
+
+//================//
+// FIND MATCHES
+//================//
+
+router.get("/match/partners", isLoggedIn, async (req, res) => {
+  const user = req.session.currentUser
+  const user_teach = user.lang_teach
+  const user_learn = user.lang_learn
+  let matches = await User.find({lang_teach: { $in: user_learn }, lang_learn: { $in: user_teach }})
+  matches = matches.filter(match => !match.private) // filter private profiles
+  for (let match of matches) { // filter irrelevant languages
+    match.lang_teach = match.lang_teach.filter(lang => user_learn.includes(lang))
+    match.lang_learn = match.lang_learn.filter(lang => user_teach.includes(lang))
+  }
+  res.render("matches", {user, matches, teachers: false});
+});
+
+router.get("/match/teachers", isLoggedIn, async (req, res) => {
+  const user = req.session.currentUser
+  const user_learn = user.lang_learn
+  let matches = await User.find({lang_teach: { $in: user_learn }, professional: true}).populate('offers')
+  for (let match of matches) { // filter irrelevant languages
+    match.lang_teach = match.lang_teach.filter(lang => user_learn.includes(lang))
+  }
+  // filter teachers with at least one offer of a language that the user wants to learn
+  matches = matches.filter(match => match.offers.some(offer => user_learn.includes(offer.language)))
+  // get review avg scores
+  for (let match of matches) {
+    let reviews = await Review.find({ subject: match._id })
+    let avg = reviews.map(r => r.rating).reduce((acc, num)=>acc+num,0) / reviews.length
+    match.ratingAvg = avg.toFixed(1)
+    match.reviews = reviews.length
+  }
+  res.render("matches", {user, matches, teachers: true});
 });
 
 module.exports = router;

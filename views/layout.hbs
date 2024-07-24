@@ -46,8 +46,8 @@
 </div>
 
           {{#if user}}
-          <a href="/auth/match/tandem" class="nav-link d-flex flex-column align-items-center me-4"><i class="bi bi-chat-text-fill mb-1 fs-2"></i>Partners</a>
-          <a href="/auth/match/teacher" class="nav-link d-flex flex-column align-items-center me-4"><i class="bi bi-mortarboard-fill mb-1 fs-2"></i>Teachers</a>
+          <a href="/match/partners" class="nav-link d-flex flex-column align-items-center me-4"><i class="bi bi-chat-text-fill mb-1 fs-2"></i>Partners</a>
+          <a href="/match/teachers" class="nav-link d-flex flex-column align-items-center me-4"><i class="bi bi-mortarboard-fill mb-1 fs-2"></i>Teachers</a>
           {{/if}}
 
           <div class="navbar-nav d-flex align-items-center">
@@ -81,7 +81,10 @@
               </div>
             
             {{else}}
-              <a href="/auth/login"><button class="btn btn-success rounded-pill">Login</button></a>
+              <a href="/auth/login">
+              <div class="circle-crop nav-item" style="width:50px;height:50px;display:inline-flex">  
+                <img src="/images/Profile-PNG-File.png">    
+              </div></a>
             
             {{/if}}
           </ul>

@@ -181,35 +181,6 @@ router.get("/logout", isLoggedIn, (req, res) => {
 });
 
 //================//
-// FIND MATCHES
-//================//
-
-router.get("/match/tandem", isLoggedIn, async (req, res) => {
-  const user = req.session.currentUser
-  const user_teach = user.lang_teach
-  const user_learn = user.lang_learn
-  let matches = await User.find({lang_teach: { $in: user_learn }, lang_learn: { $in: user_teach }})
-  matches = matches.filter(match => !match.private) // filter private profiles
-  for (let match of matches) { // filter irrelevant languages
-    match.lang_teach = match.lang_teach.filter(lang => user_learn.includes(lang))
-    match.lang_learn = match.lang_learn.filter(lang => user_teach.includes(lang))
-  }
-  res.render("matches", {user, matches});
-});
-
-router.get("/match/teacher", isLoggedIn, async (req, res) => {
-  const user = req.session.currentUser
-  const user_learn = user.lang_learn
-  let matches = await User.find({lang_teach: { $in: user_learn }, professional: true}).populate('offers')
-  for (let match of matches) { // filter irrelevant languages
-    match.lang_teach = match.lang_teach.filter(lang => user_learn.includes(lang))
-  }
-  // filter teachers with at least one offer of a language that the user wants to learn
-  matches = matches.filter(match => match.offers.some(offer => user_learn.includes(offer.language)))
-  res.render("matches", {user, matches});
-});
-
-//================//
 // CHECKOUT
 //================//
 

@@ -1,0 +1,57 @@
+<h3 class="center my-3">My Reviews</h3>
+<div class="d-flex justify-content-center flex-wrap px-auto" style="width: 100%;">
+{{#each reviews}}
+
+  <div class="card review-card text-left mx-3 mb-4" style="width: 30%;">
+    <div class="card-body">
+
+      <div class="row mb-2">
+        <a href="/users/{{this.author._id}}" class="link-text col">
+        <div class="d-flex align-items-center">
+              <div class="circle-crop me-2" style="width:50px;height:50px;display:inline-flex">
+                {{#if this.author.profilePic}}
+                <img src="/uploads/{{this.author.profilePic}}">
+                {{else}}
+                <img src="/images/Profile-PNG-File.png">
+                {{/if}}
+              </div>
+              <span class="fs-5">{{this.author.username}}</span>
+              
+        </div></a>
+        <div class="col-auto">
+          <div class="card-text ms-auto rating fs-5" style="width: fit-content;color: #ffca08;">{{this.rating}}</div>
+          <div class="card-text ms-auto date" style="width: fit-content;">{{this.date}}</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <span class="card-text col fst-italic">"{{this.text}}"</span>
+      </div>
+
+    </div>
+
+    <div class="card-footer">
+      <div class="row mb-2">
+        <span class="card-text col"> 
+          <img src="/images/{{this.language}}.svg" class="lang-flag">
+          <span class="lang-name">{{this.language}}</span>
+        </span>
+        <span class="card-text col stylize">{{this.level}}</span>
+      </div>
+      
+      <div class="row">
+        <span class="card-text col stylize">{{this.locationType}}</span>
+        <span class="card-text col">
+          <span class="stylize">{{this.classType}}</span>
+          {{#if this.maxGroupSize}}
+          <span>(max. {{this.maxGroupSize}} students)</span>
+          {{/if}}
+        </span>
+      </div>
+      
+    </div>
+    
+  </div>
+
+{{/each}}
+</div>

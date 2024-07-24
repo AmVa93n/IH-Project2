@@ -22,7 +22,7 @@
     </div></a>
 
     <div class="row mb-2 align-items-center">
-        <span class="fw-bold col-auto" style="width: 125px;">Can teach</span> 
+        <span class="fw-bold col-auto" style="width: 125px;">{{#if ../teachers}}Teaching{{else}}Can teach{{/if}}</span> 
         <div class="col">
             {{#each this.lang_teach}}
             <div>
@@ -33,6 +33,7 @@
         </div>
     </div>
     
+    {{#unless ../teachers}}
     <div class="row mb-2 align-items-center">
         <span class="fw-bold col-auto" style="width: 125px;">Wants to learn</span>
         <div class="col">
@@ -44,6 +45,19 @@
             {{/each}}
         </div>
     </div>
+    {{/unless}}
+
+    {{#if ../teachers}}
+    <div class="row mb-2 align-items-center">
+        <span class="fw-bold col-auto" style="width: 125px;">Rating</span>
+        <div class="col">
+            {{#if this.reviews}}
+            <div class="mx-auto" style="width: fit-content;">{{this.ratingAvg}} <span style="color: #ffca08;">&#9733;</span></div>
+            {{/if}}
+            <div class="mx-auto small" style="width: fit-content;">({{this.reviews}} Reviews)</div>
+        </div>
+    </div>
+    {{/if}}
 
     <div class="row mt-auto">
         <div class="col d-flex justify-content-center align-items-end">

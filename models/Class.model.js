@@ -12,6 +12,7 @@ const classSchema = new Schema({
   locationType: {type: String, required: true},
   location: {type: String},
   duration: {type: Number, required: true},
+  isRated: {type: Boolean, default: false}
 });
 
 const Class = model('Class', classSchema);

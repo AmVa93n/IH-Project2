@@ -223,7 +223,38 @@ router.get('/offers/:offerId/delete', isLoggedIn, async (req, res) => {
 router.get('/classes', isLoggedIn, async (req, res) => {
     const user = req.session.currentUser
     const classes = await Class.find({ student: user._id }).populate('teacher')
+    for (let cl of classes) {
+      const [day, month, year] = cl.date.split('-').map(Number);
+      const inputDate = new Date(year, month - 1, day);
+      const currentDate = new Date();
+      cl.isPast = inputDate < currentDate
+    }
     res.render('account/classes', {user, classes})
+});
+
+router.get('/classes/:classId/rate', isLoggedIn, async (req, res) => {
+    const user = req.session.currentUser
+    const classId = req.params.classId
+    const classFromDB = await Class.findById(classId).populate('teacher')
+    res.render('account/class-rate', {user, class: classFromDB})
+});
+
+router.post('/classes/:classId/rate', isLoggedIn, async (req, res) => {
+    const user = req.session.currentUser
+    const { rating, text } = req.body
+    const classId = req.params.classId
+    const classFromDB = await Class.findById(classId)
+    const { teacher, date, language, level, classType, locationType } = classFromDB
+    await Review.create({ author: user._id, subject: teacher, rating, text, date, language, level, classType, locationType})
+    classFromDB.isRated = true
+    await classFromDB.save()
+    res.redirect('/account/classes')
+});
+
+router.get('/classes/:classId/cancel', isLoggedIn, async (req, res) => {
+  const classId = req.params.classId
+  await Class.findByIdAndDelete(classId)
+  res.redirect('/account/classes')
 });
   
 //================//

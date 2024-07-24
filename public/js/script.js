@@ -7,6 +7,13 @@ document.addEventListener("DOMContentLoaded", () => {
   for (let span of spansToStylize) {
       span.innerHTML = stylizeText(span.innerText)
   }
+  document.querySelectorAll('.rating').forEach(span => {
+    let stars = parseInt(span.innerText)
+    span.innerHTML = ""
+    for (let i=1; i<stars+1; i++) {
+      span.innerHTML += '&#9733;'
+    }
+  })
 });
 
 function getLanguageName(langCode) {

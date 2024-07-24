@@ -60,7 +60,7 @@ async function searchItems(query) {
         li.classList.add('overlay-li', 'list-group-item', 'd-flex', 'align-items-center');
 
         const img = document.createElement('img');
-        img.src = user.profilePic || '/Profile-PNG-File.png'; // Sets the profile picture or a default image
+        img.src = `/uploads/${user.profilePic}` || '/images/Profile-PNG-File.png'; // Sets the profile picture or a default image
         img.alt = `${user.username}'s profile picture`; // Sets the alt text for the image
         img.classList.add('rounded-circle', 'me-3');
         img.style.width = '50px';
