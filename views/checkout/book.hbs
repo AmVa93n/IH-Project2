@@ -1,7 +1,7 @@
 <script src="https://js.stripe.com/v3/"></script>
 
 <h3 class="center my-3">Review offer details</h3>
-<div class="d-flex" style="width: fit-content; margin:auto">
+<div class="d-flex" style="width: 40%; margin:auto">
 
 <div class="card offer-card text-left mx-3 mb-2" style="width: 50%;">
   <h5 class="card-header center">{{offer.name}}</h5>
@@ -49,30 +49,39 @@
             <i class="bi bi-calendar-fill me-2"></i>{{#each offer.weekdays}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</span>
     </div>
 
-    <div class="row" style="margin-bottom: 12rem;">
+    <div class="row mb-2">
         <span class="card-text col"><i class="bi bi-clock-fill me-2"></i>{{offer.duration}} Minutes</span>
+    </div>
+
+    <div class="row" style="margin-bottom: 12rem;">
+        <span class="card-text col"><i class="bi bi-tag-fill me-2"></i><span class="price">$</span>{{offer.price}}.00</span>
     </div>
 
     <div class="container mb-3">
         <div class="form-group">
             <label for="datepicker">Choose a date</label>
-            <input type="text" id="datepicker" class="form-control" placeholder="Choose a date" name="date">
+            <input type="text" id="datepicker" class="form-control" placeholder="Choose a date" name="date" required>
         </div>
     </div>
 
-  <div class="container">
-      <label for="timeslot">Choose a time slot</label>
-      <select class="form-select" id="timeslot" name="timeslot"> 
-        {{#each offer.timeslots}}
-        <option value={{this}}>{{this}}</option>
-        {{/each}}
-      </select>
-  </div>
+    <div class="container mb-4">
+        <label for="timeslot">Choose a time slot</label>
+        <select class="form-select" id="timeslot" name="timeslot"> 
+          {{#each offer.timeslots}}
+          <option value={{this}}>{{this}}</option>
+          {{/each}}
+        </select>
+    </div>
+
+    <div class="d-flex justify-content-center">
+        <button type="submit" class="btn btn-warning rounded-pill" onclick="initialize()">
+          <i class="bi bi-credit-card me-2"></i>Contine to checkout</button>
+    </div>
 
   </div>
 </div>
 
-<div id="checkout" class="content-box mt-0">
+<div id="checkout" class="content-box mt-0" style="width: 306.05px;">
 <!-- Checkout will insert the payment form here -->
 </div>
 
@@ -90,7 +99,7 @@
           var day = ('0' + date.getDate()).slice(-2);
           var month = ('0' + (date.getMonth() + 1)).slice(-2);
           var year = date.getFullYear();
-          return day + '/' + month + '/' + year;
+          return day + '-' + month + '-' + year;
       }
 
       // Calculate start date (2 days from today)
@@ -110,7 +119,7 @@
       }
       
       $('#datepicker').datepicker({
-          format: 'dd/mm/yyyy', // Format of the date
+          format: 'dd-mm-yyyy', // Format of the date
           startDate: formatDate(startDate), // Start date
           endDate: formatDate(endDate),   // End date
           daysOfWeekDisabled: getDisabledWeekdays(), // Disable weekdays
@@ -125,13 +134,25 @@
     // This is your test secret API key.
 const stripe = Stripe('{{stripePublicKey}}');
 
-initialize();
+const date = document.getElementById('datepicker')
+const timeslot = document.getElementById('timeslot')
 
 // Create a Checkout Session
 async function initialize() {
+  if (!date.value) return
+  date.setAttribute('disabled',true)
+  timeslot.setAttribute('disabled',true)
+
   const fetchClientSecret = async () => {
     const response = await fetch("/auth/offers/{{offer._id}}/book", {
       method: "POST",
+      headers: {
+          'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+          date: date.value,
+          timeslot: timeslot.value
+      })
     });
     const { clientSecret } = await response.json();
     return clientSecret;

@@ -10,12 +10,12 @@ router.get("/", (req, res, next) => {
 });
 
 // GET another user profile
-router.get("/users/:username", async (req, res) => {
+router.get("/users/:userId", async (req, res) => {
   const user = req.session.currentUser;
-  const viewedUsername = decodeURIComponent(req.params.username);
+  const viewedUserId = decodeURIComponent(req.params.userId);
   
   try {
-    const viewedUser = await User.findOne({ username: viewedUsername }).populate('offers');
+    const viewedUser = await User.findById(viewedUserId).populate('offers');
     if (!viewedUser) {
       return res.status(404).render("error", { message: "User not found" });
     }

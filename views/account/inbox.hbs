@@ -39,6 +39,9 @@
     let activeChatId = '{{ chatId }}' || "";
     let activeChat = null
 
+    const username = '{{ user.username }}'; // This should be dynamically set based on the logged-in user
+    const userId = '{{ user._id }}';
+
     socket.on('init', (chats) => {
       chatList.innerHTML = '';
       for (let chat of chats) {
@@ -49,7 +52,7 @@
     });
 
     function createChat(chat) {
-      const otherParty = chat.participants.find(party => party.username != username); // The other party
+      const otherParty = chat.participants.find(party => party._id != userId); // The other party
       let profilePicSrc = otherParty.profilePic ? `/uploads/${otherParty.profilePic}` : "/images/Profile-PNG-File.png"
       let profBadge = otherParty.professional ? `
         <span class="badge rounded-pill text-bg-primary position-absolute" style="top:-8;right:-8">Professional</span>`
@@ -67,13 +70,13 @@
           ${profBadge}`
 
       div.addEventListener('click', () => {
-          window.location.href = `/auth/inbox/${chat._id}`;
+          window.location.href = `/account/inbox/${chat._id}`;
       });
       return div
     }
 
     function setActiveChat(chat, chatElement) {
-      const otherParty = chat.participants.find(party => party.username != username); // The other party
+      const otherParty = chat.participants.find(party => party._id != userId); // The other party
       activeChatId = chat._id;
       activeChat = chat
       chatElement.classList.add("chatbox-active")
@@ -91,11 +94,11 @@
       });
     }
 
-    function createMessage(msgBody, authorData, timestamp) {
-      let dynClasses = authorData.username == '{{ user.username }}' ? 'bg-primary' : ''
-      let alignment = authorData.username == '{{ user.username }}' ? 'align-self: flex-end' : 'align-self: flex-start'
-      let order = authorData.username == '{{ user.username }}' ? 'flex-row-reverse' : ''
-      let dynStylesMsg = authorData.username == '{{ user.username }}' ? 'color: white;' : 'background-color: rgb(200, 200, 200);'
+    function createMessage(msgBody, authorId, timestamp) {
+      let dynClasses = authorId == userId ? 'bg-primary' : ''
+      let alignment = authorId == userId ? 'align-self: flex-end' : 'align-self: flex-start'
+      let order = authorId == userId ? 'flex-row-reverse' : ''
+      let dynStylesMsg = authorId == userId ? 'color: white;' : 'background-color: rgb(200, 200, 200);'
       messageList.innerHTML += `
         <div class="d-flex align-items-center ${order}" style="width: fit-content; ${alignment}">
           <div class="${dynClasses} rounded-pill p-2 mb-1" style="${dynStylesMsg}">
@@ -106,8 +109,9 @@
     }
 
     socket.on('private message', (msg) => {
-      const otherParty = activeChat.participants.find(party => party.username != username).username
-      if (msg.sender.username === otherParty || msg.recipient.username === otherParty) {
+      const otherParty = activeChat.participants.find(party => party._id != userId)
+      console.log(msg.sender, msg.recipient)
+      if (msg.sender === otherParty._id || msg.recipient === otherParty._id) {
         createMessage(msg.message, msg.sender, msg.timestamp)
         messageList.scrollTo(0, messageList.scrollHeight);
       }
@@ -118,9 +122,9 @@
       if (input.value && activeChat) {
         let chatDiv = document.getElementById(activeChatId)
         chatList.insertBefore(chatDiv, chatList.firstChild);
-        const otherParty = activeChat.participants.find(party => party.username != username).username
+        const otherParty = activeChat.participants.find(party => party._id != userId)
         socket.emit('private message', {
-          recipient: otherParty,
+          recipient: otherParty._id,
           message: input.value,
           chatId: activeChatId,
         });
@@ -128,6 +132,5 @@
       }
     });
 
-    const username = '{{ user.username }}'; // This should be dynamically set based on the logged-in user
-    socket.emit('join', username);
+    socket.emit('join', userId);
   </script>

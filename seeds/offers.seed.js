@@ -27,7 +27,7 @@ async function seedDatabase() {
             let timeslotsAmount = getRandomNumber(1,6)
             let timeslots = []
             for (let i = 0; i < timeslotsAmount; i++) {
-              let hour = getRandomNumber(0, 23).toString().padStart(2, '0')
+              let hour = getRandomNumber(7, 20).toString().padStart(2, '0')
               let minute = randomElement([0,15,30,45]).toString().padStart(2, '0')
               timeslots.push(`${hour}:${minute}`)
             }

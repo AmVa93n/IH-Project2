@@ -10,22 +10,17 @@ const server = http.createServer(app);
 const io = socketIo(server);
 
 io.on('connection', (socket) => {
-  console.log('A user connected');
 
-  socket.on('join', async (username) => {
-    const userfromDB = await User.findOne({ username: username })
-    socket.username = username;
-    socket.join(username);
-    console.log(`${username} joined their room`);
+  socket.on('join', async (userId) => {
+    const userfromDB = await User.findById(userId)
+    socket.userId = userId;
+    socket.join(userId);
+    console.log(`${userfromDB.username} joined their room`);
 
     try {
-      const Chats = await Chat.find({ participants: { $in: [userfromDB._id] } })
+      const Chats = await Chat.find({ participants: { $in: [userId] } })
       .populate({
         path: 'messages',
-        populate: [
-          { path: 'sender', select: 'username profilePic' },
-          { path: 'recipient', select: 'username profilePic' }
-        ],
         options: { sort: { timestamp: 1 } }
       })
       .populate({
@@ -42,12 +37,10 @@ io.on('connection', (socket) => {
   });
 
   socket.on('private message', async (msg) => {
-    const senderfromDB = await User.findOne({ username: socket.username })
-    const recipientFromDB = await User.findOne({ username: msg.recipient })
     const chat = await Chat.findById(msg.chatId)
     const newMessage = new Message({
-      sender: senderfromDB._id, // Use the username stored in the socket
-      recipient: recipientFromDB._id,
+      sender: socket.userId, // Use the username stored in the socket
+      recipient: msg.recipient,
       message: msg.message,
     });
 
@@ -56,9 +49,9 @@ io.on('connection', (socket) => {
       chat.messages.push(newMessage._id);
       chat.lastMessageTimestamp = newMessage.timestamp;
       await chat.save();
-      await newMessage.populate('sender recipient','username')
+      //await newMessage.populate('sender recipient','username')
       io.to(msg.recipient).emit('private message', newMessage); // Emit to recipient's room
-      io.to(socket.username).emit('private message', newMessage); // Emit to sender's room
+      io.to(socket.userId).emit('private message', newMessage); // Emit to sender's room
     } catch (err) {
       console.error(err);
     }

@@ -177,6 +177,7 @@ body {
 #calendar {
   max-width: 900px;
   margin: 40px auto;
+  margin-top: 0;
   padding: 10px;
   background-color: white;
   border-top: solid 5px rgb(255, 187, 59);

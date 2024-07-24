@@ -8,9 +8,8 @@ const mongoose = require("mongoose");
 // How many rounds should bcrypt run the salt (default - 10 rounds)
 const saltRounds = 10;
 
-// Require the User model in order to interact with the database
+// Require the models in order to interact with the database
 const User = require("../models/User.model");
-const Chat = require("../models/Chat.model");
 const Offer = require("../models/Offer.model");
 const Class = require("../models/Class.model");
 
@@ -21,7 +20,6 @@ const isLoggedIn = require("../middleware/isLoggedIn");
 // ℹ️ Handles file upload via forms
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
 
 // Set storage engine for multer
 const storage = multer.diskStorage({
@@ -108,7 +106,7 @@ router.post("/signup", upload.single('profilepic'), isLoggedOut, (req, res) => {
       } else if (error.code === 11000) {
         res.status(500).render("auth/signup", {
           errorMessage:
-            "The username or the email address is already taken. Choose a different username or email.",
+            "This email address is already taken. Please choose a different email address.",
         });
       } else {
         next(error);
@@ -125,20 +123,20 @@ router.get("/login", isLoggedOut, (req, res) => {
 });
 
 router.post("/login", isLoggedOut, (req, res, next) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
 
   // Check that username, email, and password are provided
-  if (username === "" || password === "") {
+  if (email === "" || password === "") {
     res.status(400).render("auth/login", {
       errorMessage:
-        "All fields are mandatory. Please provide username and password.",
+        "All fields are mandatory. Please provide email and password.",
     });
 
     return;
   }
 
   // Search the database for a user with the email submitted in the form
-  User.findOne({ username })
+  User.findOne({ email: email })
     .then((user) => {
       // If the user isn't found, send an error message that user provided wrong credentials
       if (!user) {
@@ -183,75 +181,6 @@ router.get("/logout", isLoggedIn, (req, res) => {
 });
 
 //================//
-// PROFILE
-//================//
-
-router.get("/profile", isLoggedIn, (req, res) => {
-  let user = req.session.currentUser
-  res.render("account/profile", {user});
-});
-
-router.get("/profile/delete", isLoggedIn, (req, res) => {
-  const user = req.session.currentUser
-  const username = user.username
-  User.findOneAndDelete({ username })
-    .then(() => {
-      if (user.profilePic) { // delete profile picture from file system, if it exists
-        const profilePicPath = path.join(__dirname, '../public/uploads', user.profilePic);
-        fs.unlinkSync(profilePicPath)
-      }
-      req.session.destroy(() => {
-        res.redirect("/");
-      })
-    })
-    .catch((err) => {
-      res.status(500).render("account/profile", { errorMessage: "An error occurred while deleting your account." });
-    });
-});
-
-router.post('/profile/edit', upload.single('pfp'), isLoggedIn, async (req, res) => {
-  const user = req.session.currentUser
-  const { username, email, gender, birthdate, country, lang_teach, lang_learn, professional, private } = req.body;
-  const newProfilePic = req.file ? req.file.filename : null;
-  const isPrivate = !!private
-  const isProfessional = !!professional
-  const userId = req.session.currentUser._id;
-
-  if ([username,email,birthdate,country].some(field => field === "")) {
-    res.status(400).render("account/profile", {
-      errorMessage:
-        "Some mandatory fields are missing. Please provide your username, email, birth date and country of residence.",
-    });
-    return;
-  }
-
-  if (!lang_learn && !lang_teach) {
-    res.status(400).render("account/profile", {
-      errorMessage:
-        "Please choose at least one language you'd like to teach or learn",
-    });
-    return;
-  }
-
-  try {
-    const updatedUser = await User.findByIdAndUpdate(userId, { username, email, gender, birthdate, country, 
-      lang_teach, lang_learn, professional: isProfessional, private: isPrivate }, { new: true });
-    if (newProfilePic) {
-      if (user.profilePic) {
-        const oldPfpPath = path.join(__dirname, '../public/uploads', user.profilePic); // delete old profile picture from file system, if it exists
-        fs.unlinkSync(oldPfpPath)
-      }
-      updatedUser.profilePic = newProfilePic
-      await updatedUser.save()
-    }
-    req.session.currentUser = updatedUser; // Update current user in session
-    res.redirect('/auth/profile'); // Redirect to profile page
-  } catch (err) {
-    res.status(500).render('account/profile', { errorMessage: 'Failed to update profile. Please try again.' });
-  }
-});
-
-//================//
 // FIND MATCHES
 //================//
 
@@ -281,122 +210,6 @@ router.get("/match/teacher", isLoggedIn, async (req, res) => {
 });
 
 //================//
-// MESSAGING
-//================//
-
-router.get("/inbox", isLoggedIn, async (req, res) => {
-  const user = req.session.currentUser
-  res.render("account/inbox", {user});
-});
-
-router.get("/inbox/:chatId", isLoggedIn, async (req, res) => {
-  const user = req.session.currentUser
-  const chatId = req.params.chatId;
-  res.render("account/inbox", {user, chatId});
-});
-
-router.post('/inbox', isLoggedIn, async (req, res) => {
-  const { targetUsername } = req.body;
-  const user = req.session.currentUser
-  const initUser = await User.findOne({ username: user.username });
-  const targetUser = await User.findOne({ username: targetUsername });
-
-  // Check if a chat already exists
-  const existingChat = await Chat.findOne({
-    participants: { $all: [initUser._id, targetUser._id] }
-  });
-  if (existingChat) {
-    res.redirect(`/auth/inbox/${existingChat._id}`);
-    return
-  }
-
-  const newChat = new Chat({
-    participants: [user._id, targetUser._id],
-    messages: []
-  });
-  await newChat.save();
-  initUser.chats.push(newChat._id);
-  targetUser.chats.push(newChat._id);
-  await initUser.save();
-  await targetUser.save();
-  res.redirect(`/auth/inbox/${newChat._id}`);
-});
-
-//================//
-// OFFERS
-//================//
-
-router.get('/offers', isLoggedIn, async (req, res) => {
-  const user = req.session.currentUser
-  const userDB = await User.findOne({ username: user.username }).populate('offers')
-  const offers = userDB.offers
-  res.render('account/offers', {user, offers})
-});
-
-router.get('/offers/new', isLoggedIn, async (req, res) => {
-  const user = req.session.currentUser
-  res.render('account/offer-create', {user})
-});
-
-router.post('/offers/new', isLoggedIn, async (req, res) => {
-  const user = req.session.currentUser
-  const userDB = await User.findOne({ username: user.username });
-  const { name, language, level, locationType, location, weekdays, timeslots, 
-    duration, classType, maxGroupSize, price} = req.body;
-
-  // Check that all fields are provided
-  if ([name,language,level,locationType,classType,weekdays,timeslots,duration,price].some(field => !field)) {
-    res.status(400).render("account/offer-create", {
-      errorMessage:
-        "Some mandatory fields are missing. Please try again",
-    });
-    return;
-  }
-
-  const offer = await Offer.create({ name, language, level, locationType, location, weekdays, timeslots, 
-    duration, classType, maxGroupSize, price});
-  userDB.offers.push(offer._id);
-  await userDB.save();
-  res.redirect('/auth/offers')
-});
-
-router.get('/offers/:offerId/edit', isLoggedIn, async (req, res) => {
-  const user = req.session.currentUser
-  const offerId = req.params.offerId
-  const offer = await Offer.findById(offerId)
-  res.render('account/offer-edit', {user, offer})
-});
-
-router.post('/offers/:offerId/edit', isLoggedIn, async (req, res) => {
-  const { name, language, level, locationType, location, weekdays, timeslots, 
-    duration, classType, maxGroupSize, price } = req.body;
-  const offerId = req.params.offerId
-
-  // Check that all fields are provided
-  if ([name,language,level,locationType,classType,weekdays,timeslots,duration,price].some(field => !field)) {
-    res.status(400).render("account/offer-edit", {
-      errorMessage:
-        "Some mandatory fields are missing. Please try again",
-    });
-    return;
-  }
-
-  try {
-    await Offer.findByIdAndUpdate(offerId, {  name, language, level, locationType, location, weekdays, timeslots, 
-      duration, classType, maxGroupSize, price });
-    res.redirect('/auth/offers'); // Redirect to my offers page
-  } catch (err) {
-    res.status(500).render('account/offer-edit', { errorMessage: 'Failed to update offer. Please try again.' });
-  }
-});
-
-router.get('/offers/:offerId/delete', isLoggedIn, async (req, res) => {
-  const offerId = req.params.offerId
-  await Offer.findByIdAndDelete(offerId)
-  res.redirect('/auth/offers')
-});
-
-//================//
 // CHECKOUT
 //================//
 
@@ -416,6 +229,7 @@ router.post('/offers/:offerId/book', isLoggedIn, async (req, res) => {
   const offerId = req.params.offerId
   const offer = await Offer.findById(offerId)
   const user = req.session.currentUser
+  const { date, timeslot } = req.body
   const session = await stripe.checkout.sessions.create({
     ui_mode: 'embedded',
     customer_email: user.email,
@@ -434,6 +248,10 @@ router.post('/offers/:offerId/book', isLoggedIn, async (req, res) => {
     ],
     mode: 'payment',
     return_url: `http://localhost:${PORT}/auth/offers/${offerId}/return?session_id={CHECKOUT_SESSION_ID}`,
+    metadata: {
+      date,
+      timeslot,
+    }
   });
   res.send({clientSecret: session.client_secret});
 });
@@ -457,6 +275,7 @@ router.post('/offers/:offerId/return', isLoggedIn, async (req, res) => {
   const { sessionId } = req.body;
   // Retrieve the session to get more details if needed
   const session = await stripe.checkout.sessions.retrieve(sessionId);
+  const { date, timeslot } = session.metadata;
 
   if (session.payment_status === 'paid') {
     const user = req.session.currentUser
@@ -466,7 +285,8 @@ router.post('/offers/:offerId/return', isLoggedIn, async (req, res) => {
     await Class.create({ 
       student: user,
       teacher: teacher._id,
-      date: "22-07-2024",
+      date,
+      timeslot, 
       language: offer.language,
       level: offer.level,
       classType: offer.classType,
@@ -480,26 +300,6 @@ router.post('/offers/:offerId/return', isLoggedIn, async (req, res) => {
   } else {
     res.render('checkout/return', { errorMessage: 'Payment not successful.' });
   }
-});
-
-//================//
-// CLASSES
-//================//
-
-router.get('/classes', isLoggedIn, async (req, res) => {
-  const user = req.session.currentUser
-  const classes = await Class.find({ student: user._id }).populate('teacher')
-  res.render('account/classes', {user, classes})
-});
-
-//================//
-// CALENDAR
-//================//
-
-router.get('/calendar', isLoggedIn, async (req, res) => {
-  const user = req.session.currentUser
-  const classes = await Class.find({ teacher: user._id }).populate('student').lean()
-  res.render('account/calendar', {user, classes: JSON.stringify(classes)})
 });
 
 module.exports = router;

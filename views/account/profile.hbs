@@ -7,7 +7,7 @@
 
 <div class="content-box" style="width: 35%; position:relative">
     <h2 class="mb-3 center">My Profile</h2>
-    <form action="/auth/profile/edit" method="POST" enctype="multipart/form-data">
+    <form action="/account/profile/edit" method="POST" enctype="multipart/form-data">
       <div class="mb-3 mx-auto circle-crop">
           {{#if user.profilePic}}
           <img id="profile-pic-preview" src="/uploads/{{user.profilePic}}">
@@ -162,7 +162,7 @@
     </form>
 
     <div class="d-flex justify-content-center mt-3">
-      <a href="/auth/profile/delete"><button class="btn btn-sm btn-outline-danger"></i>Delete Account</button></a>
+      <a href="/account/profile/delete"><button class="btn btn-sm btn-outline-danger"></i>Delete Account</button></a>
     </div>
     
 </div>

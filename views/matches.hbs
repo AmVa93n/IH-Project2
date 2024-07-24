@@ -3,7 +3,7 @@
 {{#each matches}}
 
 <div class="user-card mb-3 mx-2">
-    <a href="/users/{{this.username}}" class="link-text">
+    <a href="/users/{{this._id}}" class="link-text">
     <div class="d-flex align-items-center mb-3 position-relative">
         <div class="circle-crop me-2" style="width:50px;height:50px;display:inline-flex">
             {{#if this.profilePic}}
@@ -47,8 +47,8 @@
 
     <div class="row mt-auto">
         <div class="col d-flex justify-content-center align-items-end">
-            <form action="/auth/inbox" method="POST">
-                <input style="display: none;" value="{{this.username}}" name="targetUsername">
+            <form action="/account/inbox" method="POST">
+                <input style="display: none;" value="{{this._id}}" name="targetUserId">
                 <button type="submit" class="btn btn-primary mx-1"><i class="bi bi-envelope-fill me-1"></i>Message</button>
             </form>
         </div>

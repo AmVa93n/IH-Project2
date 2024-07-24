@@ -7,7 +7,7 @@
 
 <div class="content-box" style="min-width: 25%;">
   <h2 class="center mb-3">Edit your offer</h2>
-  <form action="/auth/offers/{{ offer._id }}/edit" method="POST">
+  <form action="/account/offers/{{ offer._id }}/edit" method="POST">
 
     <div class="form-floating mb-3">
       <input type="text" name="name" id="name" value="{{ offer.name }}" class="form-control">
@@ -134,7 +134,7 @@
 
     const timeslots = document.getElementById("timeslots")
     const defaultTimeslots = '{{ offer.timeslots }}'.split(",")
-    for (let hr = 0; hr < 24; hr++) {
+    for (let hr = 7; hr < 21; hr++) {
       for (let min of [0,15,30,45]) {
         let hour = hr.toString().padStart(2, '0')
         let minute = min.toString().padStart(2, '0')
