@@ -14,6 +14,11 @@ router.get("/", (req, res, next) => {
   res.render("index", { user });
 });
 
+router.get("/countries", isLoggedIn, (req, res) => {
+  let user = req.session.currentUser
+  res.render("countries", {user});
+});
+
 // GET another user profile
 router.get("/users/:userId", async (req, res) => {
   const user = req.session.currentUser;
