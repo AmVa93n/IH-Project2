@@ -1,79 +1,30 @@
-<h4 class="center my-3">{{matches.length}} Available languages</h4>
+<h4 class="center my-3">{{matches.length}} languages found</h4>
 <div class="d-flex flex-wrap mx-auto" style="width: 92%;">
 {{#each matches}}
 
-<div class="user-card mb-3 mx-2">
-    <a href="/users/{{this._id}}" class="link-text">
-    <div class="d-flex align-items-center mb-3 position-relative">
-        <div class="circle-crop me-2" style="width:50px;height:50px;display:inline-flex">
-            {{#if this.profilePic}}
-            <img src="/uploads/{{this.profilePic}}">
-            {{else}}
-            <img src="/images/Profile-PNG-File.png">
+<div class="language-card mb-3 mx-2">
+    <a href="/languages/{{this._id}}" class="link-text">
+        <div class="d-flex align-items-center mb-3 position-relative">
+            <div class="circle-crop me-2" style="width:50px;height:50px;display:inline-flex">
+                {{#if this.flag}}
+                <img src="/uploads/{{this.flag}}" alt="{{this.name}} flag" style="width:100%;height:100%;object-fit:cover;">
+                {{/if}}
+            </div>
+        
+            {{#if this.isPopular}}
+            <span class="badge rounded-pill text-bg-primary position-absolute" style="top:-8px;right:-8px;">Popular</span>
             {{/if}}
         </div>
-        <span class="fs-5">{{this.username}}</span>
-        <span class="position-absolute" style="top:40;left:60;font-size:12px">
-            <span class="date">{{this.birthdate}}</span>, {{this.country}}
-        </span>
-        {{#if this.professional}}
-        <span class="badge rounded-pill text-bg-primary position-absolute" style="top:-8;right:-8">Professional</span>
-        {{/if}}
-    </div></a>
-
-    <div class="row mb-2 align-items-center">
-        <span class="fw-bold col-auto" style="width: 125px;">{{#if ../teachers}}Teaching{{else}}Can teach{{/if}}</span> 
-        <div class="col">
-            {{#each this.lang_teach}}
-            <div>
-                <img src="/images/{{this}}.svg" class="lang-flag">
-                <span class="lang-name me-1">{{this}}</span>
-            </div>
-            {{/each}}
+        <div class="language-details">
+            <h5 class="mb-1">{{this.name}}</h5>
+            <small class="text-muted">{{this.country}}</small>
         </div>
-    </div>
-    
-    {{#unless ../teachers}}
-    <div class="row mb-2 align-items-center">
-        <span class="fw-bold col-auto" style="width: 125px;">Wants to learn</span>
-        <div class="col">
-            {{#each this.lang_learn}}
-            <div>
-                <img src="/images/{{this}}.svg" class="lang-flag">
-                <span class="lang-name me-1">{{this}}</span>
-            </div>
-            {{/each}}
-        </div>
-    </div>
-    {{/unless}}
-
-    {{#if ../teachers}}
-    <div class="row mb-2 align-items-center">
-        <span class="fw-bold col-auto" style="width: 125px;">Rating</span>
-        <div class="col">
-            {{#if this.reviews}}
-            <div class="mx-auto" style="width: fit-content;">{{this.ratingAvg}} <span style="color: #ffca08;">&#9733;</span></div>
-            {{/if}}
-            <div class="mx-auto small" style="width: fit-content;">({{this.reviews}} Reviews)</div>
-        </div>
-    </div>
-    {{/if}}
-
-    <div class="row mt-auto">
-        <div class="col d-flex justify-content-center align-items-end">
-            <form action="/account/inbox" method="POST">
-                <input style="display: none;" value="{{this._id}}" name="targetUserId">
-                <button type="submit" class="btn btn-primary mx-1"><i class="bi bi-envelope-fill me-1"></i>Message</button>
-            </form>
-        </div>
-    </div>
-    
+    </a>
 </div>
 
 {{/each}}
 </div>
 
 <script>
-    const dates = [...document.querySelectorAll('.date')]
-    for (let date of dates) date.innerText = getUserAge(date.innerText)
+    // Sscript here
 </script>
