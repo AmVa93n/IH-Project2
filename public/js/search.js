@@ -7,6 +7,7 @@ function debounce(func, wait) {
     timeout = setTimeout(() => func.apply(context, args), wait); // Schedule a new execution after the specified delay
   };
 }
+
 // Waits for the DOM to be fully loaded before executing the code
 document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById('search'); // Gets the search input element
@@ -23,8 +24,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const query = searchInput.value.trim(); // Gets and trims the value of the input
       searchItems(query); // Calls the search function with the input value
     }, 300);
+
     // Adds an event listener to the search input to trigger the debounced search function
     searchInput.addEventListener('input', debouncedSearch);
+
     // Adds an event listener to the form submission
     searchForm.addEventListener('submit', (event) => {
       event.preventDefault(); // Prevents the default form submission behavior
@@ -33,6 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
 // Async function to search for items based on the query
 async function searchItems(query) {
   const results = document.getElementById('results'); // Gets the element where results will be displayed
@@ -59,19 +63,32 @@ async function searchItems(query) {
         const li = document.createElement('li');
         li.classList.add('overlay-li', 'list-group-item', 'd-flex', 'align-items-center');
 
+        // Create the link element
+        const link = document.createElement('a');
+        link.href = `/users/${user._id}`; // Update the URL to the correct route
+        link.classList.add('d-flex', 'align-items-center', 'w-100', 'text-decoration-none', 'text-dark');
+
+        // Create and configure the user image
         const img = document.createElement('img');
-        img.src = `/uploads/${user.profilePic}` || '/images/Profile-PNG-File.png'; // Sets the profile picture or a default image
+        img.src = user.profilePic ? `/uploads/${user.profilePic}` : '/images/Profile-PNG-File.png'; // Sets the profile picture or a default image
         img.alt = `${user.username}'s profile picture`; // Sets the alt text for the image
         img.classList.add('rounded-circle', 'me-3');
         img.style.width = '50px';
         img.style.height = '50px';
 
+        // Create and configure the user info text
         const userInfo = document.createElement('span');
         userInfo.textContent = `${user.username} - ${user.country}`; // Sets the text with the user's name and country
 
-        li.appendChild(img); // Adds the image to the list item
-        li.appendChild(userInfo); // Adds the user info to the list item
-        results.appendChild(li); // Adds the list item to the results element
+        // Add the image and user info to the link
+        link.appendChild(img);
+        link.appendChild(userInfo);
+
+        // Add the link to the list item
+        li.appendChild(link);
+
+        // Add the list item to the results container
+        results.appendChild(li);
       });
     }
   } catch (error) {
