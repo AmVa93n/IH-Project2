@@ -7,6 +7,7 @@ const Chat = require("../models/Chat.model");
 const Offer = require("../models/Offer.model");
 const Class = require("../models/Class.model");
 const Review = require("../models/Review.model");
+const Notification = require("../models/Notification.model");
 
 // Require necessary middleware in order to control access to specific routes
 const isLoggedIn = require("../middleware/isLoggedIn");
@@ -248,6 +249,7 @@ router.post('/classes/:classId/rate', isLoggedIn, async (req, res) => {
     await Review.create({ author: user._id, subject: teacher, rating, text, date, language, level, classType, locationType})
     classFromDB.isRated = true
     await classFromDB.save()
+    await Notification.create({ source: user._id, target: teacher, type: 'review'})
     res.redirect('/account/classes')
 });
 

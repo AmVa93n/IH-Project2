@@ -23,6 +23,9 @@ const projectName = "Omniglot";
 
 app.locals.appTitle = `${capitalize(projectName)}`;
 
+const getNotifs = require("./middleware/notifications");
+app.use(getNotifs)
+
 // 👇 Start handling routes here
 const indexRoutes = require("./routes/index.routes");
 app.use("/", indexRoutes);

@@ -3,6 +3,7 @@ const router = express.Router();
 const Offer = require('../models/Offer.model');
 const Review = require('../models/Review.model');
 const User = require("../models/User.model");
+const Notification = require("../models/Notification.model");
 
 // Require necessary middleware in order to control access to specific routes
 const isLoggedIn = require("../middleware/isLoggedIn");
@@ -55,6 +56,22 @@ router.get("/search", async (req, res) => {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
+});
+
+//================//
+// NOTIFICATIONS
+//================//
+
+router.post("/notification/read", isLoggedIn, async (req, res) => {
+  const { notifId } = req.body
+  await Notification.findByIdAndUpdate(notifId, {read: true})
+  res.status(200).send()
+});
+
+router.post("/notification/delete", isLoggedIn, async (req, res) => {
+  const { notifId } = req.body
+  await Notification.findByIdAndDelete(notifId)
+  res.status(200).send()
 });
 
 //================//

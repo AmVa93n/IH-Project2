@@ -3,7 +3,7 @@
 
   <div class="col-2" style="border-right: 1px solid rgb(199, 199, 199); max-height: 625px;">
     <div class="p-3 fs-3">Inbox</div>
-    <div class="row-auto" id="conversation-list" style="height: 550px; overflow-y:scroll">
+    <div class="row-auto" id="conversation-list" style="height: 550px; overflow-y:auto">
 
     </div>
   </div>
@@ -13,7 +13,7 @@
       <span id="conversation-with" class="fs-3" >You have no chats</span>
     </div>
     
-    <div class="p-3 d-flex flex-column" id="message-list" style="flex: 1 1 auto;overflow-y:scroll;background-color:white">
+    <div class="p-3 d-flex flex-column" id="message-list" style="flex: 1 1 auto;overflow-y:auto;background-color:white">
 
     </div>
 
@@ -78,6 +78,7 @@
     function setActiveChat(chat, chatElement) {
       const otherParty = chat.participants.find(party => party._id != userId); // The other party
       activeChatId = chat._id;
+      socket.emit('join chat', activeChatId);
       activeChat = chat
       chatElement.classList.add("chatbox-active")
       chatTitle.textContent = `Chat with ${otherParty.username}`;
@@ -124,6 +125,7 @@
         chatList.insertBefore(chatDiv, chatList.firstChild);
         const otherParty = activeChat.participants.find(party => party._id != userId)
         socket.emit('private message', {
+          sender: userId,
           recipient: otherParty._id,
           message: input.value,
           chatId: activeChatId,
@@ -133,4 +135,5 @@
     });
 
     socket.emit('join', userId);
+    if (activeChatId) socket.emit('join chat', activeChatId);
   </script>

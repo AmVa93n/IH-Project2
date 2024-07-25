@@ -6,6 +6,7 @@ const socketIo = require('socket.io');
 const Message = require('./models/Message.model');
 const Chat = require('./models/Chat.model');
 const User = require('./models/User.model');
+const Notification = require("./models/Notification.model");
 const server = http.createServer(app);
 const io = socketIo(server);
 
@@ -36,10 +37,15 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('join chat', async (chatId) => {
+    socket.join(chatId);
+    console.log(`${socket.userId} joined chat ${chatId}`);
+  });
+
   socket.on('private message', async (msg) => {
     const chat = await Chat.findById(msg.chatId)
     const newMessage = new Message({
-      sender: socket.userId, // Use the username stored in the socket
+      sender: msg.sender,
       recipient: msg.recipient,
       message: msg.message,
     });
@@ -49,9 +55,19 @@ io.on('connection', (socket) => {
       chat.messages.push(newMessage._id);
       chat.lastMessageTimestamp = newMessage.timestamp;
       await chat.save();
-      //await newMessage.populate('sender recipient','username')
-      io.to(msg.recipient).emit('private message', newMessage); // Emit to recipient's room
-      io.to(socket.userId).emit('private message', newMessage); // Emit to sender's room
+      io.to(msg.chatId).emit('private message', newMessage); // Emit to chat's room
+      
+      try {
+        const rooms = io.sockets.adapter.rooms
+        const room = rooms.get(msg.chatId)
+        if (room.size === 1) {
+          const existingNotif = await Notification.findOne({ source: msg.sender, target: msg.recipient, type: 'message', read: false }) // anti spam
+          if (!existingNotif) await Notification.create({ source: msg.sender, target: msg.recipient, type: 'message' })
+        }
+      } catch (error) {
+        console.error('Error accessing rooms:', error);
+      }
+
     } catch (err) {
       console.error(err);
     }

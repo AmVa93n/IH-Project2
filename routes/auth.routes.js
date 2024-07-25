@@ -12,6 +12,7 @@ const saltRounds = 10;
 const User = require("../models/User.model");
 const Offer = require("../models/Offer.model");
 const Class = require("../models/Class.model");
+const Notification = require("../models/Notification.model");
 
 // Require necessary (isLoggedOut and isLiggedIn) middleware in order to control access to specific routes
 const isLoggedOut = require("../middleware/isLoggedOut");
@@ -186,6 +187,8 @@ router.get("/logout", isLoggedIn, (req, res) => {
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const PORT = process.env.PORT || 3000;
+const localURL = `http://localhost:${PORT}`
+const deployedURL = `https://omniglot-znxc.onrender.com`
 
 router.get('/offers/:offerId/book', isLoggedIn, async (req, res) => {
   const offerId = req.params.offerId
@@ -218,7 +221,7 @@ router.post('/offers/:offerId/book', isLoggedIn, async (req, res) => {
       },
     ],
     mode: 'payment',
-    return_url: `http://localhost:${PORT}/auth/offers/${offerId}/return?session_id={CHECKOUT_SESSION_ID}`,
+    return_url: `${localURL}/auth/offers/${offerId}/return?session_id={CHECKOUT_SESSION_ID}`,
     metadata: {
       date,
       timeslot,
@@ -266,8 +269,8 @@ router.post('/offers/:offerId/return', isLoggedIn, async (req, res) => {
       location: offer.location,
       duration: offer.duration,
     })
-
-    res.redirect('/auth/classes');
+    await Notification.create({ source: user._id, target: teacher._id, type: 'booking'})
+    res.status(200).send();
   } else {
     res.render('checkout/return', { errorMessage: 'Payment not successful.' });
   }
