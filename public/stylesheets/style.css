@@ -1,3 +1,16 @@
+/* website style */
+
+/* Custom Scrollbar for Firefox */
+html {
+  scrollbar-width: thin; /* Makes the scrollbar thinner */
+}
+
+/* Optionally, apply the same style to specific elements */
+body {
+  scrollbar-width: thin; /* You can also apply to specific elements if needed */
+}
+
+
 body {
   font-family: "Roboto", Helvetica, Arial, sans-serif; 
   font-size: 14px;
