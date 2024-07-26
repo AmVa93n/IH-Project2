@@ -8,6 +8,7 @@ module.exports = async (req, res, next) => {
       notifications.forEach(notif => {
         switch(notif.type) {
             case "review": notif.newReview = true; break
+            case "cancel": notif.cancelBooking = true; break
             case "booking": notif.newBooking = true; break
             case "message": notif.newMessage = true; break
         }

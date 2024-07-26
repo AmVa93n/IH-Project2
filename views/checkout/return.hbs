@@ -8,15 +8,15 @@ async function initialize() {
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
   const sessionId = urlParams.get('session_id');
-  const response = await fetch(`/auth/offers/{{offer._id}}/session-status?session_id=${sessionId}`);
+  const response = await fetch(`/offers/{{offer._id}}/session-status?session_id=${sessionId}`);
   const session = await response.json();
 
   if (session.status == 'open') {
-    window.replace(`${localURL}/auth/offers/{{offer._id}}/book`)
+    window.replace(`${localURL}/offers/{{offer._id}}/book`)
 
   } else if (session.status == 'complete') {
     document.getElementById('payment-status').innerText = 'Payment successful!';
-    const response = await fetch('/auth/offers/{{offer._id}}/return', {
+    const response = await fetch('/offers/{{offer._id}}/return', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

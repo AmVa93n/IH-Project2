@@ -4,34 +4,17 @@ const router = express.Router();
 // Require the models in order to interact with the database
 const User = require("../models/User.model");
 const Chat = require("../models/Chat.model");
+const Message = require("../models/Message.model");
 const Offer = require("../models/Offer.model");
 const Class = require("../models/Class.model");
 const Review = require("../models/Review.model");
 const Notification = require("../models/Notification.model");
 
-// Require necessary middleware in order to control access to specific routes
+// Require necessary middleware
 const isLoggedIn = require("../middleware/isLoggedIn");
+const upload = require("../middleware/file-storage");
 
-// ℹ️ Handles file upload via forms
-const multer = require('multer');
-const path = require('path');
 const fs = require('fs');
-
-// Set storage engine for multer
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, './public/uploads'); // Directory where uploaded files will be stored
-  },
-  filename: function (req, file, cb) {
-    cb(null, 'pfp-' + Date.now() + path.extname(file.originalname)); // File naming convention
-  }
-});
-
-// Initialize multer upload middleware
-const upload = multer({
-  storage: storage,
-  limits: { fileSize: 10 * 1024 * 1024 } // Limit file size to 10MB (adjust as needed)
-});
 
 //================//
 // PROFILE
@@ -140,6 +123,15 @@ router.post('/inbox', isLoggedIn, async (req, res) => {
     await initUser.save();
     await targetUser.save();
     res.redirect(`/account/inbox/${newChat._id}`);
+});
+
+router.get("/inbox/:chatId/delete", isLoggedIn, async (req, res) => {
+  const user = req.session.currentUser
+  const chatId = req.params.chatId;
+  const chat = await Chat.findById(chatId)
+  await Message.deleteMany({ _id: { $in: chat.messages } });
+  await Chat.deleteOne({ _id: chatId })
+  res.redirect("/account/inbox");
 });
 
 //================//
@@ -254,8 +246,12 @@ router.post('/classes/:classId/rate', isLoggedIn, async (req, res) => {
 });
 
 router.get('/classes/:classId/cancel', isLoggedIn, async (req, res) => {
+  const user = req.session.currentUser
   const classId = req.params.classId
-  await Class.findByIdAndDelete(classId)
+  const classFromDB = await Class.findById(classId)
+  const { teacher } = classFromDB
+  await Class.deleteOne({ _id: classId })
+  await Notification.create({ source: user._id, target: teacher, type: 'cancel'})
   res.redirect('/account/classes')
 });
   
@@ -270,6 +266,9 @@ router.get('/calendar', isLoggedIn, async (req, res) => {
     for (let cl of classes) {
         let [day, month, year] = cl.date.split('-').map(Number);
         let dateObj = new Date(year, month - 1, day);
+        const currentDate = new Date();
+        cl.isPast = dateObj < currentDate
+
         const date = [dateObj.getFullYear(),
         (dateObj.getMonth() + 1).toString().padStart(2, '0'),
         dateObj.getDate().toString().padStart(2, '0')
@@ -295,7 +294,7 @@ router.get('/calendar', isLoggedIn, async (req, res) => {
         }
         events.push(event)
     }
-    res.render('account/calendar', {user, classes: JSON.stringify(events)})
+    res.render('account/calendar', {user, classes, events: JSON.stringify(events)})
 });
 
 //================//

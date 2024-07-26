@@ -3,6 +3,7 @@ body {
   font-size: 14px;
   background-image: url('/images/background.jpg');
   background-size: cover;
+  background-attachment: fixed;
 }
 
 .center {
@@ -224,4 +225,13 @@ body {
   background-color: rgba(250, 250, 250, 0.8);
   border-radius: 20px;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.calendar-card {
+  background-color: rgba(250, 250, 250, 0.9);
+  border-radius: 20px;
+  width: 265px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  position: absolute;
+  z-index: 1000;
 }

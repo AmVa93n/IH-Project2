@@ -54,12 +54,12 @@
             <button class="dropdown-toggle no-arrow" data-bs-toggle="dropdown">
               <div class="nav-link btn d-flex flex-column align-items-center me-4">
                 <div style="width: fit-content;position: relative"><i class="bi bi-bell-fill mb-1 fs-3"></i>
-                  {{#if unread}}<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{unread}}</span>{{/if}}
+                  <span id="unreadCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;">{{unread}}</span>
                 </div>Notifications
               </div>
             </button>
 
-            <ul class="dropdown-menu dropdown-menu-end" style="max-height: 400px; overflow-y:auto">
+            <ul class="dropdown-menu dropdown-menu-end" style="max-height: 400px; overflow-y:auto" id="notifList">
               {{#each notifications}}
 
               <li class="notif" id="{{this._id}}">
@@ -76,6 +76,7 @@
                   <span><span class="fw-bold">{{this.source.username}}</span>
                     {{#if this.newReview}} has left a review about your class{{/if}}
                     {{#if this.newBooking}} has booked a class with you{{/if}}
+                    {{#if this.cancelBooking}} has cancelled your class{{/if}}
                     {{#if this.newMessage}} has sent you a message{{/if}}
                     </span>
                   </div>
@@ -130,50 +131,23 @@
           </ul>
         </div>
       </div>
-    </nav>    
+    </nav>
+    <script src="/js/notif.js"></script>
+    <script>
+      const socket = io();
+      socket.emit('join', '{{user._id}}');
+
+      socket.on('notification', (notif) => {
+          if (notif.target === '{{user._id}}') createNotif(notif)
+      });
+    </script>    
     <script src="/js/script.js"></script>
     <script src="/js/search.js"></script>
+    
 
     {{{body}}}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-
-    <script>
-      async function readNotif(notifId, type) {
-        let redirectUrl
-        switch(type) {
-          case 'message':
-            redirectUrl = '/account/inbox' ;break
-          case 'booking':
-            redirectUrl = '/account/calendar' ;break
-          case 'review':
-            redirectUrl = '/account/reviews' ;break
-        }
-        const response = await fetch('/notification/read', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ notifId }),
-        });
-        const localURL = `http://localhost:3000`
-        const deployedURL = `https://omniglot-znxc.onrender.com`
-        if (response.ok) window.location.href = `${localURL}${redirectUrl}`;
-      }
-
-      async function deleteNotif(notifId, event) {
-        event.stopPropagation();
-        await fetch('/notification/delete', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ notifId }),
-        });
-        document.getElementById(notifId).remove()
-      }
-      
-    </script>
   
   </body>
 

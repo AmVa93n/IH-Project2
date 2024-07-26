@@ -1,31 +1,96 @@
 <h3 class="center my-3">My Calendar</h3>
 <div id="calendar"></div>
 
+{{#each classes}}
+<div class="card calendar-card text-left mx-3 mb-4" id="{{this._id}}" style="display: none;">
+  <h5 class="card-header center"><span class="fs-6">{{this.date}}</span><br>{{this.timeslot}}</h5>
+  <div class="card-body">
+    <a href="/users/{{this.student._id}}" class="link-text">
+    <div class="d-flex align-items-center mb-2">
+          <div class="circle-crop me-2" style="width:50px;height:50px;display:inline-flex">
+            {{#if this.student.profilePic}}
+            <img src="/uploads/{{this.student.profilePic}}">
+            {{else}}
+            <img src="/images/Profile-PNG-File.png">
+            {{/if}}
+          </div>
+          <span class="fs-5">{{this.student.username}}</span>
+    </div></a>
+
+    <div class="row mb-2">
+        <span class="card-text col"> 
+          <img src="/images/{{this.language}}.svg" class="lang-flag">
+          <span class="lang-name">{{this.language}}</span>
+        </span>
+        <span class="card-text col stylize">{{this.level}}</span>
+    </div>
+
+    <div class="row mb-2">
+        <span class="card-text col stylize">{{this.locationType}}</span>
+        {{#if this.location}}
+        <span>({{this.location}})</span>
+        {{/if}}
+    </div>
+
+    <div class="row mb-2">
+        <span class="card-text col">
+          <span class="stylize">{{this.classType}}</span>
+          {{#if this.maxGroupSize}}
+          <span>(max. {{this.maxGroupSize}} students)</span>
+          {{/if}}
+        </span>
+    </div>
+
+    <div class="row mb-2">
+        <span class="card-text col"><i class="bi bi-clock-fill me-2"></i>{{this.duration}} Minutes</span>
+    </div>
+
+    <div class="d-flex justify-content-center mt-3">
+        {{#unless this.isPast}}
+        <a href="/account/classes/{{this._id}}/cancel" class="btn btn-danger mx-1"><i class="bi bi-x-circle-fill me-2"></i>Cancel</a>
+        {{/unless}}
+    </div>
+  </div>
+</div>
+{{/each}}
+
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
 <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/bootstrap5@6.1.15/index.global.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('calendar');
-    var events = {{{ classes }}}; // Injected events data
-    console.log(events)
+    var events = {{{ events }}}; // Injected events data
     var calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: 'dayGridMonth',
-    headerToolbar: {
-        left: 'prev,next today',
-        center: 'title',
-        right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
-    },
-    eventTimeFormat: {
-        hour: '2-digit',
-        minute: '2-digit',
-        meridiem: false,
-        hour12: false
-    },
-    events: events,
-    themeSystem: 'bootstrap5',
-    eventDidMount: function(info) {
-          // Optional: Debugging output to ensure the event is being added
-          console.log(info.event);
+        initialView: 'dayGridMonth',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+        },
+        eventTimeFormat: {
+            hour: '2-digit',
+            minute: '2-digit',
+            meridiem: false,
+            hour12: false
+        },
+        events: events,
+        themeSystem: 'bootstrap5',
+        eventDidMount: function(info) {
+          const classCard = document.getElementById(info.event.id);
+          
+          // Hover event listeners to show and hide the tooltip
+          info.el.addEventListener('mouseenter', function() {
+            classCard.style.display = 'block';
+          });
+
+          info.el.addEventListener('mouseleave', function() {
+            classCard.style.display = 'none';
+          });
+
+          info.el.addEventListener('mousemove', function(e) {
+            classCard.style.top = (e.clientY + 15) + 'px';
+            classCard.style.left = (e.clientX + 15) + 'px';
+          });
         }
     });
     calendar.render();

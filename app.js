@@ -30,6 +30,9 @@ app.use(getNotifs)
 const indexRoutes = require("./routes/index.routes");
 app.use("/", indexRoutes);
 
+const checkoutRoutes = require("./routes/checkout.routes");
+app.use("/", checkoutRoutes);
+
 const authRoutes = require("./routes/auth.routes");
 app.use("/auth", authRoutes);
 

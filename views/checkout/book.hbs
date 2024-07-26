@@ -144,7 +144,7 @@ async function initialize() {
   timeslot.setAttribute('disabled',true)
 
   const fetchClientSecret = async () => {
-    const response = await fetch("/auth/offers/{{offer._id}}/book", {
+    const response = await fetch("/offers/{{offer._id}}/book", {
       method: "POST",
       headers: {
           'Content-Type': 'application/json',
