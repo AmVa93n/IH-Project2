@@ -15,6 +15,7 @@ const isLoggedIn = require("../middleware/isLoggedIn");
 const upload = require("../middleware/file-storage");
 
 const fs = require('fs');
+const path = require('path');
 
 //================//
 // PROFILE
@@ -79,7 +80,7 @@ router.post('/profile/edit', upload.single('pfp'), isLoggedIn, async (req, res) 
       req.session.currentUser = updatedUser; // Update current user in session
       res.redirect('/account/profile'); // Redirect to profile page
     } catch (err) {
-      res.status(500).render('account/profile', { errorMessage: 'Failed to update profile. Please try again.' });
+      res.status(500).render('account/profile', { user, errorMessage: 'Failed to update profile. Please try again.' });
     }
 });
 
