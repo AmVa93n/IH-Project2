@@ -48,9 +48,7 @@ async function readNotif(notifId, type) {
         },
         body: JSON.stringify({ notifId }),
     });
-    const localURL = `http://localhost:3000`
-    const deployedURL = `https://omniglot-znxc.onrender.com`
-    if (response.ok) window.location.href = `${localURL}${redirectUrl}`;
+    if (response.ok) window.location.href = `${redirectUrl}`;
 }
 
 async function deleteNotif(notifId, event) {

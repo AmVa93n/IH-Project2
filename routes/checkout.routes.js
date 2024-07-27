@@ -15,9 +15,7 @@ const isLoggedIn = require("../middleware/isLoggedIn");
 //================//
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const PORT = process.env.PORT || 3000;
-const localURL = `http://localhost:${PORT}`
-const deployedURL = `https://omniglot-znxc.onrender.com`
+const domain = process.env.LOCAL || `https://omniglot-znxc.onrender.com`
 
 router.get('/offers/:offerId/book', isLoggedIn, async (req, res) => {
   const offerId = req.params.offerId
@@ -50,7 +48,7 @@ router.post('/offers/:offerId/book', isLoggedIn, async (req, res) => {
       },
     ],
     mode: 'payment',
-    return_url: `${localURL}/offers/${offerId}/return?session_id={CHECKOUT_SESSION_ID}`,
+    return_url: `${domain}/offers/${offerId}/return?session_id={CHECKOUT_SESSION_ID}`,
     metadata: {
       date,
       timeslot,

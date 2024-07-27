@@ -12,7 +12,7 @@ async function initialize() {
   const session = await response.json();
 
   if (session.status == 'open') {
-    window.replace(`${localURL}/offers/{{offer._id}}/book`)
+    window.location.href = (`/offers/{{offer._id}}/book`)
 
   } else if (session.status == 'complete') {
     document.getElementById('payment-status').innerText = 'Payment successful!';
@@ -23,9 +23,7 @@ async function initialize() {
           },
           body: JSON.stringify({ sessionId }),
       });
-    const localURL = `http://localhost:3000`
-    const deployedURL = `https://omniglot-znxc.onrender.com`
-    if (response.ok) window.location.href = `${localURL}/account/classes`;
+    if (response.ok) window.location.href = `/account/classes`;
   }
 }
 </script>
