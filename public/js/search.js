@@ -62,6 +62,7 @@ async function searchItems(query) {
       users.forEach(user => {
         const li = document.createElement('li');
         li.classList.add('overlay-li', 'list-group-item', 'd-flex', 'align-items-center');
+        li.style.width = "100%"
 
         // Create the link element
         const link = document.createElement('a');
@@ -70,7 +71,7 @@ async function searchItems(query) {
 
         // Create and configure the user image
         const img = document.createElement('img');
-        img.src = user.profilePic ? `/uploads/${user.profilePic}` : '/images/Profile-PNG-File.png'; // Sets the profile picture or a default image
+        img.src = user.profilePic ? `${user.profilePic}` : '/images/Profile-PNG-File.png'; // Sets the profile picture or a default image
         img.alt = `${user.username}'s profile picture`; // Sets the alt text for the image
         img.classList.add('rounded-circle', 'me-3');
         img.style.width = '50px';

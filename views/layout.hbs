@@ -25,25 +25,21 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           
-{{!-- create a child to the search form --}}
+          {{!-- create a child to the search form --}}
 
-<div class="container" style="width: 70%;">
-  <div class="row g-0 justify-content-center">
-    <div class="col-md-6 col-lg-4 g-0">
-      <form id="searchForm" class="d-flex" role="search">
-        <input id="search" class="form-control rounded-start-pill" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn rounded-end-pill" type="submit" style="background-color: rgb(192, 192, 192);">
-          <i class="bi bi-search"></i>
-        </button>
-          <ul id="results" class="list-group mt-3"></ul>
-      </form>
-    </div>
-  </div>
-  
+          <div class="container">
+            <div class="row g-0 justify-content-center">
+              <div class="col-md-6 col-lg-4 g-0">
+                <form id="searchForm" class="d-flex position-relative" role="search">
+                  <input id="search" class="form-control rounded-pill" type="search" placeholder="Search" aria-label="Search">
+                    <i class="bi bi-search position-absolute" style="top:30%; right:5%"></i>
+                    <ul id="results" class="list-group mt-3" style="width: 100%;"></ul>
+                </form>
+              </div>
+            </div>
+          </div>
 
-    
-  </div>
-</div>
+        </div>
 
           {{#if user}}
           <a href="/match/partners" class="nav-link d-flex flex-column align-items-center me-4"><i class="bi bi-chat-text-fill mb-1 fs-3"></i>Partners</a>
@@ -52,7 +48,7 @@
           <div class="dropdown-center">
 
             <button class="dropdown-toggle no-arrow" data-bs-toggle="dropdown">
-              <div class="nav-link btn d-flex flex-column align-items-center me-4">
+              <div class="nav-link btn d-flex flex-column align-items-center me-4 mt-1">
                 <div style="width: fit-content;position: relative"><i class="bi bi-bell-fill mb-1 fs-3"></i>
                   <span id="unreadCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;">{{unread}}</span>
                 </div>Notifications
@@ -84,7 +80,6 @@
                   <button class="btn position-absolute top-0 end-0 p-0" onclick="deleteNotif('{{this._id}}', event)"><i class="bi bi-x"></i></button>
                 
               </div></li>
-              {{#unless @last}}<li><hr class="dropdown-divider my-0"></li>{{/unless}}
 
               {{/each}}
             </ul>

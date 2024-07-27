@@ -26,9 +26,8 @@ router.get("/profile", isLoggedIn, (req, res) => {
   
 router.get("/profile/delete", isLoggedIn, async (req, res) => {
     const user = req.session.currentUser
-    const username = user.username
     try {
-      await User.findOneAndDelete({ username })
+      await User.findByIdAndDelete(user._id)
       req.session.destroy(() => { res.redirect("/") });
     } catch (err) {
       res.status(500).render("account/profile", { errorMessage: "An error occurred while deleting your account." });
