@@ -130,8 +130,7 @@ router.get("/inbox/:chatId/delete", isLoggedIn, async (req, res) => {
   const user = req.session.currentUser
   const chatId = req.params.chatId;
   const chat = await Chat.findById(chatId)
-  await Message.deleteMany({ _id: { $in: chat.messages } });
-  await Chat.deleteOne({ _id: chatId })
+  await Message.deleteMany({ _id: { $in: chat.messages }, sender: user._id });
   res.redirect("/account/inbox");
 });
 
@@ -181,8 +180,10 @@ router.get('/offers/:offerId/edit', isLoggedIn, async (req, res) => {
 });
 
 router.post('/offers/:offerId/edit', isLoggedIn, async (req, res) => {
-    const { name, language, level, locationType, location, weekdays, timeslots, 
-      duration, classType, maxGroupSize, price } = req.body;
+    const { name, language, level, locationType, weekdays, timeslots, duration, classType, price } = req.body;
+    let { location, maxGroupSize } = req.body;
+    if (!location) location = null
+    if (!maxGroupSize) maxGroupSize = null
     const offerId = req.params.offerId
   
     // Check that all fields are provided

@@ -135,10 +135,11 @@
     <script src="/js/notif.js"></script>
     <script>
       const socket = io();
-      socket.emit('join', '{{user._id}}');
+      const userId = '{{user._id}}'
+      if (userId) socket.emit('join', userId);
 
       socket.on('notification', (notif) => {
-          if (notif.target === '{{user._id}}') createNotif(notif)
+          if (notif.target === userId) createNotif(notif)
       });
     </script>    
     <script src="/js/script.js"></script>

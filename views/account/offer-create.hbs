@@ -33,15 +33,15 @@
       <legend class="col-form-label col-sm-3 pt-0">Type</legend>
       <div class="col-sm-9">
         <div class="form-check">
-          <input class="form-check-input" type="radio" name="locationType" id="online", value="online" checked>
+          <input class="form-check-input" type="radio" name="locationType" id="online", value="online" onchange="toggleLocation(false)" checked>
           <label class="form-check-label" for="private">Online</label>
         </div>
         <div class="form-check">
-          <input class="form-check-input" type="radio" name="locationType" id="at-student", value="at-student">
+          <input class="form-check-input" type="radio" name="locationType" id="at-student", value="at-student" onchange="toggleLocation(false)">
           <label class="form-check-label" for="group">In-person (at the student)</label>
         </div>
         <div class="form-check">
-          <input class="form-check-input" type="radio" name="locationType" id="at-teacher", value="at-teacher">
+          <input class="form-check-input" type="radio" name="locationType" id="at-teacher", value="at-teacher" onchange="toggleLocation(true)">
           <label class="form-check-label" for="group">In-person (at the teacher)</label>
         </div>
       </div>
@@ -49,18 +49,18 @@
 
     <div class="form-floating mb-3">
       <input type="address" name="location" id="location" placeholder="" class="form-control" disabled>
-      <label for="name">Location</label>
+      <label for="location">Location</label>
     </div>
 
     <fieldset class="row mb-3">
       <legend class="col-form-label col-sm-3 pt-0">Type</legend>
       <div class="col-sm-9">
         <div class="form-check">
-          <input class="form-check-input" type="radio" name="classType" id="private", value="private" checked>
+          <input class="form-check-input" type="radio" name="classType" id="private", value="private" onchange="toggleGroupSize(false)" checked>
           <label class="form-check-label" for="private">Private</label>
         </div>
         <div class="form-check">
-          <input class="form-check-input" type="radio" name="classType" id="group", value="group">
+          <input class="form-check-input" type="radio" name="classType" id="group", value="group" onchange="toggleGroupSize(true)">
           <label class="form-check-label" for="group">Group</label>
         </div>
       </div>
@@ -68,7 +68,7 @@
 
     <div class="input-group mb-3" id="maxGroupSize" style="display: none;">
         <span class="input-group-text" id="addon-wrapping">Max. Group Size</span>
-        <input type="number" class="form-control" min="2" max="15" placeholder="2" name="maxGroupSize">
+        <input id="mgs-input" type="number" class="form-control" min="2" max="15" placeholder="2" name="maxGroupSize">
     </div>
 
     <div class="row mb-3">
@@ -125,7 +125,7 @@
         if (langList[a] < langList[b]) return -1
         if (langList[a] == langList[b]) return 0
     })
-    for (lang of languages) {
+    for (let lang of languages) {
       let langName = getLanguageName(lang)
       selectLang.innerHTML += `<option value=${lang}><img src="/images/${lang}.svg" class="lang-flag"> ${langName}</option>`
     }
@@ -139,6 +139,22 @@
         option.value = `${hour}:${minute}`;
         option.textContent = `${hour}:${minute}`;
         timeslots.appendChild(option);
+      }
+    }
+
+    const maxGroupSize = document.getElementById("maxGroupSize")
+    const customLocation = document.getElementById("location")
+
+    function toggleGroupSize(bool) {
+      maxGroupSize.style.display = bool ? 'flex' : 'none'
+      if (!bool) document.getElementById("mgs-input").value = null
+    }
+
+    function toggleLocation(bool) {
+      if (bool) customLocation.removeAttribute('disabled')
+      else {
+        customLocation.setAttribute('disabled',true)
+        customLocation.value = null
       }
     }
 </script>
