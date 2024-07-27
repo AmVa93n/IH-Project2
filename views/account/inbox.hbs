@@ -42,7 +42,7 @@
     let activeChat = null
 
     const username = '{{ user.username }}'; // This should be dynamically set based on the logged-in user
-    const userId = '{{ user._id }}';
+    //const userId = '{{ user._id }}';
 
     socket.on('init', (chats) => {
       chatList.innerHTML = '';
@@ -55,7 +55,7 @@
 
     function createChat(chat) {
       const otherParty = chat.participants.find(party => party._id != userId); // The other party
-      let profilePicSrc = otherParty.profilePic ? `/uploads/${otherParty.profilePic}` : "/images/Profile-PNG-File.png"
+      let profilePicSrc = otherParty.profilePic ? `${otherParty.profilePic}` : "/images/Profile-PNG-File.png"
       let profBadge = otherParty.professional ? `
         <span class="badge rounded-pill text-bg-primary position-absolute" style="top:-8;right:-8">Professional</span>`
         : ""

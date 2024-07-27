@@ -10,7 +10,7 @@
     <form action="/account/profile/edit" method="POST" enctype="multipart/form-data">
       <div class="mb-3 mx-auto circle-crop">
           {{#if user.profilePic}}
-          <img id="profile-pic-preview" src="/uploads/{{user.profilePic}}">
+          <img id="profile-pic-preview" src="{{user.profilePic}}">
           {{else}}
           <img id="profile-pic-preview" src="/images/Profile-PNG-File.png">
           {{/if}}

@@ -12,10 +12,8 @@ const Notification = require("../models/Notification.model");
 
 // Require necessary middleware
 const isLoggedIn = require("../middleware/isLoggedIn");
-const upload = require("../middleware/file-storage");
-
-const fs = require('fs');
-const path = require('path');
+//const upload = require("../middleware/file-storage");
+const fileUploader = require('../middleware/cloudinary');
 
 //================//
 // PROFILE
@@ -26,28 +24,21 @@ router.get("/profile", isLoggedIn, (req, res) => {
     res.render("account/profile", {user});
 });
   
-router.get("/profile/delete", isLoggedIn, (req, res) => {
+router.get("/profile/delete", isLoggedIn, async (req, res) => {
     const user = req.session.currentUser
     const username = user.username
-    User.findOneAndDelete({ username })
-      .then(() => {
-        if (user.profilePic) { // delete profile picture from file system, if it exists
-          const profilePicPath = path.join(__dirname, '../public/uploads', user.profilePic);
-          fs.unlinkSync(profilePicPath)
-        }
-        req.session.destroy(() => {
-          res.redirect("/");
-        })
-      })
-      .catch((err) => {
-        res.status(500).render("account/profile", { errorMessage: "An error occurred while deleting your account." });
-      });
+    try {
+      await User.findOneAndDelete({ username })
+      req.session.destroy(() => { res.redirect("/") });
+    } catch (err) {
+      res.status(500).render("account/profile", { errorMessage: "An error occurred while deleting your account." });
+    }
 });
   
-router.post('/profile/edit', upload.single('pfp'), isLoggedIn, async (req, res) => {
+router.post('/profile/edit', fileUploader.single('pfp'), isLoggedIn, async (req, res) => {
     const user = req.session.currentUser
     const { username, email, gender, birthdate, country, lang_teach, lang_learn, professional, private } = req.body;
-    const newProfilePic = req.file ? req.file.filename : null;
+    const newProfilePic = req.file ? req.file.path : null;
     const isPrivate = !!private
     const isProfessional = !!professional
     const userId = req.session.currentUser._id;
@@ -68,15 +59,7 @@ router.post('/profile/edit', upload.single('pfp'), isLoggedIn, async (req, res) 
   
     try {
       const updatedUser = await User.findByIdAndUpdate(userId, { username, email, gender, birthdate, country, 
-        lang_teach, lang_learn, professional: isProfessional, private: isPrivate }, { new: true });
-      if (newProfilePic) {
-        if (user.profilePic) {
-          const oldPfpPath = path.join(__dirname, '../public/uploads', user.profilePic); // delete old profile picture from file system, if it exists
-          fs.unlinkSync(oldPfpPath)
-        }
-        updatedUser.profilePic = newProfilePic
-        await updatedUser.save()
-      }
+        lang_teach, lang_learn, professional: isProfessional, private: isPrivate, profilePic: newProfilePic }, { new: true });
       req.session.currentUser = updatedUser; // Update current user in session
       res.redirect('/account/profile'); // Redirect to profile page
     } catch (err) {

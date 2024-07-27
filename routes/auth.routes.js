@@ -14,7 +14,8 @@ const User = require("../models/User.model");
 // Require necessary middleware
 const isLoggedOut = require("../middleware/isLoggedOut");
 const isLoggedIn = require("../middleware/isLoggedIn");
-const upload = require("../middleware/file-storage");
+//const upload = require("../middleware/file-storage");
+const fileUploader = require('../middleware/cloudinary');
 
 //================//
 // SIGNUP 
@@ -24,34 +25,25 @@ router.get("/signup", isLoggedOut, (req, res) => {
   res.render("auth/signup");
 });
 
-router.post("/signup", upload.single('profilepic'), isLoggedOut, (req, res) => {
+router.post("/signup", fileUploader.single('profilepic'), isLoggedOut, (req, res) => {
   const { username, email, password, gender, birthdate, country, lang_teach, lang_learn, professional, private} = req.body;
-  const profilePic = req.file ? req.file.filename : null;
+  const profilePic = req.file ? req.file.path : null;
   const isPrivate = !!private
   const isProfessional = !!professional
 
   // Check that username, email, and password are provided
   if ([username,email,password,birthdate,country].some(field => field === "")) {
-    res.status(400).render("auth/signup", {
-      errorMessage:
-        "Some mandatory fields are missing. Please provide your username, email, password, birth date and country of residence.",
-    });
+    res.status(400).render("auth/signup", {errorMessage: "Some mandatory fields are missing. Please provide your username, email, password, birth date and country of residence."});
     return;
   }
 
   if (!lang_learn && !lang_teach) {
-    res.status(400).render("auth/signup", {
-      errorMessage:
-        "Please choose at least one language you'd like to teach or learn",
-    });
+    res.status(400).render("auth/signup", {errorMessage: "Please choose at least one language you'd like to teach or learn"});
     return;
   }
 
   if (password.length < 8) {
-    res.status(400).render("auth/signup", {
-      errorMessage: "Your password needs to be at least 8 characters long.",
-    });
-
+    res.status(400).render("auth/signup", {errorMessage: "Your password needs to be at least 8 characters long."});
     return;
   }
 

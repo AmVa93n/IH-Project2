@@ -20,6 +20,8 @@ async function seedDatabase() {
     let professional = randomChance(20)
     let gender = fakeUsers[i].gender
     let avatarIndex = gender == "male" ? 5 : 4
+    //let profilePic = "avatar-"+gender+getRandomNumber(1,avatarIndex)+".jpg"
+    let profilePic = fakeUsers[i].picture.large
 
     let user = {
       username: fakeUsers[i].name.first,
@@ -28,7 +30,7 @@ async function seedDatabase() {
       gender,
       birthdate: `${year}-${month}-${day}`,
       country: fakeUsers[i].location.country,
-      profilePic: "avatar-"+gender+getRandomNumber(1,avatarIndex)+".jpg",
+      profilePic,
       lang_teach,
       lang_learn,
       private: randomChance(5),

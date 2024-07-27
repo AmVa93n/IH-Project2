@@ -6,6 +6,3 @@ npm-debug.log
 
 # Environment Variables should NEVER be published
 .env
-
-# files uploaded by users
-uploads
