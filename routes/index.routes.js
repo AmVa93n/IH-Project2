@@ -4,6 +4,7 @@ const Offer = require('../models/Offer.model');
 const Review = require('../models/Review.model');
 const User = require("../models/User.model");
 const Notification = require("../models/Notification.model");
+const Deck = require("../models/Deck.model");
 
 // Require necessary middleware in order to control access to specific routes
 const isLoggedIn = require("../middleware/isLoggedIn");
@@ -30,6 +31,7 @@ router.get("/users/:userId", async (req, res) => {
       return res.status(404).render("error", { message: "User not found" });
     }
     viewedUser.reviews = await Review.find({ subject: viewedUserId }).populate('author')
+    viewedUser.decks = await Deck.find({ creator: viewedUserId })
     
     res.render("user", { viewedUser, user });
   } catch (error) {

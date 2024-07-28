@@ -1,0 +1,36 @@
+<h3 class="center my-3">My Decks</h3>
+<div class="d-flex justify-content-center flex-wrap px-auto" style="width: 100%;">
+{{#each decks}}
+
+<div class="card offer-card text-left mx-3 mb-4" style="width: 270px;">
+  <h5 class="card-header center">{{this.topic}}</h5>
+  <div class="card-body">
+
+    <div class="row mb-2">
+        <span class="card-text col"> 
+          <img src="/images/{{this.language}}.svg" class="lang-flag">
+          <span class="lang-name">{{this.language}}</span>
+        </span>
+        <span class="card-text col stylize">{{this.level}}</span>
+    </div>
+
+    <div class="row mb-3">
+        <span class="card-text col"><i class="bi bi-aspect-ratio-fill me-2"></i>{{this.cards.length}} Cards</span>
+        <span class="card-text col"><i class="bi bi-trophy-fill me-2"></i>{{this.mastered.length}} Mastered</span>
+    </div>
+
+    <div class="d-flex justify-content-center mt-auto">
+        <a href="/account/decks/{{this._id}}/play" class="btn btn-sm btn-success mx-1"><i class="bi bi-play-circle-fill me-2"></i>Play</a>
+        <a href="/account/decks/{{this._id}}/edit" class="btn btn-sm btn-secondary mx-1"><i class="bi bi-pencil-square me-2"></i>Edit</a>
+        <a href="/account/decks/{{this._id}}/delete" class="btn btn-sm btn-danger mx-1"><i class="bi bi-trash3-fill me-2"></i>Delete</a>
+    </div>
+  </div>
+</div>
+
+{{/each}}
+</div>
+
+<div class="d-flex justify-content-center mt-3">
+    <a href="/account/decks/new">
+    <button class="btn btn-primary mx-auto"><i class="bi bi-folder-plus me-2"></i>Create Deck</button></a>
+</div>

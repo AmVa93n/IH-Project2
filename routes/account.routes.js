@@ -9,6 +9,8 @@ const Offer = require("../models/Offer.model");
 const Class = require("../models/Class.model");
 const Review = require("../models/Review.model");
 const Notification = require("../models/Notification.model");
+const Deck = require("../models/Deck.model");
+const Flashcard = require("../models/Flashcard.model");
 
 // Require necessary middleware
 const isLoggedIn = require("../middleware/isLoggedIn");
@@ -122,25 +124,25 @@ router.get("/inbox/:chatId/delete", isLoggedIn, async (req, res) => {
 
 router.get('/offers', isLoggedIn, async (req, res) => {
     const user = req.session.currentUser
-    const userDB = await User.findOne({ username: user.username }).populate('offers')
+    const userDB = await User.findById(user._id).populate('offers')
     const offers = userDB.offers
-    res.render('account/offers', {user, offers})
+    res.render('account/offers/offers', {user, offers})
 });
   
 router.get('/offers/new', isLoggedIn, async (req, res) => {
     const user = req.session.currentUser
-    res.render('account/offer-create', {user})
+    res.render('account/offers/create', {user})
 });
   
 router.post('/offers/new', isLoggedIn, async (req, res) => {
     const user = req.session.currentUser
-    const userDB = await User.findOne({ username: user.username });
+    const userDB = await User.findById(user._id);
     const { name, language, level, locationType, location, weekdays, timeslots, 
       duration, classType, maxGroupSize, price} = req.body;
   
     // Check that all fields are provided
     if ([name,language,level,locationType,classType,weekdays,timeslots,duration,price].some(field => !field)) {
-      res.status(400).render("account/offer-create", {
+      res.status(400).render("account/offers/create", {
         errorMessage:
           "Some mandatory fields are missing. Please try again",
       });
@@ -158,7 +160,7 @@ router.get('/offers/:offerId/edit', isLoggedIn, async (req, res) => {
     const user = req.session.currentUser
     const offerId = req.params.offerId
     const offer = await Offer.findById(offerId)
-    res.render('account/offer-edit', {user, offer})
+    res.render('account/offers/edit', {user, offer})
 });
 
 router.post('/offers/:offerId/edit', isLoggedIn, async (req, res) => {
@@ -172,9 +174,7 @@ router.post('/offers/:offerId/edit', isLoggedIn, async (req, res) => {
     if ([name,language,level,locationType,classType,weekdays,timeslots,duration,price].some(field => !field)) {
         const user = req.session.currentUser
         const offer = await Offer.findById(offerId)
-        res.status(400).render("account/offer-edit", {user, offer,
-            errorMessage: "Some mandatory fields are missing. Please try again",
-        });
+        res.status(400).render("account/offers/edit", {user, offer, errorMessage: "Some mandatory fields are missing. Please try again"});
         return;
     }
   
@@ -183,7 +183,7 @@ router.post('/offers/:offerId/edit', isLoggedIn, async (req, res) => {
         duration, classType, maxGroupSize, price });
       res.redirect('/account/offers'); // Redirect to my offers page
     } catch (err) {
-      res.status(500).render('account/offer-edit', { errorMessage: 'Failed to update offer. Please try again.' });
+      res.status(500).render('account/offers/edit', { errorMessage: 'Failed to update offer. Please try again.'});
     }
 });
   
@@ -206,14 +206,14 @@ router.get('/classes', isLoggedIn, async (req, res) => {
       const currentDate = new Date();
       cl.isPast = inputDate < currentDate
     }
-    res.render('account/classes', {user, classes})
+    res.render('account/classes/classes', {user, classes})
 });
 
 router.get('/classes/:classId/rate', isLoggedIn, async (req, res) => {
     const user = req.session.currentUser
     const classId = req.params.classId
     const classFromDB = await Class.findById(classId).populate('teacher')
-    res.render('account/class-rate', {user, class: classFromDB})
+    res.render('account/classes/rate', {user, class: classFromDB})
 });
 
 router.post('/classes/:classId/rate', isLoggedIn, async (req, res) => {
@@ -289,6 +289,115 @@ router.get('/reviews', isLoggedIn, async (req, res) => {
     const user = req.session.currentUser
     const reviews = await Review.find({ subject: user._id }).populate('author')
     res.render('account/reviews', {user, reviews})
+});
+
+//================//
+// Decks
+//================//
+
+router.get('/decks', isLoggedIn, async (req, res) => {
+  const user = req.session.currentUser
+  const decks = await Deck.find({ creator: user._id }).populate('cards')
+  for (let deck of decks) {
+    deck.mastered = deck.cards.filter(card => card.priority == -10)
+  }
+  res.render('account/decks/decks', {user, decks})
+});
+
+router.get('/decks/new', isLoggedIn, async (req, res) => {
+  const user = req.session.currentUser
+  res.render('account/decks/create', {user})
+});
+
+router.post('/decks/new', isLoggedIn, async (req, res) => {
+  const user = req.session.currentUser
+  const { language, level, topic } = req.body;
+  const cardsFront = []
+  const cardsBack = []
+  
+  for (let key of Object.keys(req.body)) {
+    if (!key.includes("card")) continue
+    if (key.includes("front")) cardsFront.push(req.body[key])
+    if (key.includes("back")) cardsBack.push(req.body[key])
+  }
+  const cards = []
+  for (let i=0; i < cardsFront.length; i++) {
+    if (!cardsFront[i] || !cardsBack[i]) continue
+    cards.push({front: cardsFront[i], back: cardsBack[i]})
+  }
+
+  // Check that all fields are provided
+  if ([language,level,topic].some(field => !field)) {
+    res.status(400).render("account/decks/create", {user, errorMessage: "Some mandatory fields are missing. Please try again"});
+    return;
+  }
+  const cardsDB = await Flashcard.create(cards)
+  const cardsIds = cardsDB.map(card => card._id)
+
+  await Deck.create({ creator: user._id, language, level, topic, cards: cardsIds });
+  res.redirect('/account/decks')
+});
+
+router.get('/decks/:deckId/edit', isLoggedIn, async (req, res) => {
+  const user = req.session.currentUser
+  const deckId = req.params.deckId
+  const deck = await Deck.findById(deckId).populate('cards').lean()
+  res.render('account/decks/edit', {user, deck, cards: deck.cards})
+});
+
+router.post('/decks/:deckId/edit', isLoggedIn, async (req, res) => {
+  const user = req.session.currentUser
+  const deckId = req.params.deckId
+  const { language, level, topic } = req.body;
+  const cardsFront = []
+  const cardsBack = []
+  const cardsPriority = []
+  
+  for (let key of Object.keys(req.body)) {
+    if (!key.includes("card")) continue
+    if (key.includes("front")) cardsFront.push(req.body[key])
+    if (key.includes("back")) cardsBack.push(req.body[key])
+    if (key.includes("priority")) cardsPriority.push(req.body[key])
+  }
+  const cards = []
+  for (let i=0; i < cardsFront.length; i++) {
+    if (!cardsFront[i] || !cardsBack[i]) continue
+    cards.push({front: cardsFront[i], back: cardsBack[i]})
+  }
+
+  // Check that all fields are provided
+  if ([language,level,topic].some(field => !field)) {
+    res.status(400).render("account/decks/edit", {user, errorMessage: "Some mandatory fields are missing. Please try again"});
+    return;
+  }
+  const deck = await Deck.findById(deckId)
+  await Flashcard.deleteMany({ _id: { $in: deck.cards } })
+  const cardsDB = await Flashcard.create(cards)
+  const cardsIds = cardsDB.map(card => card._id)
+
+  await Deck.updateOne(deck, { creator: user._id, language, level, topic, cards: cardsIds });
+  res.redirect('/account/decks')
+});
+
+router.get('/decks/:deckId/delete', isLoggedIn, async (req, res) => {
+  const deckId = req.params.deckId
+  await Deck.findByIdAndDelete(deckId)
+  res.redirect('/account/decks')
+});
+
+router.get('/decks/:deckId/play', isLoggedIn, async (req, res) => {
+  const user = req.session.currentUser
+  const deckId = req.params.deckId
+  const deck = await Deck.findById(deckId).populate('cards')
+  res.render('account/decks/play', {user, deck})
+});
+
+router.post('/decks/:deckId/play', isLoggedIn, async (req, res) => {
+  const { cards } = req.body
+  for (let card of cards) {
+    await Flashcard.findByIdAndUpdate(card._id, { priority: card.priority })
+  }
+  res.status(200).send()
 });
 
 module.exports = router;

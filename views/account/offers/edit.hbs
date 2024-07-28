@@ -22,9 +22,9 @@
 
     <div class="form-floating mb-3">
       <select class="form-select" id="level" name="level">
-        <option value="beginner">Beginner</option>
-        <option value="intermediate">Intermediate</option>
-        <option value="advanced">Advanced</option>
+        <option id="beginner" value="beginner">Beginner</option>
+        <option id="intermediate" value="intermediate">Intermediate</option>
+        <option id="advanced" value="advanced">Advanced</option>
       </select>
       <label for="level">Level</label>
     </div>
@@ -157,6 +157,7 @@
     const customLocation = document.getElementById("location")
     document.getElementById('{{ offer.classType }}').setAttribute('checked',true)
     document.getElementById('{{ offer.locationType }}').setAttribute('checked',true)
+    document.getElementById('{{ offer.level }}').setAttribute('selected',true)
     if ('{{ offer.locationType }}' != "at-teacher") customLocation.setAttribute('disabled',true)
     if ('{{ offer.classType }}' == "group") maxGroupSize.style.display = 'flex'
 

@@ -246,3 +246,43 @@ body {
   position: absolute;
   z-index: 1000;
 }
+
+.flashcard-container {
+  perspective: 1000px;
+}
+
+.flashcard {
+  width: 300px;
+  height: 200px;
+  position: relative;
+  transform-style: preserve-3d;
+  transform: rotateY(0deg);
+  transition: transform 0.6s;
+}
+
+.fc-front, .fc-back {
+  border-radius: 10px;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  backface-visibility: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  color: #000000;
+  border: solid 1px gray;
+}
+
+.fc-front {
+  background-image: linear-gradient(45deg, white, gray);
+}
+
+.fc-back {
+  background-image: linear-gradient(45deg, gray, white);
+  transform: rotateY(180deg);
+}
+
+.flashcard.flipped {
+  transform: rotateY(180deg);
+}
