@@ -12,7 +12,7 @@ function createNotif(notifData) {
     let notifText = notifData.type == "review" ? " has left a review about your class"
                     : notifData.type == "booking" ? " has booked a class with you"
                     : notifData.type == "cancel" ? " has cancelled your class"
-                    : notifData.type == "cancel" ? " has sent you a message"
+                    : notifData.type == "message" ? " has sent you a message"
                     : " has cloned one of your decks"
     newNotif.innerHTML = 
         `<div class="dropdown-item gap-2 py-2 position-relative" onclick="readNotif('${notifData._id}','${notifData.type}')" style="background-color: rgb(227, 242, 253);">
