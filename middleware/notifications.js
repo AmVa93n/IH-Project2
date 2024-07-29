@@ -11,6 +11,7 @@ module.exports = async (req, res, next) => {
             case "cancel": notif.cancelBooking = true; break
             case "booking": notif.newBooking = true; break
             case "message": notif.newMessage = true; break
+            case "clone": notif.newClone = true; break
         }
         notif.timeDiff = formatDistanceToNow(new Date(notif.createdAt), { addSuffix: true })
       })

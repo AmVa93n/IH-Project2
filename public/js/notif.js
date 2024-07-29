@@ -12,7 +12,8 @@ function createNotif(notifData) {
     let notifText = notifData.type == "review" ? " has left a review about your class"
                     : notifData.type == "booking" ? " has booked a class with you"
                     : notifData.type == "cancel" ? " has cancelled your class"
-                    : " has sent you a message"
+                    : notifData.type == "cancel" ? " has sent you a message"
+                    : " has cloned one of your decks"
     newNotif.innerHTML = 
         `<div class="dropdown-item gap-2 py-2 position-relative" onclick="readNotif('${notifData._id}','${notifData.type}')" style="background-color: rgb(227, 242, 253);">
             <div class="d-flex align-items-center mb-1">
@@ -34,12 +35,14 @@ async function readNotif(notifId, type) {
     let redirectUrl
     switch(type) {
         case 'message':
-        redirectUrl = '/account/inbox' ;break
+            redirectUrl = '/account/inbox' ;break
         case 'booking':
         case 'cancel':
-        redirectUrl = '/account/calendar' ;break
+            redirectUrl = '/account/calendar' ;break
         case 'review':
-        redirectUrl = '/account/reviews' ;break
+            redirectUrl = '/account/reviews' ;break
+        case 'clone':
+            redirectUrl = '/account/decks' ;break
     }
     const response = await fetch('/notification/read', {
         method: 'POST',

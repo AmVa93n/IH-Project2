@@ -68,6 +68,39 @@
 
 <div class="b-example-divider"></div>
 
+<div id="statistics" class="row my-3">
+  <h2 class="center">Most popular languages</h2>
+  <div class="col">
+    <h4 class="mx-auto" style="width: 40%;">Teaching</h4>
+    {{#each stats.teach}}
+    <div class="row mx-auto" style="width: 40%;">
+      <div class="col-6 ps-0">
+        <img src="/images/{{this.name}}.svg" class="lang-flag">
+        <span class="lang-name">{{this.name}}</span> 
+      </div>
+      <div class="col-6">
+        <span>{{this.amount}} Users</span>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+
+  <div class="col">
+    <h4 class="mx-auto" style="width: 40%;">Learning</h4>
+    {{#each stats.learn}}
+    <div class="row mx-auto" style="width: 40%;">
+      <div class="col-6 ps-0">
+        <img src="/images/{{this.name}}.svg" class="lang-flag">
+        <span class="lang-name">{{this.name}}</span> 
+      </div>
+      <div class="col-6">
+        <span>{{this.amount}} Users</span>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+</div>
+
 <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
   <symbol id="bootstrap" viewBox="0 0 118 94">
     <title>Bootstrap</title>

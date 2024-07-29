@@ -400,4 +400,19 @@ router.post('/decks/:deckId/play', isLoggedIn, async (req, res) => {
   res.status(200).send()
 });
 
+router.get('/decks/:deckId/clone', isLoggedIn, async (req, res) => {
+  const user = req.session.currentUser
+  const deckId = req.params.deckId
+  const deck = await Deck.findById(deckId).populate('cards')
+  const cardsData = []
+  deck.cards.forEach(card => {
+    cardsData.push({front: card.front, back: card.back, priority: 0})
+  })
+  const clonedCards = await Flashcard.create(cardsData)
+  await Deck.create({ creator: user._id, language: deck.language, level: deck.level, 
+    topic: deck.topic + " (cloned)", cards: clonedCards })
+  await Notification.create({ source: user._id, target: deck.creator, type: 'clone'})
+  res.redirect('/account/decks')
+});
+
 module.exports = router;
