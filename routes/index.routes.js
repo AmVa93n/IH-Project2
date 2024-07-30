@@ -183,8 +183,8 @@ router.get("/teachers/:langId", isLoggedIn, async (req, res) => {
   try {
     const user = req.session.currentUser;
     // Find teachers for the specified language
-    const teachers = await User.find({ lang_teach: langId, professional: true });
-    res.render("matches", { lang: langId, matches: teachers, user, teachers: true });
+    const teachers = await User.find({ lang_teach: langId});
+    res.render("matches", { lang: langId, matches: teachers, user});
   } catch (error) {
     console.error('Error fetching teachers:', error);
     res.status(500).send('Internal Server Error');
