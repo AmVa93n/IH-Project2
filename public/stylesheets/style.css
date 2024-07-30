@@ -328,3 +328,69 @@ body {
   padding: 0 10px;
   font-size: 24px; /* Adjust the font size as needed */
 }
+
+/* Speech Bubble Style - Turquoise */
+.speech-bubble-turquoise {
+  background-color: rgba(64, 224, 208, 0.5); /* Semi-transparent turquoise */
+  border-radius: 15px; /* Rounded corners */
+  position: relative; /* Needed for the triangle positioning */
+  padding: 20px; /* Internal padding */
+  margin: 10px 0; /* Margin for spacing */
+}
+
+/* Triangle pointer of the speech bubble - Turquoise */
+.speech-bubble-turquoise::after {
+  content: '';
+  position: absolute;
+  bottom: -15px; /* Adjust vertical position */
+  left: 20px; /* Adjust horizontal position */
+  width: 0;
+  height: 0;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  border-top: 15px solid rgba(64, 224, 208, 0.5); /* Color of the bubble */
+}
+/* Speech Bubble Style - Coral */
+
+.speech-bubble-coral {
+  background-color: rgba(255, 127, 80, 0.5); /* Semi-transparent coral */
+  border-radius: 15px; /* Rounded corners */
+  position: relative; /* Needed for the triangle positioning */
+  padding: 20px; /* Internal padding */
+  margin: 10px 0; /* Margin for spacing */
+}
+
+/* Triangle pointer of the speech bubble - Coral */
+.speech-bubble-coral::after {
+  content: '';
+  position: absolute;
+  bottom: -15px; /* Adjust vertical position */
+  left: 20px; /* Adjust horizontal position */
+  width: 0;
+  height: 0;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  border-top: 15px solid rgba(255, 127, 80, 0.5); /* Color of the bubble */
+}
+
+/* Speech Bubble Style for Blue */
+.speech-bubble-blue {
+  background-color: rgba(173, 216, 230, 0.8); /* Light blue with some transparency */
+  border-radius: 15px; /* Rounded corners */
+  position: relative; /* Needed for the triangle positioning */
+  padding: 20px; /* Internal padding */
+  margin: 10px 0; /* Margin for spacing */
+}
+
+/* Triangle pointer of the blue speech bubble */
+.speech-bubble-blue::after {
+  content: '';
+  position: absolute;
+  bottom: 10px; /* Adjust vertical position */
+  right: -15px; /* Adjust horizontal position */
+  width: 0;
+  height: 0;
+  border-top: 15px solid transparent;
+  border-bottom: 15px solid transparent;
+  border-left: 15px solid rgba(173, 216, 230, 0.8); /* Color of the bubble */
+}
