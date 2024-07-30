@@ -39,14 +39,14 @@
             <i class="bi bi-clock-fill me-2"></i>{{#each this.timeslots}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</span>
     </div>
 
-    <div class="row mb-2">
+    <div class="row mb-4">
         <span class="card-text col"><i class="bi bi-clock-fill me-2"></i>{{this.duration}} Minutes</span>
         <span class="card-text col"><i class="bi bi-tag-fill me-2"></i><span class="price">$</span>{{this.price}}.00</span>
     </div>
 
-    <div class="d-flex justify-content-center mt-auto">
-        <a href="/account/offers/{{this._id}}/edit" class="btn btn-secondary mx-1"><i class="bi bi-pencil-square me-2"></i>Edit</a>
-        <a href="/account/offers/{{this._id}}/delete" class="btn btn-danger mx-1"><i class="bi bi-trash3-fill me-2"></i>Delete</a>
+    <div class="d-flex justify-content-center">
+        <a href="/account/offers/{{this._id}}/edit" class="btn btn-sm btn-secondary mx-1"><i class="bi bi-pencil-square me-2"></i>Edit</a>
+        <a href="/account/offers/{{this._id}}/delete" class="btn btn-sm btn-danger mx-1"><i class="bi bi-trash3-fill me-2"></i>Delete</a>
     </div>
   </div>
 </div>

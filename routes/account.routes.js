@@ -200,13 +200,16 @@ router.get('/offers/:offerId/delete', isLoggedIn, async (req, res) => {
 router.get('/classes', isLoggedIn, async (req, res) => {
     const user = req.session.currentUser
     const classes = await Class.find({ student: user._id }).populate('teacher')
+    const upcomingClasses = []
+    const pastClasses = []
     for (let cl of classes) {
-      const [day, month, year] = cl.date.split('-').map(Number);
+      const [year, month, day] = cl.date.split('-').map(Number);
       const inputDate = new Date(year, month - 1, day);
       const currentDate = new Date();
-      cl.isPast = inputDate < currentDate
+      if (inputDate < currentDate) pastClasses.push(cl)
+      else upcomingClasses.push(cl)
     }
-    res.render('account/classes/classes', {user, classes})
+    res.render('account/classes/classes', {user, upcomingClasses, pastClasses})
 });
 
 router.get('/classes/:classId/rate', isLoggedIn, async (req, res) => {
@@ -233,10 +236,13 @@ router.get('/classes/:classId/cancel', isLoggedIn, async (req, res) => {
   const user = req.session.currentUser
   const classId = req.params.classId
   const classFromDB = await Class.findById(classId)
-  const { teacher } = classFromDB
+  const { teacher, student } = classFromDB
+  const target = user._id == teacher ? student : teacher
+  const type = user._id == teacher ? 'cancel-teacher' : 'cancel-student'
+  const redirect = user._id == teacher ? 'calendar' : 'classes'
   await Class.deleteOne({ _id: classId })
-  await Notification.create({ source: user._id, target: teacher, type: 'cancel'})
-  res.redirect('/account/classes')
+  await Notification.create({ source: user._id, target: target, type: type})
+  res.redirect('/account/' + redirect)
 });
   
 //================//
@@ -248,7 +254,7 @@ router.get('/calendar', isLoggedIn, async (req, res) => {
     const classes = await Class.find({ teacher: user._id }).populate('student').lean()
     const events = []
     for (let cl of classes) {
-        let [day, month, year] = cl.date.split('-').map(Number);
+        let [year, month, day] = cl.date.split('-').map(Number);
         let dateObj = new Date(year, month - 1, day);
         const currentDate = new Date();
         cl.isPast = dateObj < currentDate
@@ -268,6 +274,7 @@ router.get('/calendar', isLoggedIn, async (req, res) => {
 
         const start = `${date}T${cl.timeslot}:00`;
         const end = `${date}T${endTime}:00`;
+        cl.endTime = endTime
 
         let event = {
         title: cl.student.username,

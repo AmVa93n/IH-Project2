@@ -4,14 +4,13 @@ if (unreadCount.innerText > 0) unreadCount.style.display = 'block'
 updateNotifBorder()
 
 function createNotif(notifData) {
-    console.log(notifData)
     const newNotif = document.createElement('li')
     newNotif.classList.add("notif")
     newNotif.id = notifData._id
     let profilePicSrc = notifData.source.profilePic ? `${notifData.source.profilePic}` : "/images/Profile-PNG-File.png"
     let notifText = notifData.type == "review" ? " has left a review about your class"
                     : notifData.type == "booking" ? " has booked a class with you"
-                    : notifData.type == "cancel" ? " has cancelled your class"
+                    : notifData.type.includes("cancel") ? " has cancelled your class"
                     : notifData.type == "message" ? " has sent you a message"
                     : " has cloned one of your decks"
     newNotif.innerHTML = 
@@ -37,8 +36,10 @@ async function readNotif(notifId, type) {
         case 'message':
             redirectUrl = '/account/inbox' ;break
         case 'booking':
-        case 'cancel':
+        case 'cancel-student':
             redirectUrl = '/account/calendar' ;break
+        case 'cancel-teacher':
+            redirectUrl = '/account/classes' ;break
         case 'review':
             redirectUrl = '/account/reviews' ;break
         case 'clone':

@@ -195,6 +195,11 @@ body {
   border-top: solid 5px rgb(255, 187, 59);
 }
 
+#manageClass {
+  width: 20%;
+  border-radius: 0;
+}
+
 /* Custom styles for bootstrap-datepicker */
 .datepicker {
   background-color: #f8f9fa; /* Light background */
@@ -294,4 +299,32 @@ body {
 
 #statistics {
   background-color: rgba(250, 250, 250, 0.8);
+}
+
+.hr-with-text {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.hr-with-text::before,
+.hr-with-text::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid #000;
+}
+
+.hr-with-text:not(:empty)::before {
+  margin-right: 10px;
+}
+
+.hr-with-text:not(:empty)::after {
+  margin-left: 10px;
+}
+
+.hr-with-text span {
+  display: inline-block;
+  padding: 0 10px;
+  font-size: 24px; /* Adjust the font size as needed */
 }

@@ -78,6 +78,9 @@ router.post('/offers/:offerId/return', isLoggedIn, async (req, res) => {
   const session = await stripe.checkout.sessions.retrieve(sessionId);
   const { date, timeslot } = session.metadata;
 
+  const [day, month, year] = date.split('-');
+  const formattedDate = `${year}-${month}-${day}`;
+
   if (session.payment_status === 'paid') {
     const user = req.session.currentUser
     const offerId = req.params.offerId
@@ -86,7 +89,7 @@ router.post('/offers/:offerId/return', isLoggedIn, async (req, res) => {
     await Class.create({ 
       student: user,
       teacher: teacher._id,
-      date,
+      date: formattedDate,
       timeslot, 
       language: offer.language,
       level: offer.level,

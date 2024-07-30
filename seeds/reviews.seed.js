@@ -12,7 +12,7 @@ async function seedDatabase() {
     const nonProfUsers = await User.find({professional: false})
     
     for (let user of profUsers) {
-        let reviewCount = getRandomNumber(1,50)
+        let reviewCount = getRandomNumber(1,25)
 
         for (let i = 1; i < reviewCount+1; i++) {
             let author = randomElement(nonProfUsers)._id
@@ -24,7 +24,7 @@ async function seedDatabase() {
             let review = {
                 author,
                 subject: user._id,
-                date: `${day}-${month}-${year}`,
+                date: `${year}-${month}-${day}`,
                 text: generateLoremIpsum(),
                 rating: getRandomNumber(1,10),
                 language: offer.language,

@@ -14,7 +14,7 @@
         </div>
         <span class="fs-5">{{this.username}}</span>
         <span class="position-absolute" style="top:40;left:60;font-size:12px">
-            <span class="date">{{this.birthdate}}</span>, {{this.country}}
+            <span class="age">{{this.birthdate}}</span>, {{this.country}}
         </span>
         {{#if this.professional}}
         <span class="badge rounded-pill text-bg-primary position-absolute" style="top:-8;right:-8">Professional</span>
@@ -72,8 +72,3 @@
 
 {{/each}}
 </div>
-
-<script>
-    const dates = [...document.querySelectorAll('.date')]
-    for (let date of dates) date.innerText = getUserAge(date.innerText)
-</script>

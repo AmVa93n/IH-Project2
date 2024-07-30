@@ -14,6 +14,11 @@ document.addEventListener("DOMContentLoaded", () => {
       span.innerHTML += '&#9733;'
     }
   })
+  const ageSpans = [...document.querySelectorAll('.age')]
+  for (let span of ageSpans) span.innerText = getUserAge(span.innerText)
+
+  const dateSpans = [...document.querySelectorAll('.date')]
+  for (let span of dateSpans) span.innerText = formatDate(span.innerText)
 });
 
 function getLanguageName(langCode) {
@@ -31,8 +36,8 @@ const months = [
   "July", "August", "September", "October", "November", "December"
 ];
 
-function formatDate(birthdate) {
-  let date = new Date(birthdate);
+function formatDate(dateString) {
+  let date = new Date(dateString);
   
   const day = date.getUTCDate();
   const month = months[date.getUTCMonth()];
