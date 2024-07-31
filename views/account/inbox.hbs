@@ -11,7 +11,10 @@
   <div class="col-7 g-0 d-flex flex-column" style="max-height: 625px; border-right: 1px solid rgb(199, 199, 199)">
     <div class="p-3 d-flex" style="flex: 0 0 auto; border-bottom: 1px solid rgb(199, 199, 199)">
       <span id="conversation-with" class="fs-3" >You have no chats</span>
-      <a id="delete" href="" class="btn btn-danger ms-auto disabled" style="height: fit-content;"><i class="bi bi-trash3-fill me-2"></i>Delete</a>
+      <div class="ms-auto">
+        <a id="profile" href="" class="btn btn-primary disabled me-1" style="height: fit-content;"><i class="bi bi-person-circle me-2"></i>Profile</a>
+        <a id="delete" href="" class="btn btn-danger disabled" style="height: fit-content;"><i class="bi bi-trash3-fill me-2"></i>Delete</a>
+      </div>
     </div>
     
     <div class="p-3 d-flex flex-column" id="message-list" style="flex: 1 1 auto;overflow-y:auto;background-color:white">
@@ -37,6 +40,7 @@
     const chatList = document.getElementById('conversation-list');
     const chatTitle = document.getElementById('conversation-with');
     const deleteBtn = document.getElementById('delete');
+    const profileBtn = document.getElementById('profile');
 
     let activeChatId = '{{ chatId }}' || "";
     let activeChat = null
@@ -86,6 +90,8 @@
       chatTitle.textContent = `Chat with ${otherParty.username}`;
       deleteBtn.href = `/account/inbox/${chat._id}/delete`
       deleteBtn.classList.remove('disabled')
+      profileBtn.href = `/users/${otherParty._id}`
+      profileBtn.classList.remove('disabled')
       messageList.innerHTML = '';
       let curDate = ''
       chat.messages.forEach((msg) => {

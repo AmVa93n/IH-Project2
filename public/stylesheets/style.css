@@ -375,7 +375,7 @@ body {
 
 /* Speech Bubble Style for Blue */
 .speech-bubble-blue {
-  background-color: rgba(173, 216, 230, 0.8); /* Light blue with some transparency */
+  background-color: rgba(173, 216, 230, 0.5); /* Light blue with some transparency */
   border-radius: 15px; /* Rounded corners */
   position: relative; /* Needed for the triangle positioning */
   padding: 20px; /* Internal padding */
@@ -392,5 +392,5 @@ body {
   height: 0;
   border-top: 15px solid transparent;
   border-bottom: 15px solid transparent;
-  border-left: 15px solid rgba(173, 216, 230, 0.8); /* Color of the bubble */
+  border-left: 15px solid rgba(173, 216, 230, 0.5); /* Color of the bubble */
 }

@@ -4,7 +4,7 @@
       <div class="col-10 col-sm-8 col-lg-6">
         <img src="/images/hero2.png" class="d-block mx-lg-auto img-fluid" alt="Bootstrap Themes" loading="lazy">
       </div>
-      <div class="col-lg-6 speech-bubble-turquoise">
+      <div class="col-lg-6 speech-bubble-blue">
   <h1 class="display-5 fw-bold text-body-emphasis lh-1 mb-3">Exchange languages and learn for free</h1>
   <p class="lead fw-normal">With Omniglot's matching system, you can easily connect with native speakers of your target language all around the world and teach each other at your own leisure.</p>
   <div class="d-grid gap-2 d-md-flex justify-content-md-start">
@@ -22,9 +22,9 @@
 <div class="homepage-container" style="background-image: url('/images/features.jpg');">
   <div class="container px-4 py-5">
     <div class="row row-cols-1 row-cols-md-2 align-items-md-center g-5 py-5">
-      <div class="col d-flex flex-column align-items-start gap-2 speech-bubble-coral">
+      <div class="col d-flex flex-column align-items-start gap-2 speech-bubble-blue me-4" style="width: fit-content;">
         <h2 class="fw-bold text-body-emphasis">Make the most out of Omniglot</h2>
-        <p class="text-body-secondary fw-medium">Join hundreds of certified teachers and boost your revenue with a professional account. Offer commission-free classes with secure credit card payments.</p>
+        <p class="text-body-secondary fw-medium">Join hundreds of certified teachers and boost your revenue with a professional account.<br>Offer commission-free classes with secure credit card payments.</p>
         <a href="/account/profile" class="btn btn-primary btn-lg rounded-pill">Go professional</a>
       </div>
       <div class="col speech-bubble-blue">
@@ -34,7 +34,7 @@
                 <i class="bi bi-cash-coin"></i>
             </div>
             <h4 class="fw-semibold mb-0 text-body-emphasis">Offers</h4>
-            <p class="text-body-secondary fw-medium">Private or group classes, online or in-person. Set your own availability and prices.</p>
+            <p class="text-body-secondary fw-medium">Private or group classes, online or in-person. Set your own availability and prices to make your offers attractive and competitive.</p>
         </div>
         <div class="col d-flex flex-column gap-2">
             <div class="feature-icon-small d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-4 rounded-3">
@@ -48,7 +48,7 @@
                 <i class="bi bi-calendar"></i>
             </div>
             <h4 class="fw-semibold mb-0 text-body-emphasis">Calendar</h4>
-            <p class="text-body-secondary fw-medium">Once your class is booked, it will be added to your calendar so you can keep track of your schedule.</p>
+            <p class="text-body-secondary fw-medium">Easily track, manage or reschedule your classes using our dynamic calendar.</p>
         </div>
         <div class="col d-flex flex-column gap-2">
             <div class="feature-icon-small d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-4 rounded-3">
@@ -64,7 +64,7 @@
   </div>
 </div>
 
-          <p class="text-body-secondary fw-medium">
+          
       </div>
     </div>
   </div>
@@ -73,11 +73,11 @@
 
 <div class="b-example-divider"></div>
 
-<div id="statistics" class="row py-3">
-  <h2 class="center">Most popular languages</h2>
+<div id="statistics" class="row g-0 py-3">
+  <h2 class="center px-0">Most popular languages</h2>
   
-  <div class="col">
-    <h4 class="mx-auto" style="width: 40%;">Teaching</h4>
+  <div class="col-auto mx-auto">
+    <h4 class="mx-auto" style="width: fit-content;">Teaching</h4>
     <ul class="list-group">
       {{#each stats.teach}}
       <a href="/teachers/{{this.name}}" class="text-decoration-none">
@@ -86,15 +86,15 @@
             <img src="/images/{{this.name}}.svg" class="lang-flag me-2">
             <span class="lang-name">{{this.name}}</span>
           </div>
-          <span class="badge bg-primary rounded-pill">{{this.amount}} Users</span>
+          <span class="badge bg-primary rounded-pill ms-5">{{this.amount}} Users</span>
         </li>
       </a>
       {{/each}}
     </ul>
   </div>
 
-  <div class="col">
-    <h4 class="mx-auto" style="width: 40%;">Learning</h4>
+  <div class="col-auto mx-auto">
+    <h4 class="mx-auto" style="width: fit-content;">Learning</h4>
     <ul class="list-group">
       {{#each stats.learn}}
       <a href="/learners/{{this.name}}" class="text-decoration-none">
@@ -103,7 +103,7 @@
             <img src="/images/{{this.name}}.svg" class="lang-flag me-2">
             <span class="lang-name">{{this.name}}</span>
           </div>
-          <span class="badge bg-primary rounded-pill">{{this.amount}} Users</span>
+          <span class="badge bg-primary rounded-pill ms-5">{{this.amount}} Users</span>
         </li>
       </a>
       {{/each}}

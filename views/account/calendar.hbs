@@ -50,13 +50,28 @@
       <span class="card-text col"><i class="bi bi-clock-fill me-2"></i>{{managedClass.timeslot}} - {{managedClass.endTime}}</span>
     </div>
 
+    {{#if (equal managedClass.reschedule.status "pending")}}
+    <div class="p-1 bg-warning mb-3">
+      <p class="center m-0">Pending reschedule request</p>
+      <h6 class="center"><span class="date">{{managedClass.reschedule.new_date}}</span>, {{managedClass.reschedule.new_timeslot}}</h6>
+      {{#unless (equal managedClass.reschedule.initiator user._id)}}
+      <div class="d-flex justify-content-center">
+        <a href="/account/calendar/{{managedClass._id}}/reschedule/accept" class="btn btn-sm btn-success mx-1" style="font-size: smaller;"><i class="bi bi-check-circle-fill me-2"></i>Accept</a>
+        <a href="/account/calendar/{{managedClass._id}}/reschedule/decline" class="btn btn-sm btn-danger mx-1" style="font-size: smaller;"><i class="bi bi-x-circle-fill me-2"></i>Decline</a>
+      </div>
+      {{/unless}}
+    </div>
+    {{/if}}
+
     <div class="d-flex flex-column mb-3" style="width: 60%;">
         <form action="/account/inbox" method="POST" style="width: 100%;">
           <input type="hidden" value="{{managedClass.student._id}}" name="targetUserId">
           <button class="btn btn-sm btn-primary mb-2" style="width: 100%;"><i class="bi bi-envelope-fill me-2"></i>Message {{managedClass.student.username}}</button>
         </form>
         {{#unless managedClass.isPast}}
-        <button class="btn btn-sm btn-secondary mb-2" onclick="pickNewDate('{{managedClass.date}}','{{managedClass.timeslot}}')"><i class="bi bi-calendar2-x-fill me-2"></i>Reschedule</button>
+        <button class="btn btn-sm btn-secondary mb-2" onclick="pickNewDate('{{managedClass.date}}','{{managedClass.timeslot}}')"
+        {{#if (equal managedClass.reschedule.status "pending")}}disabled{{/if}}
+        ><i class="bi bi-calendar2-x-fill me-2"></i>Reschedule</button>
         <a href="/account/calendar/{{managedClass._id}}/cancel" class="btn btn-sm btn-danger mb-2"><i class="bi bi-x-circle-fill me-2"></i>Cancel</a>
         {{/unless}}
     </div>
@@ -209,14 +224,6 @@ document.addEventListener('DOMContentLoaded', function() {
           weekStart: 1, // Start the week on Monday
       });
   });
-
-  // Function to convert 'yyyy/mm/dd' dates to 'dd/mm/yyyy' format
-  function flipDayAndYear(date) {
-      var day = ('0' + date.getDate()).slice(-2);
-      var month = ('0' + (date.getMonth() + 1)).slice(-2);
-      var year = date.getFullYear();
-      return day + '-' + month + '-' + year;
-  }
 
   function pickNewDate(currentDate, currentTimeslot) {
     document.getElementById("reschedule").style.display = 'block';

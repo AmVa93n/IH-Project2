@@ -56,6 +56,14 @@ function formatDate(dateString) {
   return `${day}${ordinalSuffix(day)} ${month} ${year}`;
 }
 
+// convert 'yyyy/mm/dd' dates to 'dd/mm/yyyy' format
+function flipDayAndYear(date) {
+  var day = ('0' + date.getDate()).slice(-2);
+  var month = ('0' + (date.getMonth() + 1)).slice(-2);
+  var year = date.getFullYear();
+  return day + '-' + month + '-' + year;
+}
+
 function getUserAge(birthdate) {
   const date = new Date(birthdate);
   const today = new Date();

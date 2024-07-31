@@ -17,6 +17,7 @@ const classSchema = new Schema({
     new_date: {type: String},
     new_timeslot: {type: String},
     status: {type: String},
+    initiator: {type: String},
   }
 });
 

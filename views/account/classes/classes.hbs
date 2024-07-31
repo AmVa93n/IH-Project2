@@ -13,10 +13,12 @@
   <div class="p-1 bg-warning">
     <p class="center m-0">Pending reschedule request</p>
     <h6 class="center"><span class="date">{{this.reschedule.new_date}}</span>, {{this.reschedule.new_timeslot}}</h6>
+    {{#unless (equal this.reschedule.initiator ../user._id)}}
     <div class="d-flex justify-content-center">
       <a href="/account/classes/{{this._id}}/reschedule/accept" class="btn btn-sm btn-success mx-1" style="font-size: smaller;"><i class="bi bi-check-circle-fill me-2"></i>Accept</a>
       <a href="/account/classes/{{this._id}}/reschedule/decline" class="btn btn-sm btn-danger mx-1" style="font-size: smaller;"><i class="bi bi-x-circle-fill me-2"></i>Decline</a>
     </div>
+    {{/unless}}
   </div>
   {{/if}}
   
@@ -62,7 +64,9 @@
     </div>
 
     <div class="d-flex justify-content-center mt-3">
-        <button class="btn btn-sm btn-secondary mx-1" onclick="pickNewDate()"><i class="bi bi-calendar2-x-fill me-2"></i>Reschedule</button>
+        <button class="btn btn-sm btn-secondary mx-1" onclick="pickNewDate('{{this._id}}','{{this.date}}','{{this.timeslot}}')" data-bs-toggle="modal" data-bs-target="#exampleModal"
+        {{#if (equal this.reschedule.status "pending")}}disabled{{/if}}
+        ><i class="bi bi-calendar2-x-fill me-2"></i>Reschedule</button>
         <a href="/account/classes/{{this._id}}/cancel" class="btn btn-sm btn-danger mx-1"><i class="bi bi-x-circle-fill me-2"></i>Cancel</a>
     </div>
   </div>
@@ -133,3 +137,81 @@
 
 {{/each}}
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Send a reschedule request</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+
+        <form action="" method="POST" id="reschedule">
+          <div class="container mb-3">
+              <div class="form-group">
+                  <label for="datepicker">Choose a new date</label>
+                  <input type="text" id="datepicker" class="form-control" placeholder="Choose a date" name="date" required>
+              </div>
+          </div>
+          <div class="container mb-4">
+              <label for="timeslot">Choose a new time slot</label>
+              <select class="form-select" id="timeslots" name="timeslot"> 
+              </select>
+          </div>
+          <div class="d-flex justify-content-center">
+            <button type="submit" class="btn btn-primary mx-1">Send Request</button>
+            <button type="button" class="btn btn-secondary mx-1" data-bs-dismiss="modal">Close</button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+<script>
+  $(document).ready(function(){
+        // Calculate start date (1 day from today)
+        var today = new Date();
+        var startDate = new Date(today);
+        startDate.setDate(today.getDate() + 1);
+
+        // Calculate end date (3 months from today)
+        var endDate = new Date(today);
+        endDate.setMonth(today.getMonth() + 3);
+        
+        $('#datepicker').datepicker({
+            format: 'dd-mm-yyyy', // Format of the date
+            startDate: flipDayAndYear(startDate), // Start date
+            endDate: flipDayAndYear(endDate),   // End date
+            autoclose: true, // Close datepicker after selection
+            todayHighlight: false, // Highlight today's date
+            weekStart: 1, // Start the week on Monday
+        });
+    });
+
+    const timeslots = document.getElementById("timeslots")
+    for (let hr = 7; hr < 21; hr++) {
+      for (let min of [0,15,30,45]) {
+        let hour = hr.toString().padStart(2, '0')
+        let minute = min.toString().padStart(2, '0')
+        const option = document.createElement('option');
+        option.value = `${hour}:${minute}`;
+        option.textContent = `${hour}:${minute}`;
+        timeslots.appendChild(option);
+      }
+    }
+
+    function pickNewDate(classId, currentDate, currentTimeslot) {
+      document.getElementById("reschedule").action = `/account/classes/${classId}/reschedule`
+      document.getElementById("datepicker").value = flipDayAndYear(new Date(currentDate));
+      [...timeslots.children].forEach(option => {
+        if (option.value == currentTimeslot) option.setAttribute('selected',true)
+      });
+    }
+</script>

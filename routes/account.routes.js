@@ -242,6 +242,20 @@ router.get('/classes/:classId/cancel', isLoggedIn, async (req, res) => {
   res.redirect('/account/classes')
 });
 
+router.post('/classes/:classId/reschedule', isLoggedIn, async (req, res) => {
+  const user = req.session.currentUser
+  const classId = req.params.classId
+  const classFromDB = await Class.findById(classId)
+  const { date, timeslot } = req.body
+  const [day, month, year] = date.split('-');
+  const formattedDate = `${year}-${month}-${day}`;
+  classFromDB.reschedule = {new_date: formattedDate, new_timeslot: timeslot, status: 'pending', initiator: user._id}
+  await classFromDB.save()
+  const { teacher } = classFromDB
+  await Notification.create({ source: user._id, target: teacher, type: 'reschedule-student-pending'})
+  res.redirect('/account/classes')
+});
+
 router.get('/classes/:classId/reschedule/accept', isLoggedIn, async (req, res) => {
   const user = req.session.currentUser
   const classId = req.params.classId
@@ -340,10 +354,34 @@ router.post('/calendar/:classId/reschedule', isLoggedIn, async (req, res) => {
   const { date, timeslot } = req.body
   const [day, month, year] = date.split('-');
   const formattedDate = `${year}-${month}-${day}`;
-  classFromDB.reschedule = {new_date: formattedDate, new_timeslot: timeslot, status: 'pending'}
+  classFromDB.reschedule = {new_date: formattedDate, new_timeslot: timeslot, status: 'pending', initiator: user._id}
   await classFromDB.save()
   const { student } = classFromDB
   await Notification.create({ source: user._id, target: student, type: 'reschedule-teacher-pending'})
+  res.redirect(`/account/calendar/${classId}`)
+});
+
+router.get('/calendar/:classId/reschedule/accept', isLoggedIn, async (req, res) => {
+  const user = req.session.currentUser
+  const classId = req.params.classId
+  const classFromDB = await Class.findById(classId)
+  classFromDB.reschedule.status = "accepted"
+  classFromDB.date = classFromDB.reschedule.new_date
+  classFromDB.timeslot = classFromDB.reschedule.new_timeslot
+  await classFromDB.save()
+  const { student } = classFromDB
+  await Notification.create({ source: user._id, target: student, type: 'reschedule-teacher-accept'})
+  res.redirect(`/account/calendar/${classId}`)
+});
+
+router.get('/calendar/:classId/reschedule/decline', isLoggedIn, async (req, res) => {
+  const user = req.session.currentUser
+  const classId = req.params.classId
+  const classFromDB = await Class.findById(classId)
+  classFromDB.reschedule.status = "declined"
+  await classFromDB.save()
+  const { student } = classFromDB
+  await Notification.create({ source: user._id, target: student, type: 'reschedule-teacher-decline'})
   res.redirect(`/account/calendar/${classId}`)
 });
 
