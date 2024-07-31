@@ -8,11 +8,21 @@ function createNotif(notifData) {
     newNotif.classList.add("notif")
     newNotif.id = notifData._id
     let profilePicSrc = notifData.source.profilePic ? `${notifData.source.profilePic}` : "/images/Profile-PNG-File.png"
-    let notifText = notifData.type == "review" ? " has left a review about your class"
-                    : notifData.type == "booking" ? " has booked a class with you"
-                    : notifData.type.includes("cancel") ? " has cancelled your class"
-                    : notifData.type == "message" ? " has sent you a message"
-                    : " has cloned one of your decks"
+    let notifText 
+    switch(notifData.type) {
+        case "review": notifText = " has left a review about your class"; break
+        case "booking": notifText = " has booked a class with you"; break
+        case "message": notifText = " has sent you a message"; break
+        case "clone": notifText = " has cloned one of your decks"; break
+        case "cancel-teacher":
+        case "cancel-student": notifText = " has cancelled your class"; break
+        case "reschedule-teacher-pending":
+        case "reschedule-student-pending": notifText = " has requested to reschedule your class"; break
+        case "reschedule-teacher-accept":
+        case "reschedule-student-accept": notifText = " has accepted your reschedule request"; break
+        case "reschedule-teacher-decline":
+        case "reschedule-student-decline": notifText = " has declined your reschedule request"; break
+    }
     newNotif.innerHTML = 
         `<div class="dropdown-item gap-2 py-2 position-relative" onclick="readNotif('${notifData._id}','${notifData.type}')" style="background-color: rgb(227, 242, 253);">
             <div class="d-flex align-items-center mb-1">
@@ -33,17 +43,18 @@ function createNotif(notifData) {
 async function readNotif(notifId, type) {
     let redirectUrl
     switch(type) {
-        case 'message':
-            redirectUrl = '/account/inbox' ;break
+        case 'message': redirectUrl = '/account/inbox' ;break
+        case 'review': redirectUrl = '/account/reviews' ;break
+        case 'clone': redirectUrl = '/account/decks' ;break
         case 'booking':
         case 'cancel-student':
-            redirectUrl = '/account/calendar' ;break
-        case 'cancel-teacher':
-            redirectUrl = '/account/classes' ;break
-        case 'review':
-            redirectUrl = '/account/reviews' ;break
-        case 'clone':
-            redirectUrl = '/account/decks' ;break
+        case "reschedule-student-accept":
+        case "reschedule-student-decline":
+        case "reschedule-student-pending": redirectUrl = '/account/calendar' ;break
+        case 'cancel-teacher': 
+        case "reschedule-teacher-accept":
+        case "reschedule-teacher-decline":
+        case "reschedule-teacher-pending": redirectUrl = '/account/classes' ;break
     }
     const response = await fetch('/notification/read', {
         method: 'POST',

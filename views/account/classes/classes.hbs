@@ -9,6 +9,17 @@
 
 <div class="card offer-card text-left mx-3 mb-4">
   <h5 class="card-header center"><span class="fs-6 date">{{this.date}}</span><br>{{this.timeslot}}</h5>
+  {{#if (equal this.reschedule.status "pending")}}
+  <div class="p-1 bg-warning">
+    <p class="center m-0">Pending reschedule request</p>
+    <h6 class="center"><span class="date">{{this.reschedule.new_date}}</span>, {{this.reschedule.new_timeslot}}</h6>
+    <div class="d-flex justify-content-center">
+      <a href="/account/classes/{{this._id}}/reschedule/accept" class="btn btn-sm btn-success mx-1" style="font-size: smaller;"><i class="bi bi-check-circle-fill me-2"></i>Accept</a>
+      <a href="/account/classes/{{this._id}}/reschedule/decline" class="btn btn-sm btn-danger mx-1" style="font-size: smaller;"><i class="bi bi-x-circle-fill me-2"></i>Decline</a>
+    </div>
+  </div>
+  {{/if}}
+  
   <div class="card-body">
     <a href="/users/{{this.teacher._id}}" class="link-text">
     <div class="d-flex align-items-center mb-2">

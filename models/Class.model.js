@@ -12,7 +12,12 @@ const classSchema = new Schema({
   locationType: {type: String, required: true},
   location: {type: String},
   duration: {type: Number, required: true},
-  isRated: {type: Boolean, default: false}
+  isRated: {type: Boolean, default: false},
+  reschedule: {
+    new_date: {type: String},
+    new_timeslot: {type: String},
+    status: {type: String},
+  }
 });
 
 const Class = model('Class', classSchema);

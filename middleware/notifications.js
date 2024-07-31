@@ -6,14 +6,6 @@ module.exports = async (req, res, next) => {
     if (user) {
       const notifications = await Notification.find({ target: user._id }).sort({ createdAt: -1 }).populate('source')
       notifications.forEach(notif => {
-        switch(notif.type) {
-            case "review": notif.newReview = true; break
-            case "cancel-student":
-            case "cancel-teacher": notif.cancelBooking = true; break
-            case "booking": notif.newBooking = true; break
-            case "message": notif.newMessage = true; break
-            case "clone": notif.newClone = true; break
-        }
         notif.timeDiff = formatDistanceToNow(new Date(notif.createdAt), { addSuffix: true })
       })
       res.locals.notifications = notifications;

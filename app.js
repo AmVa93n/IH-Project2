@@ -15,6 +15,9 @@ const hbs = require("hbs");
 hbs.registerHelper('json', function(context) {
     return JSON.stringify(context);
 });
+hbs.registerHelper('equal', function (a, b) {
+    return a === b;
+});
 
 const app = express();
 

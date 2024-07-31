@@ -70,11 +70,18 @@
                       {{/if}}
                     </div>
                   <span><span class="fw-bold">{{this.source.username}}</span>
-                    {{#if this.newReview}} has left a review about your class{{/if}}
-                    {{#if this.newBooking}} has booked a class with you{{/if}}
-                    {{#if this.cancelBooking}} has cancelled your class{{/if}}
-                    {{#if this.newMessage}} has sent you a message{{/if}}
-                    {{#if this.newClone}} has cloned one of your decks{{/if}}
+                    {{#if (equal this.type "review")}} has left a review about your class{{/if}}
+                    {{#if (equal this.type "booking")}} has booked a class with you{{/if}}
+                    {{#if (equal this.type "message")}} has sent you a message{{/if}}
+                    {{#if (equal this.type "clone")}} has cloned one of your decks{{/if}}
+                    {{#if (equal this.type "cancel-teacher")}} has cancelled your class{{/if}}
+                    {{#if (equal this.type "cancel-student")}} has cancelled your class{{/if}}
+                    {{#if (equal this.type "reschedule-teacher-pending")}} has requested to reschedule your class{{/if}}
+                    {{#if (equal this.type "reschedule-student-pending")}} has requested to reschedule your class{{/if}}
+                    {{#if (equal this.type "reschedule-teacher-accept")}} has accepted your reschedule request{{/if}}
+                    {{#if (equal this.type "reschedule-student-accept")}} has accepted your reschedule request{{/if}}
+                    {{#if (equal this.type "reschedule-teacher-decline")}} has declined your reschedule request{{/if}}
+                    {{#if (equal this.type "reschedule-student-decline")}} has declined your reschedule request{{/if}}
                     </span>
                   </div>
                   <small style="width: fit-content;" class="d-block ms-auto">{{this.timeDiff}}</small>

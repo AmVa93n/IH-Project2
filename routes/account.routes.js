@@ -236,56 +236,115 @@ router.get('/classes/:classId/cancel', isLoggedIn, async (req, res) => {
   const user = req.session.currentUser
   const classId = req.params.classId
   const classFromDB = await Class.findById(classId)
-  const { teacher, student } = classFromDB
-  const target = user._id == teacher ? student : teacher
-  const type = user._id == teacher ? 'cancel-teacher' : 'cancel-student'
-  const redirect = user._id == teacher ? 'calendar' : 'classes'
+  const { teacher } = classFromDB
   await Class.deleteOne({ _id: classId })
-  await Notification.create({ source: user._id, target: target, type: type})
-  res.redirect('/account/' + redirect)
+  await Notification.create({ source: user._id, target: teacher, type: 'cancel-student'})
+  res.redirect('/account/classes')
+});
+
+router.get('/classes/:classId/reschedule/accept', isLoggedIn, async (req, res) => {
+  const user = req.session.currentUser
+  const classId = req.params.classId
+  const classFromDB = await Class.findById(classId)
+  classFromDB.reschedule.status = "accepted"
+  classFromDB.date = classFromDB.reschedule.new_date
+  classFromDB.timeslot = classFromDB.reschedule.new_timeslot
+  await classFromDB.save()
+  const { teacher } = classFromDB
+  await Notification.create({ source: user._id, target: teacher, type: 'reschedule-student-accept'})
+  res.redirect('/account/classes')
+});
+
+router.get('/classes/:classId/reschedule/decline', isLoggedIn, async (req, res) => {
+  const user = req.session.currentUser
+  const classId = req.params.classId
+  const classFromDB = await Class.findById(classId)
+  classFromDB.reschedule.status = "declined"
+  await classFromDB.save()
+  const { teacher } = classFromDB
+  await Notification.create({ source: user._id, target: teacher, type: 'reschedule-student-decline'})
+  res.redirect('/account/classes')
 });
   
 //================//
 // CALENDAR
 //================//
 
-router.get('/calendar', isLoggedIn, async (req, res) => {
-    const user = req.session.currentUser
-    const classes = await Class.find({ teacher: user._id }).populate('student').lean()
-    const events = []
-    for (let cl of classes) {
-        let [year, month, day] = cl.date.split('-').map(Number);
+function convertClassesToEvents(classesFromDB) {
+  const events = []
+    for (let classDB of classesFromDB) {
+        let [year, month, day] = classDB.date.split('-').map(Number);
         let dateObj = new Date(year, month - 1, day);
         const currentDate = new Date();
-        cl.isPast = dateObj < currentDate
+        classDB.isPast = dateObj < currentDate
 
         const date = [dateObj.getFullYear(),
         (dateObj.getMonth() + 1).toString().padStart(2, '0'),
         dateObj.getDate().toString().padStart(2, '0')
         ].join('-');
 
-        let [hours, minutes] = cl.timeslot.split(':').map(Number);
-        let totalMinutes = hours * 60 + minutes + Number(cl.duration);
+        let [hours, minutes] = classDB.timeslot.split(':').map(Number);
+        let totalMinutes = hours * 60 + minutes + Number(classDB.duration);
         let newHours = Math.floor(totalMinutes / 60) % 24;
         let newMinutes = totalMinutes % 60;
         newHours = newHours.toString().padStart(2, '0');
         newMinutes = newMinutes.toString().padStart(2, '0');
         const endTime = `${newHours}:${newMinutes}`;
 
-        const start = `${date}T${cl.timeslot}:00`;
+        const start = `${date}T${classDB.timeslot}:00`;
         const end = `${date}T${endTime}:00`;
-        cl.endTime = endTime
+        classDB.endTime = endTime
 
         let event = {
-        title: cl.student.username,
-        id: cl._id,
+        title: classDB.student.username,
+        id: classDB._id,
         start: start,
         end: end,
         display: 'block'
         }
         events.push(event)
     }
+    return events
+}
+
+router.get('/calendar', isLoggedIn, async (req, res) => {
+    const user = req.session.currentUser
+    const classes = await Class.find({ teacher: user._id }).populate('student').lean()
+    const events = convertClassesToEvents(classes)
     res.render('account/calendar', {user, classes, events: JSON.stringify(events)})
+});
+
+router.get('/calendar/:classId', isLoggedIn, async (req, res) => {
+  const user = req.session.currentUser
+  const classId = req.params.classId
+  const classes = await Class.find({ teacher: user._id }).populate('student').lean()
+  const events = convertClassesToEvents(classes)
+  const managedClass = classes.find(cl => cl._id == classId)
+  res.render('account/calendar', {user, classes, events: JSON.stringify(events), managedClass})
+});
+
+router.get('/calendar/:classId/cancel', isLoggedIn, async (req, res) => {
+  const user = req.session.currentUser
+  const classId = req.params.classId
+  const classFromDB = await Class.findById(classId)
+  const { student } = classFromDB
+  await Class.deleteOne({ _id: classId })
+  await Notification.create({ source: user._id, target: student, type: 'cancel-teacher'})
+  res.redirect('/account/calendar')
+});
+
+router.post('/calendar/:classId/reschedule', isLoggedIn, async (req, res) => {
+  const user = req.session.currentUser
+  const classId = req.params.classId
+  const classFromDB = await Class.findById(classId)
+  const { date, timeslot } = req.body
+  const [day, month, year] = date.split('-');
+  const formattedDate = `${year}-${month}-${day}`;
+  classFromDB.reschedule = {new_date: formattedDate, new_timeslot: timeslot, status: 'pending'}
+  await classFromDB.save()
+  const { student } = classFromDB
+  await Notification.create({ source: user._id, target: student, type: 'reschedule-teacher-pending'})
+  res.redirect(`/account/calendar/${classId}`)
 });
 
 //================//
@@ -388,6 +447,8 @@ router.post('/decks/:deckId/edit', isLoggedIn, async (req, res) => {
 
 router.get('/decks/:deckId/delete', isLoggedIn, async (req, res) => {
   const deckId = req.params.deckId
+  const deck = await Deck.findById(deckId)
+  await Flashcard.deleteMany({ _id: { $in: deck.cards } })
   await Deck.findByIdAndDelete(deckId)
   res.redirect('/account/decks')
 });
