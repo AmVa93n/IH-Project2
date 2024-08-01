@@ -46,6 +46,9 @@ const userSchema = new Schema(
     professional: {
       type: Boolean,
     },
+    stripeAccountId: {
+      type: String
+    },
     chats: [{ type: Schema.Types.ObjectId, ref: 'Chat' }],
     offers: [{ type: Schema.Types.ObjectId, ref: 'Offer' }]
   },

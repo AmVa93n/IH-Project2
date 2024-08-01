@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 // Require the models in order to interact with the database
 const User = require("../models/User.model");
@@ -38,8 +39,8 @@ router.get("/profile/delete", isLoggedIn, async (req, res) => {
   
 router.post('/profile/edit', fileUploader.single('pfp'), isLoggedIn, async (req, res) => {
     const user = req.session.currentUser
-    const { username, email, gender, birthdate, country, lang_teach, lang_learn, professional, private } = req.body;
-    const newProfilePic = req.file ? req.file.path : null;
+    const { username, email, gender, birthdate, country, lang_teach, lang_learn, professional, private, pfp } = req.body;
+    const newProfilePic = req.file ? req.file.path : pfp;
     const isPrivate = !!private
     const isProfessional = !!professional
     const userId = req.session.currentUser._id;
@@ -57,10 +58,25 @@ router.post('/profile/edit', fileUploader.single('pfp'), isLoggedIn, async (req,
       });
       return;
     }
+
+    let stripeAccount = null
+    if (isProfessional) {
+      try {
+        stripeAccount = await stripe.accounts.create({
+          country: 'DE',
+          email: email,
+          type: 'standard',
+        });
+
+      } catch (error) {
+        console.error("An error occurred when calling the Stripe API to create an account", error);
+      }
+    }
   
     try {
       const updatedUser = await User.findByIdAndUpdate(userId, { username, email, gender, birthdate, country, 
-        lang_teach, lang_learn, professional: isProfessional, private: isPrivate, profilePic: newProfilePic }, { new: true });
+        lang_teach, lang_learn, professional: isProfessional, private: isPrivate, profilePic: newProfilePic,
+        stripeAccountId: stripeAccount.id }, { new: true });
       req.session.currentUser = updatedUser; // Update current user in session
       res.redirect('/account/profile'); // Redirect to profile page
     } catch (err) {
