@@ -1,4 +1,4 @@
-# Project Name
+# Omniglot
 
 ## Check Out the App!
 
