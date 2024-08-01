@@ -15,6 +15,7 @@ const isLoggedIn = require("../middleware/isLoggedIn");
 //================//
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripePublicKey = process.env.STRIPE_PUBLIC_KEY;
 const domain = process.env.LOCAL || `https://omniglot-znxc.onrender.com`
 
 router.get('/offers/:offerId/book', isLoggedIn, async (req, res) => {
@@ -27,34 +28,47 @@ router.get('/offers/:offerId/book', isLoggedIn, async (req, res) => {
 });
 
 router.post('/offers/:offerId/book', isLoggedIn, async (req, res) => {
-  const offerId = req.params.offerId
-  const offer = await Offer.findById(offerId)
-  const user = req.session.currentUser
-  const { date, timeslot } = req.body
-  const session = await stripe.checkout.sessions.create({
-    ui_mode: 'embedded',
-    customer_email: user.email,
-    payment_method_types: ['card'],
-    line_items: [
-      {
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: offer.name,
+  try {
+    const offerId = req.params.offerId
+    const offer = await Offer.findById(offerId)
+    const teacher = await User.findOne({ offers: offerId })
+    const accountId = teacher.stripeAccountId
+    console.log(accountId)
+    const user = req.session.currentUser
+    const { date, timeslot } = req.body
+    const session = await stripe.checkout.sessions.create({
+      ui_mode: 'embedded',
+      customer_email: user.email,
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: offer.name,
+            },
+            unit_amount: offer.price * 100,
           },
-          unit_amount: offer.price * 100,
+          quantity: 1,
         },
-        quantity: 1,
+      ],
+      mode: 'payment',
+      return_url: `${domain}/offers/${offerId}/return?session_id={CHECKOUT_SESSION_ID}`,
+      metadata: {
+        date,
+        timeslot,
       },
-    ],
-    mode: 'payment',
-    return_url: `${domain}/offers/${offerId}/return?session_id={CHECKOUT_SESSION_ID}`,
-    metadata: {
-      date,
-      timeslot,
-    }
-  });
-  res.send({clientSecret: session.client_secret});
+      payment_intent_data: {
+        transfer_data: {
+            destination: accountId,  // Use the test connected account ID
+        },
+      },
+    });
+    res.send({clientSecret: session.client_secret});
+  } catch (error) {
+    console.error('Error creating Stripe Checkout session:', error);
+    res.status(500).send({ error: 'Failed to create Stripe Checkout session' });
+  }
 });
 
 router.get('/offers/:offerId/return', isLoggedIn, async (req, res) => {
