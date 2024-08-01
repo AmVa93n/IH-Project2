@@ -209,6 +209,15 @@ router.get('/offers/:offerId/delete', isLoggedIn, async (req, res) => {
     res.redirect('/account/offers')
 });
 
+const accountLink = await stripe.accountLinks.create({
+  account: account,
+  return_url: `${req.headers.origin}/return/${account}`,
+  refresh_url: `${req.headers.origin}/refresh/${account}`,
+  type: "account_onboarding",
+});
+
+res.json(accountLink);
+
 //================//
 // CLASSES
 //================//
