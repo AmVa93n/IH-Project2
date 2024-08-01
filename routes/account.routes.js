@@ -209,6 +209,25 @@ router.get('/offers/:offerId/delete', isLoggedIn, async (req, res) => {
     res.redirect('/account/offers')
 });
 
+// Create a Stripe account setup link
+const accountLink = await stripe.accountLinks.create({
+  // The ID of the Stripe account for which the link is being created
+  account: account,
+  
+  // URL to redirect the user to after completing the account setup
+  return_url: `${req.headers.origin}/return/${account}`,
+  
+  // URL to redirect the user to if they need to refresh or restart the setup process
+  refresh_url: `${req.headers.origin}/refresh/${account}`,
+  
+  // The type of link being created: for account onboarding
+  type: "account_onboarding",
+});
+
+// Send the created account link as a JSON response
+res.json(accountLink);
+
+
 //================//
 // CLASSES
 //================//
