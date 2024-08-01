@@ -1,7 +1,7 @@
 <div class="d-flex justify-content-center" style="width:100%;">
 
 <div style="width: 40%;">
-  <div class="content-box mx-auto mt-3 mb-5" style="position:relative; width:80%; height:fit-content">
+  <div class="content-box mx-auto mt-3 mb-5" style="position:relative; width:80%;">
       <h2 class="mb-3 center">{{viewedUser.username}}</h2>
       <div class="mb-4 mx-auto circle-crop">
           {{#if viewedUser.profilePic}}
@@ -86,7 +86,7 @@
     </li>
     <li class="nav-item" role="presentation">
       <button class="nav-link {{#if viewedUser.professional}}text-black{{/if}}" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" {{#unless viewedUser.professional}}disabled{{/unless}}>
-        <i class="bi bi-cash-coin me-1"></i>{{ viewedUser.username }}'s Offers
+        <i class="bi bi-clipboard2-fill me-1"></i>{{ viewedUser.username }}'s Offers
       </button>
     </li>
     <li class="nav-item" role="presentation">

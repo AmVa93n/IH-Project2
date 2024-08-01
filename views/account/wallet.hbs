@@ -1,0 +1,24 @@
+<h3 class="center my-3">My Wallet</h3>
+
+<h6 class="center">Stripe account ID: <span class="fw-normal bg-light rounded px-1">{{accountId}}</span></h6>
+<div class="content-box" style="width: 60%;">
+    <table class="table table-hover table-bordered mb-0 center">
+        <thead class="table-light">
+            <tr>
+                <th class="fw-bold" style="width: 33%;">Transaction Date and Time</th>
+                <th class="fw-bold" style="width: 33%;">Amount</th>
+                <th class="fw-bold" style="width: 33%;">Balance</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {{#each transactions}}
+            <tr>
+                <td>{{this.date}}</td>
+                <td><span class="bg-success text-white py-1 px-2 rounded-pill">+ {{this.amount}} {{this.currency}}</span></td>
+                <td>{{this.balance}} {{this.currency}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>

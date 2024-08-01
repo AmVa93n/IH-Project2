@@ -102,7 +102,7 @@
                   <div class="d-flex flex-column align-items-center">
                     <div class="circle-crop nav-item" style="width:50px;height:50px;display:inline-flex">
                       {{#if user.profilePic}}
-                      <img src="{{user.profilePic}}">
+                      <img src="{{user.profilePic}}" style="width: 100%;">
                       {{else}}
                       <img src="/images/Profile-PNG-File.png">
                       {{/if}}
@@ -117,8 +117,9 @@
                   <li><a class="dropdown-item d-flex gap-2 align-items-center" href="/account/decks"><i class="bi bi-stack me-2"></i>Decks</a></li>
                   {{#if user.professional}}
                   <li><hr class="dropdown-divider"></li>
-                  <li><a class="dropdown-item d-flex gap-2 align-items-center" href="/account/offers"><i class="bi bi-cash-coin me-2"></i>Offers</a></li>
+                  <li><a class="dropdown-item d-flex gap-2 align-items-center" href="/account/offers"><i class="bi bi-clipboard2-fill me-2"></i>Offers</a></li>
                   <li><a class="dropdown-item d-flex gap-2 align-items-center" href="/account/calendar"><i class="bi bi-calendar-week me-2"></i>Calendar</a></li>
+                  <li><a class="dropdown-item d-flex gap-2 align-items-center" href="/account/wallet"><i class="bi bi-cash-coin me-2"></i>Wallet</a></li>
                   <li><a class="dropdown-item d-flex gap-2 align-items-center" href="/account/reviews"><i class="bi bi-star-fill me-2"></i>Reviews</a></li>
                   {{/if}}
                   <li><hr class="dropdown-divider"></li>

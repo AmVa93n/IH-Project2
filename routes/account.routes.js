@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const moment = require('moment'); // Import moment for date formatting
 
 // Require the models in order to interact with the database
 const User = require("../models/User.model");
@@ -40,6 +41,7 @@ router.get("/profile/delete", isLoggedIn, async (req, res) => {
 router.post('/profile/edit', fileUploader.single('pfp'), isLoggedIn, async (req, res) => {
     const user = req.session.currentUser
     const { username, email, gender, birthdate, country, lang_teach, lang_learn, professional, private, pfp } = req.body;
+    let stripeAccountId = req.body.stripeAccountId || null
     const newProfilePic = req.file ? req.file.path : pfp;
     const isPrivate = !!private
     const isProfessional = !!professional
@@ -59,15 +61,14 @@ router.post('/profile/edit', fileUploader.single('pfp'), isLoggedIn, async (req,
       return;
     }
 
-    let stripeAccount = null
-    if (isProfessional) {
+    if (isProfessional && !stripeAccountId) {
       try {
-        stripeAccount = await stripe.accounts.create({
+        const stripeAccount = await stripe.accounts.create({
           country: 'DE',
           email: email,
           type: 'standard',
         });
-
+        stripeAccountId = stripeAccount.id
       } catch (error) {
         console.error("An error occurred when calling the Stripe API to create an account", error);
       }
@@ -76,7 +77,7 @@ router.post('/profile/edit', fileUploader.single('pfp'), isLoggedIn, async (req,
     try {
       const updatedUser = await User.findByIdAndUpdate(userId, { username, email, gender, birthdate, country, 
         lang_teach, lang_learn, professional: isProfessional, private: isPrivate, profilePic: newProfilePic,
-        stripeAccountId: stripeAccount.id }, { new: true });
+        stripeAccountId }, { new: true });
       req.session.currentUser = updatedUser; // Update current user in session
       res.redirect('/account/profile'); // Redirect to profile page
     } catch (err) {
@@ -535,6 +536,33 @@ router.get('/decks/:deckId/clone', isLoggedIn, async (req, res) => {
     topic: deck.topic + " (cloned)", cards: clonedCards })
   await Notification.create({ source: user._id, target: deck.creator, type: 'clone'})
   res.redirect('/account/decks')
+});
+
+//================//
+// Wallet
+//================//
+
+router.get('/wallet', isLoggedIn, async (req, res) => {
+  const user = req.session.currentUser
+  const userDB = await User.findById(user._id)
+  const accountId = userDB.stripeAccountId
+
+  const transactions = await stripe.balanceTransactions.list({
+    stripeAccount: accountId,
+    limit: 100 // Adjust the limit as needed
+  });
+  transactions.data.reverse()
+  for (let i = 0; i < transactions.data.length; i++) {
+    const trans = transactions.data[i]
+    trans.amount = trans.amount / 100
+    trans.currency = '€'
+    trans.balance = i > 0 ? Number(transactions.data[i-1].balance) + trans.amount : trans.amount
+    trans.balance = trans.balance.toFixed(2)
+    trans.date = moment.unix(trans.created).format('DD-MM-YYYY HH:mm:ss') // Format the Unix timestamp
+  }
+  transactions.data.reverse()
+  
+  res.render('account/wallet', {user, transactions: transactions.data, accountId})
 });
 
 module.exports = router;
