@@ -160,4 +160,4 @@ My project is a web application dedicated to language enthusiasts, where users c
 
 ## Presentation Slides
 
-- [Link to the slides](URL to slides)
+- [Link to the slides](https://docs.google.com/presentation/d/1eQPqcuuUFy1o8ziycXh70bzPjELNrTYPTu6EZmisnCA/edit?usp=sharing)
