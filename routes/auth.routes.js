@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 // ℹ️ Handles password encryption
 const bcrypt = require("bcrypt");
@@ -25,11 +26,12 @@ router.get("/signup", isLoggedOut, (req, res) => {
   res.render("auth/signup");
 });
 
-router.post("/signup", fileUploader.single('profilepic'), isLoggedOut, (req, res) => {
+router.post("/signup", fileUploader.single('profilepic'), isLoggedOut, async (req, res) => {
   const { username, email, password, gender, birthdate, country, lang_teach, lang_learn, professional, private} = req.body;
   const profilePic = req.file ? req.file.path : null;
   const isPrivate = !!private
   const isProfessional = !!professional
+  let stripeAccountId = null
 
   // Check that username, email, and password are provided
   if ([username,email,password,birthdate,country].some(field => field === "")) {
@@ -48,7 +50,6 @@ router.post("/signup", fileUploader.single('profilepic'), isLoggedOut, (req, res
   }
 
   //   ! This regular expression checks password for special characters and minimum length
-  
   const regex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/;
   if (!regex.test(password)) {
     res
@@ -59,30 +60,37 @@ router.post("/signup", fileUploader.single('profilepic'), isLoggedOut, (req, res
     return;
   }
 
-  // Create a new user - start by hashing the password
-  bcrypt
-    .genSalt(saltRounds)
-    .then((salt) => bcrypt.hash(password, salt))
-    .then((hashedPassword) => {
-      // Create a user and save it in the database
-      return User.create({ username, email, password: hashedPassword, gender, birthdate, country, 
-        profilePic, lang_teach, lang_learn, private: isPrivate, professional: isProfessional, chats: [], offers: []});
-    })
-    .then((user) => {
-      res.redirect("/auth/login");
-    })
-    .catch((error) => {
+  if (isProfessional) {
+    try {
+      const stripeAccount = await stripe.accounts.create({
+        country: 'US',
+        email: email,
+        type: 'standard',
+      });
+      stripeAccountId = stripeAccount.id
+    } catch (error) {
+      console.error("An error occurred when calling the Stripe API to create an account", error);
+    }
+  }
+
+  try {
+    const salt = await bcrypt.genSalt(saltRounds);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    await User.create({ username, email, password: hashedPassword, gender, birthdate, country, profilePic, stripeAccountId,
+      lang_teach, lang_learn, private: isPrivate, professional: isProfessional, chats: [], offers: []});
+    res.redirect("/auth/login");
+    
+  } catch (error) {
       if (error instanceof mongoose.Error.ValidationError) {
         res.status(500).render("auth/signup", { errorMessage: error.message });
       } else if (error.code === 11000) {
         res.status(500).render("auth/signup", {
-          errorMessage:
-            "This email address is already taken. Please choose a different email address.",
+          errorMessage: "This email address is already taken. Please choose a different email address.",
         });
       } else {
         next(error);
       }
-    });
+  }
 });
 
 //================//

@@ -177,7 +177,7 @@ router.get("/match/teachers", isLoggedIn, async (req, res) => {
 //==============================//
 
 // Route to get teachers of a specific language
-router.get("/teachers/:langId", isLoggedIn, async (req, res) => {
+router.get("/teachers/:langId", async (req, res) => {
   const { langId } = req.params;
 
   try {
@@ -192,7 +192,7 @@ router.get("/teachers/:langId", isLoggedIn, async (req, res) => {
 });
 
 // Route to get learners of a specific language
-router.get("/learners/:langId", isLoggedIn, async (req, res) => {
+router.get("/learners/:langId", async (req, res) => {
   const { langId } = req.params;
 
   try {

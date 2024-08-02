@@ -2,11 +2,11 @@
 
 ## Check Out the App!
 
-![App Logo](path/to/logo.png)
+![App Logo](./public/images/logo.png)
 
 ## Description
 
-My project is about a language exchange website where users can also sell language teaching services.
+My project is a web application dedicated to language enthusiasts, where users can find language exchange partners to learn with (similar to Tandem), but also includes the option to offer paid classes and other services for certified teachers.
 
 ## User Stories
 
@@ -37,24 +37,15 @@ My project is about a language exchange website where users can also sell langua
 - Express
 - Handlebars
 - Sessions & Cookies
-- MongoDB
-- Mongoose
+- MongoDB & Mongoose
+
+## Packages
+
 - bcrypt
-- cloudinary
-- connect-mongo
-- cookie-parser
-- date-fns
-- dotenv
+- multer, cloudinary
 - fullcalendar
-- morgan
-- multer
-- multer-storage-cloudinary
-- path
-- serve-favicon
 - socket.io
-- socket.io-client
 - stripe
-- @stripe/connect-js
 
 ## Database Models
 

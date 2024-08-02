@@ -64,7 +64,7 @@ router.post('/profile/edit', fileUploader.single('pfp'), isLoggedIn, async (req,
     if (isProfessional && !stripeAccountId) {
       try {
         const stripeAccount = await stripe.accounts.create({
-          country: 'DE',
+          country: 'US',
           email: email,
           type: 'standard',
         });
